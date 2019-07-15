@@ -1,0 +1,31 @@
+{
+  "name": "ros_gui",
+  "version": "1.0.0",
+  "description": "GUI to control vehicles in subT",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "ROS_gui",
+    "quick",
+    "start"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gillamkid/ros_gui.git"
+  },
+  "author": "Blake McHale",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parser": "^2.3.0",
+    "csv-writer": "^1.4.0",
+    "electron": "^4.2.5",
+    "fs": "0.0.1-security",
+    "jquery": "^3.4.1",
+    "net": "^1.0.2",
+    "node-ssh": "^5.1.2",
+    "path": "^0.12.7",
+    "tru": "^1.0.0"
+  }
+}

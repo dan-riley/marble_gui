@@ -1,0 +1,15 @@
+<!-- 
+this should be an all in one test
+
+Runs the ros_gui
+runs the test DARPA server
+runs a ros bag
+-->
+
+<launch>
+    <include file="$(find ros_gui)/launch/ros_gui.launch" />
+    <node name="server" pkg="ros_gui" type="test_server_launch.sh" output="screen" args="$(find ros_gui)/test/test_scoring_server_stix1">
+    </node>
+    <node pkg="rosbag" type="play" name="player" output="screen" args="$(find ros_gui)/test/test.bag">
+    </node>
+</launch>

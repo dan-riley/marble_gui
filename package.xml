@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ros_gui</name>
+  <version>0.0.0</version>
+  <description>The ros_gui package</description>
+  <maintainer email="bmchale@todo.todo">bmchale</maintainer>
+  <maintainer email="gillamkid@gmail.com">Sam</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <export></export>
+</package>

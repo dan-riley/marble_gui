@@ -1,0 +1,25 @@
+<launch>
+	<node name="master_discovery" pkg="master_discovery_fkie" type="master_discovery" output="screen">
+		<param name = "mcast_group" value="224.0.0.1" />
+		<param name = "remove_after" value="300.0" />
+		<param name = "active_request_after" value="60.0" />
+		<param name = "heartbeat_hz" value="10" />
+	</node>
+	<node name="master_sync" pkg="master_sync_fkie" type="master_sync" output="screen">
+		<rosparam param="sync_topics"> 
+			['*/odometry', 
+			'*/octomap_point_cloud_occupied', 
+			'*/estop', 
+			'*/vehicle_status',
+			'*/camera_info_topic',
+			'*/color_image_topic',
+			'*/depth_image_topic',
+			'*/artifact_record',
+			'*/local_artifact'] 
+		</rosparam>
+		<rosparam param="ignore_topics">['/vins_estimator*'] </rosparam>
+		<rosparam param="ignore_hosts"> [''] </rosparam>
+		<rosparam param="ignore_nodes"> ['/gazebo', '/gazebo_gui'] </rosparam>
+		<rosparam param="resync_on_reconnect_timeout"> 0 </rosparam>
+	</node>
+</launch>

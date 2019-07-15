@@ -1,0 +1,38 @@
+/* Set height of body and the document to 100% to enable "full page tabs" */
+html{
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+body{
+    margin: 0;
+    padding: 0;
+    font-family: Arial;
+    height: 100%;
+  }
+  
+  /* Style the tab content (and add height:100% for full page content) */
+  .tabcontent {
+    display: none;
+    padding: 20px 20px;
+    min-height: 100vh;
+    min-width: 100%;
+  }
+  #Robot_Pages {
+      min-height: 100%;
+      min-width: 100%;
+  }
+  #Universal_Page {
+    padding: 20px;
+    font-size: 30px;
+    justify-content: center;
+  }
+
+  #Robot_Pages #File .margin-bottom {
+    margin-bottom: 15px;
+  }
+
+
+
+
+  

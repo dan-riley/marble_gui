@@ -1,0 +1,146 @@
+Documentation.txt
+Blake McHale 5/9/2019 bmchale@ssci.com
+
+Order of file loading, starting with last loaded files and their dependencies
+Framework:
+- fileCopy.js
+- readData.js
+    - tabs.js
+    - tab_manager.js
+        - artifactHandler.js
+            - transferToBaseStation.js
+        - octomap_viewer.js
+        - stopService.js
+
+Hardcoded areas:
+- darpa command post interaction variables
+    - transferToBaseStation.js
+        - (variable) this.ip_address_port
+            - ip address and port to make connection to with http
+        - (variable) this.authorization
+            - authorization token in header of request
+        - (variable) this.url
+            - in the set url function paths are hardcoded according to desired request locations determined by darpa
+            - currently a series of if else statements handle different formats darpa expects
+- ros topics with desired namespaces related to functions of robot
+    - tab_manager.js
+        - (function) add_tab()
+            - OdomTopic, ArtifactTopic, BatteryTopic, CmdPosTopic
+    - octomap_viewer.js
+        - (function) create_viewer()
+            - variable cloudClient's topic for the point cloud data
+- css styles for web page design
+    - hardcoded associations between id and color for the page
+    - any changes to id names need to be checked within the css files
+    - only ids for tabs "Custom", "File", "Universal_Page", and "Artifact_Page"
+- ros_gui launch script in ros_gui/scripts/
+    - hardcoded location of ros_gui/src/ folder
+    - location is needed for calling npm start
+
+Launch Scripts:
+- artifact_detection.launch
+    - launches darknet_ros YOLO neural network and artifact manager for base station
+    - used in situation where no robots are performing artifact recognition
+    - in this case the base station should be receiving images from the robots and processing them
+- artifact_ground_station.launch
+    - launches both artifact detection and ground station
+- ground_station.launch
+    - launches multimaster and the components needed for the ros_gui
+- multimaster_fkie.launch
+    - launches multimaster in a state that only accepts the desired topics from other robots
+- ros_gui.launch
+    - launches gui with its dependencies rosbridge_server, rosapi, and tf2_web_republisher
+    - needs rosbridge_server to connect the gui with the locally hosted ros nodes
+    - needs rosapi to gather information about what topics are currently active
+    - needs tf2_web_republisher to display 3D visuals in the gui
+
+Description of each js file:
+- fileCopy.js
+    - used to send files over ssh to remote computer
+    - functions are included within app.html <div id="File"> tab
+    - attached in js file with jquery reference to id
+- readData.js
+    - file for handling major setup for ros gui. It creates and builds all designs and  code for every tab except for the static tab "File"
+    - order of operations
+        - establish ros connection (sets ros variable)
+        - grabs topics from rostopic list
+            - used to find what robots are connected
+        - call CreateTab() to setup all robots and their corresponding subscribers for each tab in the gui
+        - call setTopicMsg() to display values from default ros topic
+        - set up window.pubTopicMsg() to handle publishing msgs in the future
+        - call function to click on tab with id="defaultOpen", so that the Custom Tab loads initially
+- tabs.js
+    - file used to establish window.openPage() function for use with switching tabs and loading subscribers for robots
+    - all robots immediately subscribe to their odometry and battery topics on tab load
+    - the artifact topic is indefinitely subscribed no matter the tab
+        - reasons: this topic is needed so the user can interact with incoming artifact names and adapt them accordingly
+            - other topics are not always subscribed to because that increases the latency for input on the application
+    - establishes graph with data and voltage outputs on individual robot tabs
+    - recolors all tabs and their corresponding pages to match clicked tab
+- tab_manager.js
+    - establishes class for tabManager, the controller for this gui
+    - functions included in class:
+        - constructor()
+            - initializes all major links to different tags within html file and grabs all robot names then create tabs for each one
+            - each robot relies on odometry topic to determine if a robot is active
+                if a topic does not exist then the robot does not exist
+        - add_tab()
+            - creates framework for new robot tab on gui
+            - includes establishing chart relationships and function calls within tags
+            - creates related ros topics for each vehicle and formats according to robot type
+        - get_vehicleArtifactsList()
+            - grab ArtifactsList variable from tab_manager for use on Artifact Tab or other uses
+        - fix_tabs()
+            - resizes all tabs so that they fit the screen nicely
+        - get_Tab_OdomSub()
+            - returns Tab_OdomSub with use on page switching to subscribe to the topic
+        - applyCSS()
+            - allows to use json formats for establishing styles on a tag in javascript
+        - get_TopicsFromROS()
+            - updates the TopicList information so that tabs can be removed or added correspondingly
+    - (function) Chart.pluginService.register()
+        - establishes chart color so that the graph is only colored within the bounds of the x-axis and y-axis
+            - used to make chart more appealing
+- transferToBaseStation.js
+    - creates class for sending and receiving http messages to a server/ip address
+    - functions included in class:
+        - constructor()
+            - establishes json message format including things such as the url, authorization token, and data
+        - set url()
+            - function called when the variable this.url is set
+            - attaches different message formats according to the directory/topic data is being sent to
+            - also establishes type of http request that is sent (POST or GET)
+        - requestHTTP()
+            - uses ajax to send http request to desired location declared in constructor
+- octomap_viewer.js
+    - contains function to create a viewer using ROS3Djs
+    - functions in file:
+        - create_viewer()
+            - adds a viewer to a robot that streams point cloud data
+- stopService.js
+    - contains class to send estop message to robot
+    - functions included in class:
+        - constructor()
+            - sets robot name
+        - send_estop()
+            - establishes estop topic connection and publishes message
+
+Libraries Used:
+- robotwebtools
+    - gives access to function and commands that interact with active ROS sessions
+- bootstrap
+    - used as framework for html pages
+
+|npm libraries|
+- electron
+    - used as application framework, allows for inclusion of libraries that have
+    direct access to computers commands
+- fs
+    - used to open and read files
+- path
+- node-ssh
+    - used for transferring files between computers in javascript
+- csv-writer
+    - used to create csv file from array in javascript
+- csv-parser
+    - used to read csv file and convert it to array in javascript

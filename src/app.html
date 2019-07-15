@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+
+  <script>document.write(process.versions.node)</script>
+  <script>document.write(process.versions.chrome)</script>
+  <script>document.write(process.versions.electron)</script>
+  <!--! Electrons way of loading jquery into the application  -->
+  <script>window.$ = window.jQuery = require('jquery');</script>
+  <script type="text/javascript" src="bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="robotwebtools/three.min.js"></script>
+  <script type="text/javascript" src="robotwebtools/eventemitter2.min.js"></script>
+  <script type="text/javascript" src="robotwebtools/roslib.min.js"></script>
+  <script type="text/javascript" src="robotwebtools/ros3d.min.js"></script>
+
+  <script type="text/javascript" src="charts/Chart.min.js"> </script>
+  <script type="text/javascript" src="js/artifactHandler.js"></script>
+  <script type="text/javascript" src="js/transferToBaseStation.js"></script>
+  <script type="text/javascript" src="js/stopService.js"></script>
+  <script type="text/javascript" src="js/octomap_viewer.js"></script>
+  <script type="text/javascript" src="js/tab_manager.js"></script>
+  <script type="text/javascript" src="js/readData.js"></script>
+  <script type="text/javascript" src="js/tabs.js"></script>
+  <script type="text/javascript" src="js/fileCopy.js"></script>
+  <script type="text/javascript" src="js/battery.js"></script>
+
+
+  <link rel="stylesheet" href="bootstrap-4.3.1-dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tabs.css">
+</head>
+
+<!-- <body onload="window.setTimeout(function(){window.setSpeed(1000);},1000);"> -->
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <img src="images/ssci-logo.png" width="150" style="padding: 5px;">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto" id="Robot_Tabs">
+        <li class="nav-item active">
+          <a class="nav-link" onclick="window.openPage('DarpaServer')" id="darpaServer">DARPA Server
+            <br>
+            <span id="connection_status_darpa_server">
+              <font color="red">Disconnected</font>
+            </span></a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" onclick="window.openPage('Custom')" id="defaultOpen">Custom</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="window.openPage('File')" id="FileTab">File</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="window.openPage('Artifact_Page')" id="Artifact_InfoTab">Artifacts</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!--! Top bar on web page that displays all information reported back by DARPA when getting the score -->
+  <div id="Universal_Page" class="row">
+    <!-- Score: <label style="background-color: white; padding: 2px;"> 10 </label> -->
+    <div class="col-sm-4">Time: <span id="header_time">nan</span></div>
+    <div class="col-sm-4">Score: <span id="header_score">0</span></div>
+    <div class="col-sm-4">Remaining Artifacts: <span id="header_remaining_artifacts">nan</span></div>
+  </div>
+  <hr>
+
+  <div class="container">
+
+    <!--! Small artifact list user interface location -->
+    <!-- <div id="Universal_Artifact_Page"> -->
+    <!-- <div class="row">
+            <span class="badge badge-secondary col-sm-3" style="text-align: center">Type: </span>
+            <span class="badge badge-secondary col-sm-3" style="text-align: center">Confidence: </span>
+            <span class="badge badge-secondary col-sm-4" style="text-align: center">Position: </span>
+            <button class="col-sm-1">Yes</button>
+            <button class="col-sm-1">No</button>
+        </div>
+        <div class="row">
+            <span class="badge badge-secondary col-sm-3" style="text-align: center">Type: </span>
+            <span class="badge badge-secondary col-sm-3" style="text-align: center">Confidence: </span>
+            <span class="badge badge-secondary col-sm-4" style="text-align: center">Position: </span>
+            <button class="col-sm-1">Yes</button>
+            <button class="col-sm-1">No</button>
+        </div> -->
+
+    <!-- </div> -->
+    <!--! DIV that contains all details within each tab, vehicle pages are added as subsections through javascript -->
+    <div id="Robot_Pages">
+      <div id="Custom" class="tabcontent">
+        <h1>Topic Selector</h1>
+        <form autocomplete="off" action="/action_page.php">
+          <div class="autocomplete" style="width:300px;">
+            <input id="myInput" type="text" name="myTopics" placeholder="Topics">
+          </div>
+          <!-- <input type="submit"> -->
+        </form>
+        <div id="custom_viewer">
+
+        </div>
+        <!-- <div class='ldBar' data-preset='circle' data-stroke='data:ldbar/res,gradient(0,1,#eb8,#ad6,#c94)' data-stroke-width='15px' data-value='100'></div> -->
+      </div>
+      <div id="File" class="tabcontent">
+        <!-- <div class="col-sm-6">
+          <div class="row">
+            <div class="col-sm-6">
+              wow
+            </div>
+            <div class="col-sm-6">
+                wow
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="row">
+              <div class="col-sm-3">
+                wow
+              </div>
+              <div class="col-sm-3">
+                  wow
+                </div>
+            </div>
+        </div> -->
+        <h1>File Manager</h1>
+        <form autocomplete="on">
+          <!-- Source Directory: <input id='source_dir' type='text' placeholder='/home/' class='margin-bottom'> -->
+          <br>User: <input id='user' type='text' placeholder='admin' class='margin-bottom'>
+          <br>Host: <input id='host' type='text' placeholder='192.168.0.1' class='margin-bottom'>
+          <br>Password: <input id='password' type='password' placeholder='test123' class='margin-bottom'>
+          <br>Destination Directory:
+          <input id='dest_dir' type='text' placeholder='/home/example.txt' class='margin-bottom'>
+          <br><input id='TransferFile' type='button' value='Copy File' class='margin-bottom'>
+          <br><label class="btn btn-default btn-file margin-bottom" style="background-color: white; cursor: pointer;">
+            Browse Files<input type='file' id='_file' style="display: none;" multiple>
+          </label>
+        </form>
+      </div>
+      <div id="Artifact_Page" class="tabcontent">
+
+      </div>
+
+    </div>
+
+  </div>
+</body>
+
+</html>

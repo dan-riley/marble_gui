@@ -1,0 +1,6 @@
+<launch>
+        <include file="$(find darknet_ros)/launch/locate_artifacts.launch"></include>
+	<include file="$(find darknet_ros)/launch/subT_yolo_v3-tiny.launch"> </include> 
+<!--        <include file="$(find darknet_ros)/launch/subT_yolo_9000.launch"> </include> -->
+	<node name="artifact_manager" pkg="marble_common" type="artifact_manager"></node>
+</launch>

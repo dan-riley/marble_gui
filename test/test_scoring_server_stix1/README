@@ -1,0 +1,17 @@
+Install Docker CE:
+$ sudo apt install docker-ce
+
+Install docker-compose:
+$ sudo pip install docker-compose
+
+To start the server, enter the directory that contains the docker-compose.yml file and run the following:  
+$ docker-compose up --build
+
+
+The hard-coded token is set to be 'subttesttoken123'. Add this header:
+
+    Authorization: Bearer subttesttoken123
+
+to any request sent to the endpoints.
+
+See run_tests.py for example request structure.
