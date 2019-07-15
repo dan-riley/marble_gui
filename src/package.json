@@ -1,5 +1,5 @@
 {
-  "name": "ros_gui",
+  "name": "marble_gui",
   "version": "1.0.0",
   "description": "GUI to control vehicles in subT",
   "main": "main.js",
@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/gillamkid/ros_gui.git"
+    "url": "https://github.com/arpg/marble.git"
   },
   "author": "Blake McHale",
   "license": "ISC",

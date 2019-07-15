@@ -1,7 +1,7 @@
 <launch>
     <!-- Launch file for multimaster -->
-    <include file="$(find ros_gui)/launch/ground_station.launch">
+    <include file="$(find marble_gui)/launch/ground_station.launch">
     </include>
-	<include file="$(find ros_gui)/launch/artifact_detection.launch">
+	<include file="$(find marble_gui)/launch/artifact_detection.launch">
 	</include>
 </launch>

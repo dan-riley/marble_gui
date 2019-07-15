@@ -1,4 +1,4 @@
-ros_gui
+marble_gui
     The main unique value is to manage artifact reporting by robots and
     report artifacts to the DARPA server. It also creates a "we have 
     ourselves all put together" impression for the judges at the
@@ -17,22 +17,20 @@ Installing
 	    sudo snap install docker
 	    sudo usermod -aG docker $(whoami)
             # logout and login
-        # make sure the marble package is also in the catkin workspaces
-        git clone https://github.com/arpg/marble.git
 
     TODO for every clone:
-        cd my_ws/src/ros_gui/src/
+        cd my_ws/src/marble/marble_gui/src/
         sudo npm install -save electron --unsafe-perm=true --allow-root
         sudo npm install fs csv-writer csv-parser jquery path node-ssh
 
 
     Test setup
         # This tests everything all at once by launching the GUI, test DARPA server, and robot rosbags.
-        roslaunch ros_gui test_ros_gui.launch
+        roslaunch marble_gui test_marble_gui.launch
         # this should make a GUI pop up appear
-        roslaunch ros_gui ros_gui.launch
+        roslaunch marble_gui marble_gui.launch
         # should make a new robot tab appear
-        rosbag play /path/to/ros_gui/test/test.bag
+        rosbag play /path/to/marble_gui/test/test.bag
         # setup and run this server
         # this should make the Time and Score in the header report change
         git clone https://github.com/gillamkid/darpa_subt_test_scoring_server.git
