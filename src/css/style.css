@@ -32,9 +32,6 @@ input[type=submit] {
   top: 100%;
   left: 0;
   right: 0;
-  overflow: scroll;
-  max-height: 30vh;
-  color: #000000;
 }
 .autocomplete-items div {
   padding: 10px;
@@ -172,10 +169,3 @@ input[type=submit] {
   from {opacity: 0;}
   to {opacity:1 ;}
 } 
-
-#_custom {
-  position: relative;
-  height: 50vh;
-  width: 100%;
-  margin: auto;
-}

@@ -1,9 +1,9 @@
 <launch>
     <!-- Launch file for multimaster -->
-    <include file="$(find marble_gui)/launch/multimaster_fkie.launch">
+    <include file="$(find ros_gui)/launch/multimaster_fkie.launch">
     </include>
 
     <!-- Launch file for ros gui -->
-    <include file="$(find marble_gui)/launch/marble_gui.launch">
+    <include file="$(find ros_gui)/launch/ros_gui.launch">
     </include>
 </launch>

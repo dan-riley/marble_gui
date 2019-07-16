@@ -33,8 +33,8 @@ Hardcoded areas:
     - hardcoded associations between id and color for the page
     - any changes to id names need to be checked within the css files
     - only ids for tabs "Custom", "File", "Universal_Page", and "Artifact_Page"
-- marble_gui launch script in marble_gui/scripts/
-    - hardcoded location of marble_gui/src/ folder
+- ros_gui launch script in ros_gui/scripts/
+    - hardcoded location of ros_gui/src/ folder
     - location is needed for calling npm start
 
 Launch Scripts:
@@ -45,10 +45,10 @@ Launch Scripts:
 - artifact_ground_station.launch
     - launches both artifact detection and ground station
 - ground_station.launch
-    - launches multimaster and the components needed for the marble_gui
+    - launches multimaster and the components needed for the ros_gui
 - multimaster_fkie.launch
     - launches multimaster in a state that only accepts the desired topics from other robots
-- marble_gui.launch
+- ros_gui.launch
     - launches gui with its dependencies rosbridge_server, rosapi, and tf2_web_republisher
     - needs rosbridge_server to connect the gui with the locally hosted ros nodes
     - needs rosapi to gather information about what topics are currently active
@@ -57,7 +57,7 @@ Launch Scripts:
 Description of each js file:
 - fileCopy.js
     - used to send files over ssh to remote computer
-    - functions are included within app.html <div id="File"> tab
+    - functions are included within test.html <div id="File"> tab
     - attached in js file with jquery reference to id
 - readData.js
     - file for handling major setup for ros gui. It creates and builds all designs and  code for every tab except for the static tab "File"
@@ -66,6 +66,9 @@ Description of each js file:
         - grabs topics from rostopic list
             - used to find what robots are connected
         - call CreateTab() to setup all robots and their corresponding subscribers for each tab in the gui
+        - call window.autocomplete() to establish topic list in <div id="Custom"> (the Custom Tab)
+        - call window.setInterval() with startGet_Status()
+            - establish connection with darpa for streaming back information related to score, time, and number of artifact reports left    
         - call setTopicMsg() to display values from default ros topic
         - set up window.pubTopicMsg() to handle publishing msgs in the future
         - call function to click on tab with id="defaultOpen", so that the Custom Tab loads initially
@@ -84,6 +87,12 @@ Description of each js file:
             - initializes all major links to different tags within html file and grabs all robot names then create tabs for each one
             - each robot relies on odometry topic to determine if a robot is active
                 if a topic does not exist then the robot does not exist
+        - remove_tab()
+            * currently a work in progress
+            - intended to remove all tab elements after robot has lost connection with host or user notifies gui that robot is not active anymore
+        - hide_tab()
+            - hides tabs when robots disconnect, so that information is not lost in regards to their previous history
+            - maintains subscribers to Artifact, Point Cloud 2, and Pose Graph topics
         - add_tab()
             - creates framework for new robot tab on gui
             - includes establishing chart relationships and function calls within tags
@@ -101,6 +110,42 @@ Description of each js file:
     - (function) Chart.pluginService.register()
         - establishes chart color so that the graph is only colored within the bounds of the x-axis and y-axis
             - used to make chart more appealing
+- artifactHandler.js
+    - contains class for establishing and evaluating a robots artifact list
+    - functions included in class:
+        - constructor()
+            - initializes arrays that store artifact information and an array for storing artifacts that have been successfully reported to the base station
+            - also creates references to ids related to information display in the artifact table
+            - if a csv file exists with previous reported artifacts those values are read and used for future reports
+                - intended for use in the situation where the gui crashes during scored run
+                - allows for no information to be lost in regards to what has been sent
+        - skip_artifact()
+            - function to skip past the current artifact and all artifacts that have been reported
+            - meant to allow for automatic user interface, that takes up a small amount of space on screen
+                - currently the user interface is removed for the competition because there is a desire to have control of all artifact list and submissions manually
+                - this interface was a four row table that stuck universally to the top of the screen (across all tabs)
+                - allowed for easy and fast analysis of artifact submissions
+        - updateDisplay()
+            - changes values stored on page so it represents the newest value
+        - add_array()
+            - adds another robtots artifact list to the object when it joins the system
+        - set_artifacts()
+            - sets artifact list value to msg received through ros topic and updates display accordingly
+        - submit_artifact()
+            - analyzes requested artifact submission and determines if it has been reported before or if it resembles another artifact from another robot
+            - if it has been reported it will not send to darpa and post a msg to the developers console
+            - if it looks the same as another artifact, the artifact with the highest confidence will be chosen and the user will be given an option to send
+            - once artifact is submitted it will check to see if the score increases and if it does the artifact will be marked as reported
+        - get_robot_name()
+            - returns robot associated with artifact list
+        - get_artifactsList()
+            - returns artifactsList
+        - check_location()
+            -checks  specified spot in array to see if it currently active
+        - save_file()
+            - saves csv file containing robots reported artifact list, used for data storage and collection in case of ros gui failure/crash
+        - read_file()
+            - reads in csv file if it exists and stores the reported artifacts as an array
 - transferToBaseStation.js
     - creates class for sending and receiving http messages to a server/ip address
     - functions included in class:
@@ -133,8 +178,7 @@ Libraries Used:
 
 |npm libraries|
 - electron
-    - used as application framework, allows for inclusion of libraries that have
-    direct access to computers commands
+    - used as application framework, allows for inclusion of libraries that have direct access to computers commands
 - fs
     - used to open and read files
 - path

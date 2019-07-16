@@ -1,5 +1,5 @@
 var prev_time = []
-window.openPage = function (pageName, k = -1) {
+window.openPage = function (pageName, elmnt, color, /* k */ ) {
     // Hide all elements with class="tabcontent" by default */
     var tabcontent, tablinks;
 
@@ -11,13 +11,16 @@ window.openPage = function (pageName, k = -1) {
             global_tabManager.Tab_OdomSub[i].unsubscribe();
             // Tab_CmdVelSub[i].unsubscribe();
             global_tabManager.Tab_BatterySub[i].unsubscribe();
+            global_tabManager.Tab_ControlSub[i].unsubscribe();
             console.log("Unsubscribing... ")
         }
     } catch {
 
     }
 
-    if (k >= 0) {
+    if (arguments.length > 3) {
+        var k = arguments[3];
+
         // TODO: Create way of resetting data completely on chart
         // global_tabManager.Tab_OdomChart[k].data.datasets.forEach((dataset) => {
         //     dataset.data = [];
@@ -198,7 +201,53 @@ window.openPage = function (pageName, k = -1) {
         global_tabManager.Tab_BatterySub[k].subscribe(function (message) {
             // console.log(message);
             var battery = document.getElementsByClassName("battery_voltage")[0];
-            battery.innerText = "Voltage2: " + message.data;
+            battery.innerText = "Voltage: " + message.data;
+        });
+        // Changes vehicle control status on vehicle tab
+        global_tabManager.Tab_ControlSub[k].subscribe(function (message) {
+            // console.log(message);
+            var ctrStatus = document.getElementsByClassName("control_status")[0];
+            
+            switch(message.data){
+                case 0:
+                    ctrStatus.innerText = "Status: On Ground";
+                    ctrStatus.style.backgroundColor = "grey";
+                    ctrStatus.style.border = "grey";
+                    break;
+                case 1:
+                    ctrStatus.innerText = "Status: Takeoff";
+                    ctrStatus.style.backgroundColor = "yellow";
+                    ctrStatus.style.border = "yellow";
+                    break;
+                case 2:
+                    ctrStatus.innerText = "Status: Hover";
+                    ctrStatus.style.backgroundColor = "yellow";
+                    ctrStatus.style.border = "yellow";
+                    break;
+                case 3:
+                    ctrStatus.innerText = "Status: Turn";
+                    ctrStatus.style.backgroundColor = "green";
+                    ctrStatus.style.border = "green";
+                    break;
+                case 4:
+                    ctrStatus.innerText = "Status: Trajectory";
+                    ctrStatus.style.backgroundColor = "green";
+                    ctrStatus.style.border = "green";
+                    break;
+                case 5:
+                    ctrStatus.innerText = "Status: Landing";
+                    ctrStatus.style.backgroundColor = "yellow";
+                    ctrStatus.style.border = "yellow";
+                    break;
+                default:
+                    ctrStatus.innerText = "Status: Unknown";
+                    ctrStatus.style.backgroundColor = "red";
+                    ctrStatus.style.border = "red";
+                    break;
+
+
+            }
+
         });
 
         // Subscriber to point cloud topic for vehicle that publishes to darpa server
@@ -214,11 +263,15 @@ window.openPage = function (pageName, k = -1) {
                 type: "PointCloud2",
                 msg: msg
             };
+            // console.log(data);
+            var http = new HTTP("/map/update/", data);
             if (now_time - prev_time[k] >= 0.05 || prev_time[k] == null) {
-                $.post(SERVER_ROOT + "/map/update/", JSON.stringify(data))
-                    .fail(function (error) {
-                        console.log(error);
-                    });
+                http.requestHTTP().done(function (json) {
+                    // var artifact_page = document.getElementById("Artifact_Page");
+                    // this.artifact_tracker = artifact_page.querySelector("[robot_name = '" + name + "']");
+                    console.log(json);
+
+                });
                 prev_time[k] = now_time;
             }
         });
@@ -226,10 +279,29 @@ window.openPage = function (pageName, k = -1) {
     }
 
     // Sets all tabs to be hidden
-    $('.tabcontent').hide();
+    tabcontent = document.getElementsByClassName("tabcontent");
+    let tabcontentLength = tabcontent.length;
+    for (let i = 0; i < tabcontentLength; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // Remove the background color of all tablinks/buttons
+    tablinks = document.getElementsByClassName("tablink");
+    let tablinksLength = tablinks.length;
+    for (let i = 0; i < tablinksLength; i++) {
+        tablinks[i].style.backgroundColor = "";
+    }
 
     // Show the specific tab content
-    $('#' + pageName).show();
+    document.getElementById(pageName).style.display = "block";
 
+    // Add the specific color to the button used to open the tab content
+    elmnt.style.backgroundColor = color;
+
+    var universal_page = document.getElementById("Universal_Page");
+    universal_page.style.backgroundColor = color;
 }
+$(document).ready(function () {
+
+});
 

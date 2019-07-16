@@ -1,5 +1,4 @@
-// https://www.subtchallenge.com/resources/STIX_Interface_Control_Document.pdf
-
+var ros_connection = false;
 var topicsList = [];
 var topicsTypeList = [];
 var global_tabManager;
@@ -14,20 +13,7 @@ $(document).ready(function () {
   console.log("ready!");
   var selected_topic_num = 0;
 
-  // Establish connection with DARPA for streaming back information related 
-  // to score, time, and number of artifact reports left
-  window.setInterval(function () {
-    $.get(SERVER_ROOT + "/api/status/", function (json) {
-      $('#header_time').text(json.run_clock);
-      $('#header_score').text(json.score);
-      $('#header_remaining_reports').text(json.remaining_reports);
-      $('#connection_status_darpa_server').html('<font color="green">Connected</font>')
-    }).fail(function () {
-      $('#connection_status_darpa_server').html('<font color="red">Disconnected</font>');
-    });
-  }, 2000);
-
-  window.autocomplete = function (inp, arr) {
+  window.autocomplete = function(inp, arr) {
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
     var currentFocus;
@@ -72,7 +58,9 @@ $(document).ready(function () {
           a.appendChild(b);
         }
       }
-
+      a.style.overflow = "scroll";
+      a.style.maxHeight = "30vh";
+      a.style.color = "#000000";
     });
     /*execute a function presses a key on the keyboard:*/
     inp.addEventListener("keydown", function (e) {
@@ -145,20 +133,20 @@ $(document).ready(function () {
   });
 
   ros.on("connection", function () {
-    // TODO: sam - make this a header status
+    ros_connection = true;
+
     console.log("Connected to websocket server.");
     getTopics();
+    setTopicMsg();
     // create_viewer(ros);
 
   });
 
   ros.on("error", function (error) {
-    // TODO: sam - make this a header status
     console.log("Error connecting to websocket server: ", error);
   });
 
   ros.on("close", function () {
-    // TODO: sam - make this a header status
     console.log("Connection to websocket server closed.");
   });
 
@@ -173,7 +161,7 @@ $(document).ready(function () {
     var request = new ROSLIB.ServiceRequest();
 
     topicsClient.callService(request, function (result) {
-
+      console.log("Getting topics...");
       topicsList = result.topics;
       topicsTypeList = result.types;
 
@@ -182,7 +170,10 @@ $(document).ready(function () {
       }
 
       createTab();
-      setTopicMsg();
+      window.autocomplete(document.getElementById("myInput"), topicsList);
+      window.setInterval(function () {
+        startGET_Status();
+      }, 2000);
     });
 
 
@@ -202,13 +193,36 @@ $(document).ready(function () {
 
 
   count = 0
+  // TODO: Replace count with values from response
+  function startGET_Status() {
+    // var http = new HTTP("/api/status/", {});
+    var http = new HTTP("/api/status/", {});
+    http.requestHTTP().done(function (json) {
+      var universal_page = document.getElementById("Universal_Page");
+      universal_page.getElementsByTagName("span")[0].innerText = "Time: " + json.run_clock;
+      universal_page.getElementsByTagName("span")[1].innerText = "Score: " + json.score;
+      universal_page.getElementsByTagName("span")[1].setAttribute("score", json.score);
+      universal_page.getElementsByTagName("span")[2].innerText = "Remaining Reports: " + json.remaining_reports;
+      universal_page.getElementsByTagName("span")[2].setAttribute("remaining_reports", json.remaining_reports);
+    });
+    // http.getResponse();
+
+
+    // count = count + 1;
+    // universal_page.getElementsByTagName("span")[0].innerText = "Time: " + count.toString();
+    // universal_page.getElementsByTagName("span")[1].innerText = "Score: " + count.toString();
+    // universal_page.getElementsByTagName("span")[2].innerText = "Remaining Artifacts: " + count.toString();
+  }
+
 
 
   /*--- Subscribe to a chosen User Topic from the Custom Tab ---*/
   function setTopicMsg() {
     var fullColors = [];
+    // var colors = ['rgba(255,0,0,1.0)', 'rgba(0,255,0,1.0)', 'rgba(0,0,255, 1.0)', 'rgba(128,128,0, 1.0)', 'rgba(128,0,128, 1.0)', 'rgba(0,128,128, 1.0)']
     var colors = ['rgba(128,0,0,', 'rgba(0,128,0,', 'rgba(0,0,128,', 'rgba(128,128,0,', 'rgba(128,0,128,', 'rgba(0,128,128,', 'rgba(255,0,0,', 'rgba(0,255,0,', 'rgba(0,0,255,', 'rgba(0,255,255,', 'rgba(255,0,255,', 'rgba(2555,255,0,', 'rgba(0,0,0,']
-    for (let k = 0; k < colors.length; k++) {
+    var colorsLength = colors.length;
+    for (let k = 0; k < colorsLength; k++) {
       fullColors[k] = colors[k] + "1.0)";
     }
     var topic_msg = new ROSLIB.Message();
@@ -217,8 +231,12 @@ $(document).ready(function () {
       name: topicsList[selected_topic_num],
       messageType: topicsTypeList[selected_topic_num]
     });
+    var e = document.getElementById("Custom");
+    var custom = document.createElement("DIV");
+    custom.setAttribute("id", "_custom");
+    e.appendChild(custom);
 
-    $("#Custom").append(`<div id="_custom"></div>`);
+
 
     /* Unsubscribes from the topic fi */
     topic.subscribe(function (msg) {
@@ -265,6 +283,12 @@ $(document).ready(function () {
 
           // Creates a graph if there is not already an existing graph on the custom page
           if (!_custom.querySelector("[id=graph]")) {
+            applyCSS(_custom, {
+              position: "relative",
+              height: "50vh",
+              width: "100%",
+              margin: "auto"
+            });
             let graph = document.createElement("canvas");
             graph.setAttribute("id", "graph");
             let ctx = graph.getContext("2d");
@@ -334,9 +358,10 @@ $(document).ready(function () {
             });
             var titles_dataLength = titles_data.length
             for (let k = 0; k < titles_dataLength; k++) {
-              let Color = colors[(k + 1) % colors.length];
+              let Color = colors[(k + 1) % colorsLength];
               let _hidden = false;
               let yaxis_id = "linear";
+              // if (Color + "1.0)" == fullColors[i]) Color = colors[(k + 2) % colorsLength];
               if (~titles_data[k].indexOf("angular")) {
                 _hidden = true;
                 yaxis_id = "angular";
@@ -447,6 +472,12 @@ $(document).ready(function () {
 
           // Creates a graph if there is not already an existing graph on the custom page
           if (!_custom.querySelector("[id=graph]")) {
+            applyCSS(_custom, {
+              position: "relative",
+              height: "50vh",
+              width: "100%",
+              margin: "auto"
+            });
             let graph = document.createElement("canvas");
             graph.setAttribute("id", "graph");
             let ctx = graph.getContext("2d");
@@ -516,9 +547,10 @@ $(document).ready(function () {
             });
             var titles_dataLength = titles_data.length
             for (let k = 0; k < titles_dataLength; k++) {
-              let Color = colors[(k + 1) % colors.length];
+              let Color = colors[(k + 1) % colorsLength];
               let _hidden = false;
               let yaxis_id = "linear";
+              // if (Color + "1.0)" == fullColors[i]) Color = colors[(k + 2) % colorsLength];
               if (~titles_data[k].indexOf("angular")) {
                 _hidden = true;
                 yaxis_id = "angular";
@@ -613,6 +645,7 @@ $(document).ready(function () {
             canvas.style.paddingLeft = 0;
             canvas.style.marginLeft = "auto";
             canvas.style.marginRight = "auto";
+            canvas.style.display = "block";
             canvas.height = 320;
             canvas.width = 640;
           }
@@ -658,6 +691,16 @@ $(document).ready(function () {
     return;
   }
 
+
+
+
+  function removeData(chart) {
+    chart.data.labels.pop();
+    chart.data.datasets.forEach((dataset) => {
+      dataset.data.pop();
+    });
+    chart.update();
+  }
 
   /*--- Function for grabbing info from form and publishing it to ROS        ---*/
   /*--- geometry_msgs/Twist requires id format of 'linear_x' and 'angular_x' ---*/

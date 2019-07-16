@@ -1,17 +1,10 @@
 <launch>
     <node name="rosbridge" pkg="rosbridge_server" type="rosbridge_websocket" output="screen">
     </node>
-    <node name="rosapi" pkg="rosapi" type="rosapi_node" output="screen"><!-- get list of topics -->
+    <node name="rosapi" pkg="rosapi" type="rosapi_node" output="screen">
     </node>
-    <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher" output="screen"><!-- for displaying pointcould -->
+    <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher" output="screen">
     </node>
-    <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen" args="$(find marble_gui)/src">
+    <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen">
     </node>
 </launch>
-
-<!-- 
-rosrun rosbridge_server rosbridge_websocket
-rosrun rosapi rosapi_node
-rosrun tf2_web_republisher tf2_web_republisher
-scripts/gui_launch.sh
--->

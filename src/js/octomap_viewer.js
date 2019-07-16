@@ -8,7 +8,7 @@ function create_viewer(robot_name) {
         width: 800,
         height: 600,
         antialias: true,
-        background: '#111111'
+        background : '#111111'
     });
 
     // Setup a client to listen to TFs.
@@ -42,7 +42,7 @@ function create_viewer(robot_name) {
         // topic: "/octomap_point_cloud_occupied",
         topic: "/" + robot_name + "/octomap_point_cloud_occupied",
         // topic: "/octomap_point_cloud_occupied",
-        material: { size: 0.1, color: 0xeeeeee },
+        material: {size: 0.1, color: 0xeeeeee },
         max_pts: 5000
     });
 
