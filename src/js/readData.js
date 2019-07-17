@@ -137,7 +137,6 @@ $(document).ready(function () {
 
     console.log("Connected to websocket server.");
     getTopics();
-    setTopicMsg();
     // create_viewer(ros);
 
   });
@@ -174,6 +173,7 @@ $(document).ready(function () {
       window.setInterval(function () {
         startGET_Status();
       }, 2000);
+      setTopicMsg();
     });
 
 
