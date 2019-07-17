@@ -196,8 +196,7 @@ $(document).ready(function () {
   // TODO: Replace count with values from response
   function startGET_Status() {
     // var http = new HTTP("/api/status/", {});
-    var http = new HTTP("/api/status/", {});
-    http.requestHTTP().done(function (json) {
+    $.get(SERVER_ROOT + "/api/status/", function( json ) {
       var universal_page = document.getElementById("Universal_Page");
       universal_page.getElementsByTagName("span")[0].innerText = "Time: " + json.run_clock;
       universal_page.getElementsByTagName("span")[1].innerText = "Score: " + json.score;

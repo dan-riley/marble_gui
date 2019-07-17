@@ -264,9 +264,9 @@ window.openPage = function (pageName, elmnt, color, /* k */ ) {
                 msg: msg
             };
             // console.log(data);
-            var http = new HTTP("/map/update/", data);
             if (now_time - prev_time[k] >= 0.05 || prev_time[k] == null) {
-                http.requestHTTP().done(function (json) {
+                $.post(SERVER_ROOT + "/map/update/", JSON.stringify(data))
+                .done(function(json) {
                     // var artifact_page = document.getElementById("Artifact_Page");
                     // this.artifact_tracker = artifact_page.querySelector("[robot_name = '" + name + "']");
                     console.log(json);

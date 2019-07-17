@@ -8,13 +8,13 @@ Framework:
     - tabs.js
     - tab_manager.js
         - artifactHandler.js
-            - transferToBaseStation.js
+            - darpaServerComm.js
         - octomap_viewer.js
         - stopService.js
 
 Hardcoded areas:
 - darpa command post interaction variables
-    - transferToBaseStation.js
+    - darpaServerComm.js
         - (variable) this.ip_address_port
             - ip address and port to make connection to with http
         - (variable) this.authorization
@@ -146,17 +146,8 @@ Description of each js file:
             - saves csv file containing robots reported artifact list, used for data storage and collection in case of ros gui failure/crash
         - read_file()
             - reads in csv file if it exists and stores the reported artifacts as an array
-- transferToBaseStation.js
-    - creates class for sending and receiving http messages to a server/ip address
-    - functions included in class:
-        - constructor()
-            - establishes json message format including things such as the url, authorization token, and data
-        - set url()
-            - function called when the variable this.url is set
-            - attaches different message formats according to the directory/topic data is being sent to
-            - also establishes type of http request that is sent (POST or GET)
-        - requestHTTP()
-            - uses ajax to send http request to desired location declared in constructor
+- darpaServerComm.js
+    - Config values for DARPA server
 - octomap_viewer.js
     - contains function to create a viewer using ROS3Djs
     - functions in file:
