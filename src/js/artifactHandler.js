@@ -247,12 +247,12 @@ class Artifact {
         var universal_page = document.getElementById("Universal_Page");
         var universal_score_section = universal_page.getElementsByTagName("span")[1];
         var score = parseFloat(universal_score_section.getAttribute("score"));
-        var http = new HTTP("/api/artifact_reports/", data);
-        http.requestHTTP().done(function (json) {
+        $.post(SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
+        .done(function( json ) {
             // var artifact_page = document.getElementById("Artifact_Page");
             // this.artifact_tracker = artifact_page.querySelector("[robot_name = '" + name + "']");
             console.log(json);
-
+            
         });
 
         if (parseFloat(universal_score_section.getAttribute("score")) > score) {
