@@ -129,7 +129,34 @@ class Artifact {
         var tem3 = msg.vehicle_reporter;
         var fileName = 'img_'.concat(msg.vehicle_reporter,'_',msg.image_id.toString,'.jpg');
         
-        alert('Holabola!!!!')
+         //$.ajax({
+           //  url: "myPython.py",
+            // success: function(response) {
+            // alert('sucessfully executed script');
+            // }
+            // });
+            //$.ajax({
+             //   type: 'GET',
+              //  url: 'app.py',
+            
+          //      success: function(response) {
+            //      console.log(response);
+              //  },
+               // error: function(response) {
+               //   return console.error(response);
+               // }
+              //});
+        //alert('Start bola!!!!')
+
+        const spawn = require("child_process").spawn;
+        const pythonProcess = spawn('python',["../scripts/myPython.py",tem1,tem2,tem3,msg]);
+        console.log("Finished running python");
+
+                
+        //document.write('<img src="myPython.py" />');
+        // GET is the default method, so we don't need to set it
+
+        //alert('Hola bola!!!!')
     }
     set_artifacts(msg) {
         try{

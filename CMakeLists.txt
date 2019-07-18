@@ -7,8 +7,18 @@ project(marble_gui)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
-
+find_package(catkin REQUIRED
+  COMPONENTS
+    roscpp
+    std_msgs
+    geometry_msgs
+    tf
+    cv_bridge
+    rospy
+    sensor_msgs
+    marble_artifact_detection_msgs
+)
+find_package(OpenCV REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -41,6 +51,15 @@ find_package(catkin REQUIRED)
 ##     and list every .msg/.srv/.action file to be processed
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
+#generate_messages(
+#  DEPENDENCIES
+#    roscpp
+#    std_msgs
+#    geometry_msgs
+#    sensor_msgs
+#    marble_artifact_detection_msgs
+    
+#)
 
 ## Generate messages in the 'msg' folder
 # add_message_files(
@@ -142,8 +161,9 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
+#target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
+#   ${OpenCV_LIBS}
 # )
 
 #############
