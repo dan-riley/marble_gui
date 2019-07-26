@@ -498,7 +498,7 @@ class TabManager {
 
         robot_artifact_container.appendChild(robot_artifact_header);
         robot_artifact_container.appendChild(robot_artifact_titles);
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < this.fixedArray_size; i++) {
             let robot_artifact_tracker = document.createElement("DIV");
             robot_artifact_tracker.setAttribute("class", "row");
             robot_artifact_tracker.setAttribute("artifact_id", parseFloat(i));

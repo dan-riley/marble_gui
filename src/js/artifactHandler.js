@@ -160,6 +160,9 @@ class Artifact {
     }
     set_artifacts(msg) {
         try{
+            if(msg.length != this.fixedArray_size){
+                console.log("msg ")
+            }
             for (let i = 0; i < this.fixedArray_size; i++){
 
                 // When there is not an artifact class declared, set all properties of the artifact

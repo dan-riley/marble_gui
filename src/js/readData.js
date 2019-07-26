@@ -645,21 +645,18 @@ $(document).ready(function () {
             canvas.style.marginLeft = "auto";
             canvas.style.marginRight = "auto";
             canvas.style.display = "block";
-            canvas.height = 320;
-            canvas.width = 640;
           }
 
           context = canvas.getContext('2d');
 
-          make_base();
-
-          function make_base() {
             base_image = new Image();
             base_image.src = "data:image/jpg;base64," + topic_msg.data;
             base_image.onload = function () {
               context.drawImage(base_image, 0, 0);
             }
-          }
+          canvas.height = base_image.height;
+          canvas.width = base_image.width;
+
           if (!here) {
             var parent = document.getElementById("Custom").querySelector("[id = _custom]");
             parent.appendChild(canvas);
@@ -706,8 +703,8 @@ $(document).ready(function () {
   /*--- All messages and ids follow format corresponding to their JSON       ---*/
   window.pubTopicMsg = function (e) {
 
-    var topic = e.querySelector("[id=topic]").value;
-    var type = e.querySelector("[id=type]").value;
+    let topic = e.querySelector("[id=topic]").value;
+    let type = e.querySelector("[id=type]").value;
     var Topic = new ROSLIB.Topic({
       ros: ros,
       name: topic,
