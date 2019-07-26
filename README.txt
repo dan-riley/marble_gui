@@ -1,16 +1,23 @@
 marble_gui
-    The main unique value is to manage artifact reporting by robots and
-    report artifacts to the DARPA server. It also creates a "we have 
-    ourselves all put together" impression for the judges at the
-    competition because pretty buttons are more impressive than terminal
-    commands.
+    The following purposes for the gui were derived from the following needs as explained in the
+    DARPA Subterranean Challenge Competition Rules, Tunnel Circuit, Revision 2 (June 28, 2019)
+
+    "The primary scenario of interest for the competition is providing rapid situational awareness to a small team of operators preparing to enter unknown and dynamic subterranean environments."
+
+    "Systems Teams mustprovide real-time 3D volumetric map updates to the DARPA Command Post at a minimum frequency of one update per 10 seconds."
+    Teams are expected to provided a base station "which is expected to provide both artifact reports and map updates to the DARPA scoring interface." 
+    "the quality of a team’s mapping capability may be used, in part, to inform continued funding decisions."
+
+    The gui does this. The gui acts as a middle man between the agents and the scoring server. THe 3d map can be viewed in realtime
+    and artifact info can be reviewed before submitting it to the server. The gui also allows an interface for sending commands to the agents.
+
 
 Installing
     Machine prereqs
 
         has this stuff installed
-           curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-           sudo apt -y install ros-$ROS_DISTRO-rosbridge-server ros-$ROS_DISTRO-tf2-web-republisher ros-$ROS_DISTRO-rosapi nodejs
+            curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+            sudo apt -y install ros-$ROS_DISTRO-rosbridge-server ros-$ROS_DISTRO-tf2-web-republisher ros-$ROS_DISTRO-rosapi nodejs
       
         Install the DARPA test server following its instructions at
 	    https://bitbucket.org/subtchallenge/test_scoring_server/src/master/
