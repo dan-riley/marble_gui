@@ -9,24 +9,14 @@ Installing
     Machine prereqs
 
         has this stuff installed
-            sudo apt-get install ros-$ROS_DISTRO-rosbridge-server ros-$ROS_DISTRO-tf2-web-republisher ros-$ROS_DISTRO-rosapi
-            curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -        
-            sudo apt-get install -y nodejs
+           curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+           sudo apt -y install ros-$ROS_DISTRO-rosbridge-server ros-$ROS_DISTRO-tf2-web-republisher ros-$ROS_DISTRO-rosapi nodejs
       
-            # the following commands are needed to install docker-ce
-            sudo apt install apt-transport-https ca-certificates curl software-properties-common
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic test"
-            sudo apt update
-            sudo apt install docker-ce            
-
-
-	    sudo snap install docker
-	    sudo usermod -aG docker $(whoami)
-            # logout and login
+        Install the DARPA test server following its instructions at
+	    https://bitbucket.org/subtchallenge/test_scoring_server/src/master/
 
     TODO for every clone:
-        cd my_ws/src/marble/marble_gui/src/
+        cd ~/marble_ws/src/marble/marble_gui/src/
         sudo npm install -save electron --unsafe-perm=true --allow-root
         sudo npm install fs csv-writer csv-parser jquery path node-ssh
 

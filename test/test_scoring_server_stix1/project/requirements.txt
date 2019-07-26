@@ -1,9 +1,0 @@
-django==1.11
-djangorestframework==3.7.7
-django-extensions==2.1.7
-django-redis
-gunicorn
-cbor2
-psycopg2-binary
-whitenoise
-requests
