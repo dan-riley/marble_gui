@@ -2,17 +2,18 @@
  * Artifact class for handling, sending, and checking known artifacts
  */
 
+ // Fixed array size determined by University of Colorado Denver, meant to reduce overall maintenance across network
+var ARTIFACT_ARR_LEN = 20;
+
 class Artifact {
     constructor(name) {
-        // Fixed array size determined by University of Colorado Denver, meant to reduce overall maintenance across network
-        this.fixedArray_size = 20;
         this.robot_name = name;
         this.artifact_All = [];
         this.artifactsList = [];
-        this.reportedArtifacts = new Array(this.fixedArray_size);
+        this.reportedArtifacts = new Array(ARTIFACT_ARR_LEN);
 
         if (!this.read_file()) {
-            for (let i = 0; i < this.fixedArray_size; i++) {
+            for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
                 this.reportedArtifacts[i] = [i, false];
             }
         };
@@ -24,16 +25,16 @@ class Artifact {
         this.location_array = 0; // Int to keep track of location in artifact array message
         var artifact_page = document.getElementById("Artifact_Page");
 
-        this.artifact_tracker = new Array(this.fixedArray_size);
-        this.artifact_position = new Array(this.fixedArray_size);
-        this.artifact_type = new Array(this.fixedArray_size);
-        this.artifact_confidence = new Array(this.fixedArray_size);
-        this.artifact_image = new Array(this.fixedArray_size);
-        this.artifact_image_id = new Array(this.fixedArray_size);
+        this.artifact_tracker = new Array(ARTIFACT_ARR_LEN);
+        this.artifact_position = new Array(ARTIFACT_ARR_LEN);
+        this.artifact_type = new Array(ARTIFACT_ARR_LEN);
+        this.artifact_confidence = new Array(ARTIFACT_ARR_LEN);
+        this.artifact_image = new Array(ARTIFACT_ARR_LEN);
+        this.artifact_image_id = new Array(ARTIFACT_ARR_LEN);
 
 
         // Establishes links to specific rows of artifact list for vehicle
-        for (let i = 0; i < this.fixedArray_size; i++) {
+        for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
             this.artifact_tracker[i] = artifact_page.querySelector("[robot_name = '" + name + "']").querySelector("[artifact_id = '" + parseFloat(i) + "']");
             this.artifact_position[i] = this.artifact_tracker[i].querySelector("[id = 'position'");
             this.artifact_type[i] = this.artifact_tracker[i].querySelector("[id = 'type'");
@@ -77,7 +78,7 @@ class Artifact {
     updateDisplay() {
         // let end = this.artifactsList.length - 1;
         // let artifact = artifact_All[location_all][location_array];
-        for (let i = 0; i < this.fixedArray_size; i++) {
+        for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
             let artifact = this.artifactsList[i];
             let type = artifact.obj_class;
             let confidence = artifact.obj_prob;
@@ -160,10 +161,10 @@ class Artifact {
     }
     set_artifacts(msg) {
         try{
-            if(msg.length != this.fixedArray_size){
-                console.log("msg ")
+            if(msg.length != ARTIFACT_ARR_LEN){
+                console.log("number of artifacts in message received is not the same as the amount expected!!!");
             }
-            for (let i = 0; i < this.fixedArray_size; i++){
+            for (let i = 0; i < ARTIFACT_ARR_LEN; i++){
 
                 // When there is not an artifact class declared, set all properties of the artifact
                 if (this.artifactsList[i].obj_class == ""){
@@ -191,7 +192,7 @@ class Artifact {
             this.artifactsList = msg;
         }
         
-        
+        this.save_file();
         this.updateDisplay();
     }
 

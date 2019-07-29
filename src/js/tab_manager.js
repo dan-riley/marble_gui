@@ -488,7 +488,7 @@ class TabManager {
             '<span id="confidence" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Confidence</b></span>' +
             '<span id="position" class="badge badge-secondary col-sm-3" style="text-align: center"><b>Position</b></span>' +
             '<span class="badge badge-secondary col-sm-2" style="text-align: center"><b>DARPA</b></span>' +
-            '<span class="badge badge-secondary col-sm-1" style="text-align: center"><b>Img</b></span>';
+            '<span class="badge badge-secondary col-sm-1" style="text-align: center"><b>Image</b></span>';
 
 
         var robot_artifact_header = document.createElement("DIV");
@@ -498,7 +498,7 @@ class TabManager {
 
         robot_artifact_container.appendChild(robot_artifact_header);
         robot_artifact_container.appendChild(robot_artifact_titles);
-        for (let i = 0; i < this.fixedArray_size; i++) {
+        for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
             let robot_artifact_tracker = document.createElement("DIV");
             robot_artifact_tracker.setAttribute("class", "row");
             robot_artifact_tracker.setAttribute("artifact_id", parseFloat(i));
