@@ -5,8 +5,8 @@
  // Fixed array size determined by University of Colorado Denver, meant to reduce overall maintenance across network
 var ARTIFACT_ARR_LEN = 20;
 
-class Artifact {
-    constructor(name) {
+class Artifact {  
+    constructor(name) {  
         this.robot_name = name;
         this.artifact_All = [];
         this.artifactsList = [];
@@ -99,6 +99,24 @@ class Artifact {
 
             this.artifact_confidence[i].innerText = confidence.toFixed(2);
             this.artifact_position[i].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
+            
+            if(artifact.image_data == null){
+                this.artifact_image[i].innerText = "No Image";
+            }
+            else{
+                if( this.artifact_image[i].children.length == 0){
+                    this.artifact_image[i].innerText = "View Image";
+                    let robot_artifact_image = document.createElement("IMG");
+                    robot_artifact_image.setAttribute("id", "myPopup");
+                    robot_artifact_image.setAttribute("class", "popuptext");
+                    this.artifact_image[i].appendChild(robot_artifact_image);
+                }
+                this.artifact_image[i].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactsList[i].image_data);
+
+                this.artifact_image[i].onclick = function(){
+                    $(this.children[0]).toggleClass("show");
+                }
+            }
 
             let color = this.color_artifacts(type);
             this.artifact_type[i].style.color = color;
@@ -125,39 +143,10 @@ class Artifact {
     }
     // Use this to save the image received from ROS
     save_image(msg){
-        var tem1 = msg.artifact_img;
-        var tem2 = msg.image_id;
-        var tem3 = msg.vehicle_reporter;
-        var fileName = 'img_'.concat(msg.vehicle_reporter,'_',msg.image_id.toString,'.jpg');
-        
-         //$.ajax({
-           //  url: "myPython.py",
-            // success: function(response) {
-            // alert('sucessfully executed script');
-            // }
-            // });
-            //$.ajax({
-             //   type: 'GET',
-              //  url: 'app.py',
-            
-          //      success: function(response) {
-            //      console.log(response);
-              //  },
-               // error: function(response) {
-               //   return console.error(response);
-               // }
-              //});
-        //alert('Start bola!!!!')
-
-        const spawn = require("child_process").spawn;
-        const pythonProcess = spawn('python',["../scripts/myPython.py",tem1,tem2,tem3,msg]);
-        console.log("Finished running python");
-
-                
-        //document.write('<img src="myPython.py" />');
-        // GET is the default method, so we don't need to set it
-
-        //alert('Hola bola!!!!')
+        console.log("save_image called!!!!!!!!");
+        this.artifactsList[msg.image_id.data].image_data = msg.artifact_img.data;
+        this.save_file();
+        this.updateDisplay();
     }
     set_artifacts(msg) {
         try{
@@ -371,12 +360,4 @@ class Artifact {
         }
     }
 
-    // Shows hidden image when img column is clicked in artifacts list
-    display_image(vehicle_Artifacts, i) {
-        var imgId = this.artifactsList[i].image_id;
-        var fileId = 'images/img_'.concat(this.artifactsList[i].vehicle_reporter,'_',imgId.toString(),'.jpg');
-        var popup = this.artifact_image[i].querySelector("[id='myPopup']");
-        popup.setAttribute("src", fileId);
-        popup.classList.toggle("show");
-    }
 }

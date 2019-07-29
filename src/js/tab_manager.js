@@ -526,17 +526,7 @@ class TabManager {
             let robot_artifact_image_container = document.createElement("DIV");
             robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-1 popup");
             robot_artifact_image_container.setAttribute("id", "image");
-            robot_artifact_image_container.innerText = "Img";
-
-            let robot_artifact_image = document.createElement("IMG");
-            robot_artifact_image.setAttribute("id", "myPopup");
-            robot_artifact_image.setAttribute("class", "popuptext");
-            robot_artifact_image.setAttribute("src", "");
-            robot_artifact_image_container.onclick = function(){
-            global_tabManager.global_vehicleArtifactsList[n].display_image(global_tabManager.global_vehicleArtifactsList, i);
-            }
-
-            robot_artifact_image_container.appendChild(robot_artifact_image);
+            robot_artifact_image_container.innerText = "No Image";
 
             robot_artifact_tracker.appendChild(robot_artifact_tracker_yes);
             robot_artifact_tracker.appendChild(robot_artifact_image_container);
