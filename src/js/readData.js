@@ -649,11 +649,11 @@ $(document).ready(function () {
 
           context = canvas.getContext('2d');
 
-            base_image = new Image();
-            base_image.src = "data:image/jpg;base64," + topic_msg.data;
-            base_image.onload = function () {
-              context.drawImage(base_image, 0, 0);
-            }
+          base_image = new Image();
+          base_image.src = "data:image/jpg;base64," + topic_msg.data;
+          base_image.onload = function () {
+            context.drawImage(base_image, 0, 0);
+          }
           canvas.height = base_image.height;
           canvas.width = base_image.width;
 
