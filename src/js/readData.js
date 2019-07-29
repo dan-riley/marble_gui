@@ -630,38 +630,6 @@ $(document).ready(function () {
           //   robot_name[1] + " Angular Rate { x: " + topic_msg.twist.twist.angular.x + " y: " + topic_msg.twist.twist.angular.y + " z: " + topic_msg.twist.twist.angular.z + " }";
           // // console.log("Subscribed to " + topicsList[selected_topic_num]);
           break;
-        case "sensor_msgs/CompressedImage":
-          var canvas;
-          var here = true;
-
-          canvas = document.getElementById("_custom").querySelector("[id=img]");
-          if (canvas == null) {
-            here = false;
-            canvas = document.createElement("canvas");
-            canvas.setAttribute("id", "img");
-            canvas.setAttribute("class", "border border-primary");
-            canvas.style.paddingRight = 0;
-            canvas.style.paddingLeft = 0;
-            canvas.style.marginLeft = "auto";
-            canvas.style.marginRight = "auto";
-            canvas.style.display = "block";
-          }
-
-          context = canvas.getContext('2d');
-
-          base_image = new Image();
-          base_image.src = "data:image/jpg;base64," + topic_msg.data;
-          base_image.onload = function () {
-            context.drawImage(base_image, 0, 0);
-          }
-          canvas.height = base_image.height;
-          canvas.width = base_image.width;
-
-          if (!here) {
-            var parent = document.getElementById("Custom").querySelector("[id = _custom]");
-            parent.appendChild(canvas);
-          }
-          break;
         default:
           document.getElementById("_custom").innerText = "No topic selected or topic is not implemented";
       }
