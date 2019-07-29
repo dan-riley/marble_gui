@@ -414,32 +414,55 @@ class TabManager {
         var wrapper2 = document.createElement("DIV");
         wrapper2.setAttribute("class", "row");
 
-        var panel_btns = document.createElement("BUTTON");
-        panel_btns.setAttribute("type", "button");
-        panel_btns.setAttribute("class", "btn btn-danger emergency_stop");
-        panel_btns.onclick = function () {
-            // console.log(5);
-            var estop = new ESTOP(global_tabManager.robot_name[n]);
-            estop.send_estop(3);
+        function send_signal_to(robot_name, signal){
+            var Topic = new ROSLIB.Topic({
+                ros: ros,
+                name: "/" + robot_name + "/" + signal,
+                messageType: "std_msgs/Bool"
+            });
+            var msg = new ROSLIB.Message({
+                data: true
+            });
+            Topic.publish(msg);
+        }
+
+        var estop_btn = document.createElement("BUTTON");
+        estop_btn.setAttribute("type", "button");
+        estop_btn.setAttribute("class", "btn btn-danger emergency_stop");
+        estop_btn.onclick = function () {
+            send_signal_to(global_tabManager.robot_name[n], "estop")
         };
-        panel_btns.innerText = "Stop Vehicle";
+        estop_btn.innerText = "Stop Vehicle";
 
-        var panel_btns2 = document.createElement("BUTTON");
-        panel_btns2.setAttribute("type", "button");
-        panel_btns2.setAttribute("class", "click-btn");
-        panel_btns2.style.backgroundColor = "green";
-        panel_btns2.style.border = "green";
-
-        panel_btns2.style.color = "white";
-
-        panel_btns2.onclick = function () {
-            // console.log(5);
-            var startup = new STARTUP(global_tabManager.robot_name[n]);
-            startup.send_startup();
+        var startup_btn = document.createElement("BUTTON");
+        startup_btn.setAttribute("type", "button");
+        startup_btn.setAttribute("class", "click-btn");
+        startup_btn.style.backgroundColor = "green";
+        startup_btn.style.border = "green";
+        startup_btn.style.color = "white";
+        startup_btn.onclick = function () {
+            send_signal_to(global_tabManager.robot_name[n], "startup")
         };
-        panel_btns2.innerText = "Start Vehicle";
-        // var panel_btns = "<button type='button' this.robot_name='" + this.robot_name[n] + "' class='btn btn-danger emergency_stop' onclick='var estop = new ESTOP(this.robot_name); estop.send_estop();'>Stop Vehicle</button>";
-        // var batteryLevel = "<div class='ldBar' data-preset='circle' data-stroke='data:ldbar/res,gradient(0,1,#eb8,#ad6,#c94)' data-stroke-width='15' data-value='100' style='width:100%;height:130px'></div>";
+        startup_btn.innerText = "Start Vehicle";
+
+        var restart_btn = document.createElement("BUTTON");
+        restart_btn.setAttribute("type", "button");
+        restart_btn.setAttribute("class", "click-btn");
+        restart_btn.style.backgroundColor = "blue";
+        restart_btn.style.border = "blue";
+        restart_btn.style.color = "white";
+        restart_btn.onclick = function () {
+            send_signal_to(global_tabManager.robot_name[n], "restart")
+        };
+        restart_btn.innerText = "Restart Vehicle";
+
+
+
+        wrapper2.appendChild(estop_btn);
+        wrapper2.appendChild(startup_btn);
+        wrapper2.appendChild(restart_btn);
+
+                // var batteryLevel = "<div class='ldBar' data-preset='circle' data-stroke='data:ldbar/res,gradient(0,1,#eb8,#ad6,#c94)' data-stroke-width='15' data-value='100' style='width:100%;height:130px'></div>";
         // var other = "<div class='meter'><span id='" + this.robot_name[n] + "_battery' style='width: 100%'></span></div>";
         var other = "<div class='circle fill' data-fill='64'><p class='circle-text'>0%</p></div>";
         var battery_voltage = document.createElement("SPAN");
@@ -451,9 +474,6 @@ class TabManager {
         control_status.setAttribute("class", "badge badge-secondary control_status");
         control_status.style.fontSize = "30px";
         control_status.innerText = "Status: ";
-
-        wrapper2.appendChild(panel_btns);
-        wrapper2.appendChild(panel_btns2);
         
         chart_wrap.appendChild(control_status);
         chart_wrap.appendChild(battery_voltage);
