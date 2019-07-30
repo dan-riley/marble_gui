@@ -155,7 +155,7 @@ class TabManager {
         let titles_data = [];
         let robot_name_front1 = this.robot_name[n].charAt(0);
         let robot_name_front2 = this.robot_name[n].substring(0,2);
-        if (robot_name_front2 == "X1" || robot_name_front2 == "X2" || robot_name_front1 == "G" || this.robot_name[n] == "HUSKY_SIM") {
+        if (true){//robot_name_front2 == "X1" || robot_name_front2 == "X2" || robot_name_front1 == "G" || this.robot_name[n] == "HUSKY_SIM") {
             this.global_vehicleType[n] = "Ground Vehicle";
             titles_data = ['linear_x', 'angular_z', 'cmd_linear_x', 'cmd_angular_z'];
         } else if (robot_name_front2 == "X3" || robot_name_front2 == "X4" || robot_name_front1 == "A" || this.robot_name[n] == "DJI_SIM") {
