@@ -35,21 +35,16 @@ class TabManager {
         let topicsLength = topicsList.length;
         console.log("Starting Tab Creation...");
         for (let i = 0; i < topicsLength; i++) {
-            if (topicsList[i].includes("odometry")) {
-                let name = topicsList[i].split('/')[1];
+            // assume it is namespacing if there are 2 consecutive numbers ex. /G01/odometry has "01"
+            var patt = new RegExp("/\d{2}/");
+            let name = topicsList[i].split('/')[1];
+            if (patt.test(name)) {
                 if (this.robot_name.indexOf(name) == -1) {
                     this.robot_name.push(name);
                     this.tabs_robot_name.push(name);
                     this.x++;
                 }
-            } else if (topicsList[i].includes("vehicle_status")) {
-                let name = topicsList[i].split('/')[1];
-                if (this.robot_name.indexOf(name) == -1) {
-                    this.robot_name.push(name);
-                    this.tabs_robot_name.push(name);
-                    this.x++;
-                }
-            }
+            } 
         }
         this.prebuilt_tabs_N = 3; //Number of tabs that gui launches with before adding vehicles
         this.w = 100 / (this.x + this.prebuilt_tabs_N);
