@@ -25,7 +25,12 @@ Installing
     TODO for every clone:
         cd ~/marble_ws/src/marble/marble_gui/src/
         sudo npm install -save electron --unsafe-perm=true --allow-root
-        sudo npm install fs csv-writer csv-parser jquery path node-ssh
+        sudo npm install fs csv-writer csv-parser jquery path node-ssh bower polymer-cli
+
+        sudo bower init --allow-root
+        sudo bower install --save jstnhuang/ros-websocket jstnhuang/ros-rviz --allow-root
+
+
 
 
     Test setup

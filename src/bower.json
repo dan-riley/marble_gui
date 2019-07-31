@@ -1,0 +1,26 @@
+{
+  "name": "ros_gui",
+  "description": "GUI to control vehicles in subT",
+  "main": "main.js",
+  "authors": [
+    "Blake McHale"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "ROS_gui",
+    "quick",
+    "start"
+  ],
+  "homepage": "https://github.com/arpg/marble",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ros-websocket": "jstnhuang/ros-websocket#^4.0.0",
+    "ros-rviz": "jstnhuang/ros-rviz#^3.1.1"
+  }
+}
