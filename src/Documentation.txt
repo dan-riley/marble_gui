@@ -10,7 +10,6 @@ Framework:
         - artifactHandler.js
             - darpaServerComm.js
         - octomap_viewer.js
-        - stopService.js
 
 Hardcoded areas:
 - darpa command post interaction variables
@@ -153,13 +152,6 @@ Description of each js file:
     - functions in file:
         - create_viewer()
             - adds a viewer to a robot that streams point cloud data
-- stopService.js
-    - contains class to send estop message to robot
-    - functions included in class:
-        - constructor()
-            - sets robot name
-        - send_estop()
-            - establishes estop topic connection and publishes message
 
 Libraries Used:
 - robotwebtools
