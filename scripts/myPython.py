@@ -19,7 +19,7 @@ temp = String()
 temp = sys.argv[3]
 
 #img=sys.argv[1] 
-#img.imread('/home/overlord/Desktop/ros_gui/src/images/img_250.png')
+#img.imread('/home/overlord/Desktop/marble_gui/src/images/img_250.png')
 #imgplot = plt.imshow(img)
 #plt.show()
 

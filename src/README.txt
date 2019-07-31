@@ -4,20 +4,20 @@ Pre-requisites
 - npm, nodejs, build-essential, electron
 
 Hard-Coded directories that need to be changed:
-- ros_gui/scripts/gui_launch.sh
+- marble_gui/scripts/gui_launch.sh
     - change "source ~/subt_ws/devel/setup.bash" to your workspace directories setup file
 
 Terminal 1
-- roslaunch ros_gui ros_gui.launch
+- roslaunch marble_gui marble_gui.launch
 or
-- roslaunch ros_gui ground_station.launch
+- roslaunch marble_gui ground_station.launch
 
 Installing (look at issues below if there are any errors):
 
 sudo apt-get install ros-melodic-rosbridge-server ros-melodic-tf2-web-republisher ros-melodic-rosapi
 sudo apt-get install nodejs
 curl -L https://www.npmjs.com/install.sh | sudo sh
-cd ~/subT_ssci/src/ros_gui/src/
+cd ~/subT_ssci/src/marble_gui/src/
 sudo npm install -save electron --unsafe-perm=true --allow-root
 
 npm install fs

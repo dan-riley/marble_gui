@@ -32,8 +32,8 @@ Hardcoded areas:
     - hardcoded associations between id and color for the page
     - any changes to id names need to be checked within the css files
     - only ids for tabs "Custom", "File", "Universal_Page", and "Artifact_Page"
-- ros_gui launch script in ros_gui/scripts/
-    - hardcoded location of ros_gui/src/ folder
+- marble_gui launch script in marble_gui/scripts/
+    - hardcoded location of marble_gui/src/ folder
     - location is needed for calling npm start
 
 Launch Scripts:
@@ -44,10 +44,10 @@ Launch Scripts:
 - artifact_ground_station.launch
     - launches both artifact detection and ground station
 - ground_station.launch
-    - launches multimaster and the components needed for the ros_gui
+    - launches multimaster and the components needed for the marble_gui
 - multimaster_fkie.launch
     - launches multimaster in a state that only accepts the desired topics from other robots
-- ros_gui.launch
+- marble_gui.launch
     - launches gui with its dependencies rosbridge_server, rosapi, and tf2_web_republisher
     - needs rosbridge_server to connect the gui with the locally hosted ros nodes
     - needs rosapi to gather information about what topics are currently active
