@@ -191,7 +191,7 @@ class TabManager {
         };
         let ArtifactImgTopic = {
             // topic: "/artifact_record",  // For use to save images on ground station
-            topic: "/" + this.robot_name[n] + "/artifact_image",
+            topic: "/" + this.robot_name[n] + "/located_artifact_img",
             messageType: "marble_artifact_detection_msgs/ArtifactImg"
         };
         let VehicleStatusTopic = {
