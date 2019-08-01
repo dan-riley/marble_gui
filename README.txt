@@ -29,8 +29,6 @@ Installing
         # the npm problem given by the following command can be disregarded 
         sudo npm install fs csv-writer csv-parser jquery path node-ssh bower polymer-cli
 
-        sudo bower init --allow-root
-
         # when asked which version of ros-websocket to install, choose 3.0.2
         sudo bower install --save jstnhuang/ros-websocket jstnhuang/ros-rviz --allow-root
 
