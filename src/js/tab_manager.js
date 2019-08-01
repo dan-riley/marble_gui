@@ -417,6 +417,9 @@ class TabManager {
 
         var wrapper2 = document.createElement("DIV");
         wrapper2.setAttribute("class", "row");
+        this.applyCSS(wrapper2, {
+            "margin-top": "40px"
+        });
 
         function send_signal_to(robot_name, signal){
             var Topic = new ROSLIB.Topic({
