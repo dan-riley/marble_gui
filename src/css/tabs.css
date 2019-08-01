@@ -11,25 +11,8 @@ body{
     height: 100%;
   }
   
-  /* Style tab links */
-  .tablink {
-    background-color: #555;
-    color: white;
-    float: left;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    font-size: 17px;
-  }
-  
-  .tablink:hover {
-    background-color: #777;
-  }
-  
   /* Style the tab content (and add height:100% for full page content) */
   .tabcontent {
-    color: white;
     display: none;
     padding: 20px 20px;
     min-height: 100vh;
@@ -39,11 +22,7 @@ body{
       min-height: 100%;
       min-width: 100%;
   }
-  #Robot_Tabs {
-    min-width: 100%;
-  }
   #Universal_Page {
-    color: white;
     padding: 20px;
     font-size: 30px;
     justify-content: center;
@@ -71,7 +50,3 @@ body{
   #Universal_Page label{
     color: black;
   }
-
-  #Custom {background-color: orange;}
-  #File {background-color: black;}
-  #Artifact_Page {background-color: green;}

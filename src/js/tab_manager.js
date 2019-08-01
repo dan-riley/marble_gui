@@ -46,18 +46,10 @@ class TabManager {
                 }
             } 
         }
-        this.prebuilt_tabs_N = 3; //Number of tabs that gui launches with before adding vehicles
-        this.w = 100 / (this.x + this.prebuilt_tabs_N);
         this.i = 0;
         for (this.i; this.i < this.x; this.i++) {
             this.add_tab();
         }
-        var custom = this.tabs.querySelector("[id='defaultOpen']");
-        custom.style.width = this.w + "%";
-        var file = this.tabs.querySelector("[id='FileTab']");
-        file.style.width = this.w + "%";
-        var file = this.tabs.querySelector("[id='Artifact_InfoTab']");
-        file.style.width = this.w + "%";
 
         window.setInterval(this.get_TopicsFromROS, 2000);
     }
@@ -136,10 +128,6 @@ class TabManager {
                 this.add_tab();
                 tab_flag = true;
             }
-        } 
-
-        if (tab_flag) {
-            this.fix_tabs(); // Adjusts tab size on screen
         }
     }
 
@@ -246,23 +234,15 @@ class TabManager {
         //!
 
         // Creating tab at top of screen for selecting robot view
-        var tab_link = document.createElement("BUTTON");
-        tab_link.setAttribute("class", "tablink");
-        // tab_link.onclick = function(){window.openPage(this.robot_name[n],tab_link, this.fullColors[n], n);}
-        tab_link.setAttribute("onclick", "window.openPage('" + this.robot_name[n] + "', this, '" + this.fullColors[n] + "', " + n + ")");
-        tab_link.setAttribute("robot_name", this.robot_name[n]);
-        tab_link.setAttribute("visible", "true");
-        tab_link.style.backgroundColor = this.fullColors[n % this.fullColors.length];
-        tab_link.innerText = this.robot_name[n];
-
-        tab_link.style.width = this.w + "%";
-        this.tabs.prepend(tab_link);
+        $('#Robot_Tabs').prepend(`
+        <li class="nav-item" robot_name="` + this.robot_name[n] + `">
+            <a  class="nav-link" onclick="window.openPage('` + this.robot_name[n] + `', ` + n + `)" >` + this.robot_name[n] + `</a>
+        </li>`);
 
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");
         tab_content.setAttribute("id", this.robot_name[n]);
         tab_content.setAttribute("class", "tabcontent");
-        tab_content.style.backgroundColor = this.fullColors[n];
 
         var wrapper1 = document.createElement("DIV");
         wrapper1.setAttribute("class", "row");
@@ -311,8 +291,6 @@ class TabManager {
         chart.setAttribute("class", "");
         chart.width = 400;
         chart.height = 400;
-
-        Chart.defaults.global.defaultFontColor = "rgba(255, 255, 255, 1.0)";
 
         // Create chart frame
         var ctx = chart.getContext("2d");
@@ -599,25 +577,6 @@ class TabManager {
     }
     get_vehicleArtifactsList(n) {
         return this.global_vehicleArtifactsList[n];
-    }
-    fix_tabs() {
-        // this.tabs.getElementsByTagName
-        // let tab_length = 0;
-        this.w = 100 / (this.tabs_robot_name.length + this.prebuilt_tabs_N);
-        let width = this.w + "%";
-        console.log("New Width: " + width);
-        for (let i = 0; i < this.tabs_robot_name.length; i++) {
-            let robotTab = this.tabs.querySelector("[robot_name=" + this.tabs_robot_name[i] + "]");
-            // if (robotTab.getAttribute("visible") == "true") {
-                robotTab.style.width = width;
-            // }
-        }
-        var custom = this.tabs.querySelector("[id='defaultOpen']");
-        custom.style.width = width;
-        var file = this.tabs.querySelector("[id='FileTab']");
-        file.style.width = width;
-        var file = this.tabs.querySelector("[id='Artifact_InfoTab']");
-        file.style.width = width;
     }
     get_Tab_OdomSub() {
         return this.Tab_OdomSub;

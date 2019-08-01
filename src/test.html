@@ -63,11 +63,27 @@
 <body>
   <!-- <div class="container"> -->
   <!--! Tab bar at the top of web page that displays all vehicles and default tabs -->
-  <div id="Robot_Tabs">
-    <button class="tablink b4" onclick="window.openPage('Custom', this, 'orange')" id="defaultOpen">Custom</button>
-    <button class ="tablink b4" onclick="window.openPage('File', this, 'black')" id="FileTab">File</button>
-    <button class ="tablink b4" onclick="window.openPage('Artifact_Page', this, 'green')" id="Artifact_InfoTab">Artifacts</button>
-  </div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <img src="images/ssci-logo.png" width="60" style="padding: 5px;">
+    <img src="images/cu.png" width="50" style="padding: 5px;">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto" id="Robot_Tabs">
+        <li class="nav-item active">
+          <a class="nav-link" onclick="window.openPage('Custom')" id="defaultOpen">Custom</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="window.openPage('File')" id="FileTab">File</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="window.openPage('Artifact_Page')" id="Artifact_InfoTab">Artifacts</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 
   <!--! Top bar on web page that displays all information reported back by DARPA when getting the score -->
   <div id="Universal_Page" class="row">

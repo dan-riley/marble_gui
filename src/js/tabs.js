@@ -1,7 +1,7 @@
 var prev_time = []
-window.openPage = function (pageName, elmnt, color, /* k */ ) {
+window.openPage = function (pageName, k=-1 ){
     // Hide all elements with class="tabcontent" by default */
-    var tabcontent, tablinks;
+    var tabcontent;
 
     // Attempts at unsubscribing from all topics when the tab is switched
     // Meant to reduce load of data being sent to the gui
@@ -18,8 +18,7 @@ window.openPage = function (pageName, elmnt, color, /* k */ ) {
 
     }
 
-    if (arguments.length > 3) {
-        var k = arguments[3];
+    if (k >= 0) {
 
         // TODO: Create way of resetting data completely on chart
         // global_tabManager.Tab_OdomChart[k].data.datasets.forEach((dataset) => {
@@ -285,21 +284,9 @@ window.openPage = function (pageName, elmnt, color, /* k */ ) {
         tabcontent[i].style.display = "none";
     }
 
-    // Remove the background color of all tablinks/buttons
-    tablinks = document.getElementsByClassName("tablink");
-    let tablinksLength = tablinks.length;
-    for (let i = 0; i < tablinksLength; i++) {
-        tablinks[i].style.backgroundColor = "";
-    }
-
     // Show the specific tab content
     document.getElementById(pageName).style.display = "block";
 
-    // Add the specific color to the button used to open the tab content
-    elmnt.style.backgroundColor = color;
-
-    var universal_page = document.getElementById("Universal_Page");
-    universal_page.style.backgroundColor = color;
 }
 $(document).ready(function () {
 
