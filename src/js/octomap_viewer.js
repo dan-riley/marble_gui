@@ -3,7 +3,9 @@
 
 function create_viewer(robot_name) {
     var rviz = document.getElementById(robot_name + '_rviz');
-    var display = {
+
+
+    var grid = {
       isShown: true,
       name: "Grid",
       options: {
@@ -13,8 +15,9 @@ function create_viewer(robot_name) {
       },
       type: "grid"
     };
-    rviz.push('config.displays', display);
+    rviz.push('config.displays', grid);
   
+
     var pt_cloud = {
       isShown: true,
       name: "Point cloud",
@@ -25,5 +28,19 @@ function create_viewer(robot_name) {
       type: "pointCloud2"
     }
     rviz.push('config.displays', pt_cloud);
+    
+
+    var map = {
+        isShown: true,
+        name: "Map",
+        options: {
+            continuous: true,
+            opacity: 1,
+            topic: "/" + robot_name + "/map"
+        },
+        type: "occupancyGrid"
+    }
+    rviz.push('config.displays', map);
+    
     rviz.set('config.sidebarOpened', false);
 }
