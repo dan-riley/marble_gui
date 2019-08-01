@@ -201,7 +201,7 @@ window.openPage = function (pageName, elmnt, color, /* k */ ) {
         global_tabManager.Tab_BatterySub[k].subscribe(function (message) {
             // console.log(message);
             var battery = document.getElementsByClassName("battery_voltage")[0];
-            battery.innerText = "Voltage: " + message.data;
+            battery.innerText = "Voltage: " + Math.round( message.data * 10 ) / 10;
         });
         // Changes vehicle control status on vehicle tab
         global_tabManager.Tab_ControlSub[k].subscribe(function (message) {
