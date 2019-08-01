@@ -1,6 +1,10 @@
 // see the "Displays" section of this page to see how to add messages of different types
 // https://github.com/jstnhuang/ros-rviz/wiki/User-guide
 
+// the github wiki wasn't helpful for getting the code running. this was more helpful
+// https://roscon.ros.org/2017/presentations/ROSCon%202017%20Web%20Components.pdf
+
+
 function create_viewer(robot_name) {
     var rviz = document.getElementById(robot_name + '_rviz');
 
