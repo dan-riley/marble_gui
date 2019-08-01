@@ -61,22 +61,6 @@ class TabManager {
         tab.parentNode.removeChild(tab);
         tab = null;
     }
-    hide_tab(name) {
-        // let n = this.i;
-        this.tabs.querySelector("[robot_name = " + name + "]").style.display = 'none';
-        // this.w--;
-
-        // Remove robot name from robot names tab list
-        var index = this.tabs_robot_name.indexOf(name);
-        this.tabs_robot_name.splice(index,1);
-        console.log("Hiding Tab: " + name);
-    }
-    unhide_tab(name) {
-        this.tabs.querySelector("[robot_name = " + name + "]").style.display = 'block';
-        
-        this.tabs_robot_name.push(name);
-        console.log("Unhiding Tab: " + name);
-    }
 
     //\brief Function for searching topics list for robot namespaces and adding those robots to the current robot name
     // list if they are not there already
@@ -98,7 +82,7 @@ class TabManager {
                     this.x++;
                 }
                 else if (this.tabs_robot_name.indexOf(name) == -1) {
-                    this.unhide_tab(name);
+                    $('#connection_status_' + name).html('<font color="green">Connected</font>')
                 } 
                 else {
   
@@ -119,7 +103,9 @@ class TabManager {
         let curr_robot_length = this.robot_name.length; // Length of entire robots seen over all time after function
         for (let i = 0; i < curr_robot_length; i++) {
             if (temp_robot_names.indexOf(this.robot_name[i]) == -1 && this.tabs_robot_name.indexOf(this.robot_name[i]) != -1) {
-                this.hide_tab(this.robot_name[i]);
+                // notify when robots disconnect. robot pages are kept so info regarding their previous history
+                // is not lost and maintains subscribers to Artifact, Point Cloud 2, and Pose Graph topics
+                $('#connection_status_' + this.robot_name[i]).html('<font color="red">Disconnected</font>')
                 tab_flag = true;
             }
         }
@@ -236,8 +222,9 @@ class TabManager {
         // Creating tab at top of screen for selecting robot view
         $('#Robot_Tabs').prepend(`
         <li class="nav-item" robot_name="` + this.robot_name[n] + `">
-            <a  class="nav-link" onclick="window.openPage('` + this.robot_name[n] + `', ` + n + `)" >` + this.robot_name[n] + `</a>
-        </li>`);
+            <a  class="nav-link" onclick="window.openPage('` + this.robot_name[n] + `', ` + n + `)" >` + this.robot_name[n] + `<br><span id="connection_status_` + this.robot_name[n] + `"><font color="green">Connected</font></span></a>
+        </li>
+        `);
 
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");
@@ -477,7 +464,7 @@ class TabManager {
 
 
 
-        this.pages.prepend(tab_content);
+        $('#Robot_Pages').prepend(tab_content);
 
         create_viewer(this.robot_name[n]);
 
