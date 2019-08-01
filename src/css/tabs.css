@@ -60,7 +60,8 @@ body{
   }
 
   .octomap_viewer {
-    
+    height: 800px;
+    width: 100%;
   }
 
   #Robot_Pages #File .margin-bottom {

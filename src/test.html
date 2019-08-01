@@ -151,40 +151,7 @@
   </div>
   <!-- </div> -->
 
-  <dom-bind id="t">
-    <template is="dom-bind">
-      <ros-websocket auto id="websocket"ros="{{ros}}"url="ws://localhost:9090"></ros-websocket>
-      <ros-rviz id="rviz" ros="{{ros}}"websocket-url="ws://localhost:9090"></ros-rviz>
-    </template>
-  </dom-bind>
-
 
 </body>
-
-<script>
-  var rviz = document.getElementById('rviz');
-  var display = {
-    isShown: true,
-    name: "Grid",
-    options: {
-      cellSize: "1",
-      color: "#cccccc",
-      numCells: "10"
-    },
-    type: "grid"
-  };
-  rviz.push('config.displays', display);
-
-  var pt_cloud = {
-    isShown: true,
-    name: "Point cloud",
-    options: {
-      topic: "/G01/octomap_point_cloud_occupied",
-      size: 0.1
-    },
-    type: "pointCloud2"
-  }
-  rviz.push('config.displays', pt_cloud);
-</script>
 
 </html>

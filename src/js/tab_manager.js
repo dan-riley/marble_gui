@@ -281,9 +281,18 @@ class TabManager {
         sub.setAttribute("class", "info");
 
         // Set unique ID so octomap_viewer can reference it for 3D visualization
+        var viewer_row = document.createElement("DIV");
+        viewer_row.setAttribute("class", "row")
         var viewer = document.createElement("DIV");
-        viewer.setAttribute("id", this.robot_name[n] + "_viewer")
-        viewer.setAttribute("class", "octomap_viewer")
+        viewer.setAttribute("class", "octomap_viewer");
+        viewer.innerHTML = `<dom-bind id="t">
+          <template is="dom-bind">
+            <ros-websocket auto id="websocket"ros="{{ros}}"url="ws://localhost:9090"></ros-websocket>
+            <ros-rviz id="` + this.robot_name[n] + `_rviz" ros="{{ros}}"websocket-url="ws://localhost:9090"></ros-rviz>
+          </template>
+        </dom-bind>`.trim();
+
+        viewer_row.appendChild(viewer);
 
         /* Chart needs a dedicated DIV wrapper for ONLY the chart */
         var chart_wrap = document.createElement("DIV");
@@ -483,7 +492,7 @@ class TabManager {
 
         tab_content.appendChild(wrapper1);
         tab_content.appendChild(wrapper2);
-        tab_content.appendChild(viewer);
+        tab_content.appendChild(viewer_row);
 
 
 
