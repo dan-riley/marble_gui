@@ -27,7 +27,8 @@ Installing
         sudo npm install -save electron --unsafe-perm=true --allow-root
         
         # the npm problem given by the following command can be disregarded 
-        sudo npm install fs csv-writer csv-parser jquery path node-ssh bower polymer-cli
+        sudo npm install fs csv-writer csv-parser jquery path node-ssh polymer-cli
+        sudo npm install -g bower
 
         # when asked which version of ros-websocket to install, choose 3.0.2
         sudo bower install --save jstnhuang/ros-websocket jstnhuang/ros-rviz --allow-root
