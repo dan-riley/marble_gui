@@ -841,7 +841,7 @@ $(document).ready(function () {
   }
 
 
-  document.getElementById("defaultOpen").click(); //Opens Custom Tab on html load
+  document.getElementById("Custom_nav_link").click(); //Opens Custom Tab on html load
 });
 
 

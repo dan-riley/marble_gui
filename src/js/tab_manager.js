@@ -221,7 +221,7 @@ class TabManager {
 
         // Creating tab at top of screen for selecting robot view
         $('#Robot_Tabs').prepend(`
-        <li class="nav-item" robot_name="` + this.robot_name[n] + `">
+        <li class="nav-item" id="` + this.robot_name[n] + `_nav_link" robot_name="` + this.robot_name[n] + `">
             <a  class="nav-link" onclick="window.openPage('` + this.robot_name[n] + `', ` + n + `)" >` + this.robot_name[n] + `<br><span id="connection_status_` + this.robot_name[n] + `"><font color="green">Connected</font></span></a>
         </li>
         `);
