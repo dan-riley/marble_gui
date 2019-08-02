@@ -143,7 +143,6 @@ class Artifact {
     }
     // Use this to save the image received from ROS
     save_image(msg){
-        console.log("save_image called!!!!!!!!");
         this.artifactsList[msg.image_id.data].image_data = msg.artifact_img.data;
         this.save_file();
         this.updateDisplay();
@@ -187,18 +186,8 @@ class Artifact {
 
     submit_artifact(vehicle_Artifacts, row_id) {
         console.log(vehicle_Artifacts);
-        // console.log(this.artifactsList[row_id]);
-        // if (this.reportedArtifacts[row_id][1]) {
-        //     this.skip_artifact(true);
-        //     console.log("Artifact not submitted because it has already been reported");
-        //     return;
-        // }
-        // var data = {
-        //     "x": this.artifactsList[row_id].position.x,
-        //     "y": this.artifactsList[row_id].position.y,
-        //     "z": this.artifactsList[row_id].position.z,
-        //     "type": this.artifactsList[row_id].obj_class
-        // };
+        var robo_name = this.get_robot_name();
+
         console.log(JSON.parse(this.artifact_position[row_id].getAttribute("value")));
         var data = {
             "x": JSON.parse(this.artifact_position[row_id].getAttribute("value")).x,
@@ -287,41 +276,14 @@ class Artifact {
         }
     }
     save_file() {
-        console.log(this.reportedArtifacts);
-        console.log("Saving artifacts reported csv file");
         const createCsvWriter = require('csv-writer').createArrayCsvWriter;
         const csvWriter = createCsvWriter({
             path: this.robot_name + '_reported.csv',
-            // header: [
-            //     {id: 'name', title: 'NAME'},
-            //     {id: 'lang', title: 'LANGUAGE'}
-            // ]
             header: ['id', 'Reported']
         });
-        // const records = [
-        //     {name: 'Bob',  lang: 'French, English'},
-        //     {name: 'Mary', lang: 'English'}
-        // ];
         csvWriter
-            .writeRecords(this.reportedArtifacts)
-            .then(() => console.log('The CSV file was written successfully'));
-        // var elements = ['Fire', 'Wind', 'Rain'];
+            .writeRecords(this.reportedArtifacts);//.then(() => console.log('The CSV file was written successfully'));
 
-        // console.log(elements.join());
-        // console.log(this.reportedArtifacts[0]);
-        // let csvContent = "data:text/csv;charset=utf-8,";
-        // let report = this.reportedArtifacts.join(",");
-        //     csvContent += report + "\r\n";
-        // this.reportedArtifacts.forEach(function (reportArray) {
-
-        // });
-        // var encodedUri = encodeURI(csvContent);
-        // var link = document.createElement("a");
-        // link.setAttribute("href", encodedUri);
-        // link.setAttribute("download", this.robot_name + "_reported.csv");
-        // document.body.appendChild(link); // Required for FF
-
-        // link.click(); // This will download the data file
     }
     read_file() {
         const csv = require('csv-parser');
