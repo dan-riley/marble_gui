@@ -33,23 +33,8 @@ class TabManager {
             this.fullColors[k] = this.colors[k] + "1.0)";
         }
         let topicsLength = topicsList.length;
-        console.log("Starting Tab Creation...");
-        for (let i = 0; i < topicsLength; i++) {
-            // assume it is namespacing if there are 2 consecutive numbers ex. /G01/odometry has "01"
-            var patt = new RegExp("/\d{2}/");
-            let name = topicsList[i].split('/')[1];
-            if (patt.test(name)) {
-                if (this.robot_name.indexOf(name) == -1) {
-                    this.robot_name.push(name);
-                    this.tabs_robot_name.push(name);
-                    this.x++;
-                }
-            } 
-        }
+
         this.i = 0;
-        for (this.i; this.i < this.x; this.i++) {
-            this.add_tab();
-        }
 
         window.setInterval(this.get_TopicsFromROS, 2000);
     }
