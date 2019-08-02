@@ -199,7 +199,7 @@ class Artifact {
         var other_location = new Array(vehicle_Artifacts_length);
         var best_prob = parseFloat(this.artifact_confidence[row_id].getAttribute("value"));
         for (let i = 0; i < vehicle_Artifacts_length; i++) {
-            if (vehicle_Artifacts[i].get_robot_name() == this.get_robot_name()) {
+            if (vehicle_Artifacts[i].get_robot_name() == robo_name) {
                 continue;
             }
             let other_artifactsList = vehicle_Artifacts[i].get_artifactsList();
@@ -229,30 +229,25 @@ class Artifact {
         var universal_page = document.getElementById("Universal_Page");
         var universal_score_section = universal_page.getElementsByTagName("span")[1];
         var score = parseFloat(universal_score_section.getAttribute("score"));
+        console.log("submitting artifact to DARPA server. Waiting for response...");
         $.post(SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
         .done(function( json ) {
-            // var artifact_page = document.getElementById("Artifact_Page");
-            // this.artifact_tracker = artifact_page.querySelector("[robot_name = '" + name + "']");
-            console.log(json);
-            
-        });
-
-        if (parseFloat(universal_score_section.getAttribute("score")) > score) {
-            this.reportedArtifacts[row_id][1] = true;
-            this.save_file();
-
-            // Sorts through all other vehicles and saves a csv file corresponding to that vehicles order of artifacts
-            for (let i = 0; i < vehicle_Artifacts_length; i++) {
-                if (other_location[i] != null && vehicle_Artifacts[i].get_robot_name() != this.robot_name) {
-                    vehicle_Artifacts[i].reportedArtifacts[other_location[i]][1] = true;
-                    vehicle_Artifacts[i].save_file();
-                    // vehicle_Artifacts[i].check_location(other_location[i]);
+            document.getElementById(robo_name + "_" + row_id).innerText = "submission result: +" + json.score_change + " points";
+            if (json.score_change) {
+                this.reportedArtifacts[row_id][1] = true;
+                this.save_file();
+    
+                // Sorts through all other vehicles and saves a csv file corresponding to that vehicles order of artifacts
+                for (let i = 0; i < vehicle_Artifacts_length; i++) {
+                    if (other_location[i] != null && vehicle_Artifacts[i].get_robot_name() != this.robot_name) {
+                        vehicle_Artifacts[i].reportedArtifacts[other_location[i]][1] = true;
+                        vehicle_Artifacts[i].save_file();
+                        // vehicle_Artifacts[i].check_location(other_location[i]);
+                    }
                 }
-            }
-            // this.skip_artifact(false);
-        } else {
-            console.log("No score increase for report");
-        }
+                // this.skip_artifact(false);
+            } 
+        });
     }
 
     get_robot_name() {

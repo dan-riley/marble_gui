@@ -502,12 +502,17 @@ class TabManager {
                 "<span contenteditable='true' id='position' class='badge badge-secondary col-sm-3' style='text-align: center' value='" + JSON.stringify({x: 0.00, y: 0.00, z: 0.00}) + "'>{x: 0.00 y: 0.00 z: 0.00}</span>";
             // '<button class="col-sm-1">Yes</button>' +
             // '<button class="col-sm-1">No</button>';
+
+            let robot_artifact_tracker_yes_container = document.createElement("DIV");
+            robot_artifact_tracker_yes_container.setAttribute("class", "badge badge-secondary col-sm-2");
+            robot_artifact_tracker_yes_container.setAttribute("id", this.robot_name[n] + "_" + i);
             let robot_artifact_tracker_yes = document.createElement("BUTTON");
-            robot_artifact_tracker_yes.setAttribute("class", "col-sm-2");
             robot_artifact_tracker_yes.innerText = "Submit";
             robot_artifact_tracker_yes.onclick = function () {
+                robot_artifact_tracker_yes_container.innerText = "submitting...";
                 global_tabManager.global_vehicleArtifactsList[n].submit_artifact(global_tabManager.global_vehicleArtifactsList, i);
             };
+            robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_yes);
 
             // let robot_artifact_tracker_no = document.createElement("BUTTON");
             // robot_artifact_tracker_no.setAttribute("class", "col-sm-2");
@@ -519,8 +524,9 @@ class TabManager {
             robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-1 popup");
             robot_artifact_image_container.setAttribute("id", "image");
             robot_artifact_image_container.innerText = "No Image";
+            
 
-            robot_artifact_tracker.appendChild(robot_artifact_tracker_yes);
+            robot_artifact_tracker.appendChild(robot_artifact_tracker_yes_container);
             robot_artifact_tracker.appendChild(robot_artifact_image_container);
             // robot_artifact_tracker.appendChild(robot_artifact_tracker_no);
 
