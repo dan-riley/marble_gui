@@ -185,7 +185,6 @@ class Artifact {
     }
 
     submit_artifact(vehicle_Artifacts, row_id) {
-        console.log(vehicle_Artifacts);
         var robo_name = this.get_robot_name();
 
         console.log(JSON.parse(this.artifact_position[row_id].getAttribute("value")));
@@ -226,27 +225,10 @@ class Artifact {
             }
 
         }
-        var universal_page = document.getElementById("Universal_Page");
-        var universal_score_section = universal_page.getElementsByTagName("span")[1];
-        var score = parseFloat(universal_score_section.getAttribute("score"));
         console.log("submitting artifact to DARPA server. Waiting for response...");
         $.post(SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
         .done(function( json ) {
             document.getElementById(robo_name + "_" + row_id).innerText = "submission result: +" + json.score_change + " points";
-            if (json.score_change) {
-                this.reportedArtifacts[row_id][1] = true;
-                this.save_file();
-    
-                // Sorts through all other vehicles and saves a csv file corresponding to that vehicles order of artifacts
-                for (let i = 0; i < vehicle_Artifacts_length; i++) {
-                    if (other_location[i] != null && vehicle_Artifacts[i].get_robot_name() != this.robot_name) {
-                        vehicle_Artifacts[i].reportedArtifacts[other_location[i]][1] = true;
-                        vehicle_Artifacts[i].save_file();
-                        // vehicle_Artifacts[i].check_location(other_location[i]);
-                    }
-                }
-                // this.skip_artifact(false);
-            } 
         });
     }
 

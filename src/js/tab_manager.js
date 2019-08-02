@@ -11,14 +11,12 @@ class TabManager {
         this.Tab_PointCloudSub = [];
         this.Tab_CmdVelSub = [];
         this.Tab_OdomMsg = [];
-        // Tab_BatteryMsg;
-        // Tab_CmdVelMsg;
 
         this.global_vehicleType = [];
         this.global_vehicleArtifactsList = [];
 
         this.rows = 0;
-        this.robot_name = [];
+        this.robots_discovered = [];// entire robots seen over all time
         this.tabs_robot_name = [];
         this.x = 0;
         this.tabs = document.getElementById("Robot_Tabs");
@@ -32,15 +30,14 @@ class TabManager {
         for (let k = 0; k < this.colorsLength; k++) {
             this.fullColors[k] = this.colors[k] + "1.0)";
         }
-        let topicsLength = topicsList.length;
         console.log("Starting Tab Creation...");
-        for (let i = 0; i < topicsLength; i++) {
+        for (let i = 0; i < topicsList.length; i++) {
             // assume it is namespacing if there are 2 consecutive numbers ex. /G01/odometry has "01"
             var patt = new RegExp("/\d{2}/");
             let name = topicsList[i].split('/')[1];
             if (patt.test(name)) {
-                if (this.robot_name.indexOf(name) == -1) {
-                    this.robot_name.push(name);
+                if (this.robots_discovered.indexOf(name) == -1) {
+                    this.robots_discovered.push(name);
                     this.tabs_robot_name.push(name);
                     this.x++;
                 }
@@ -65,19 +62,16 @@ class TabManager {
     //\brief Function for searching topics list for robot namespaces and adding those robots to the current robot name
     // list if they are not there already
     search_robots() {
-        let topicsLength = topicsList.length;
-        let prev_robot_length = this.robot_name.length; // Length of entire robots seen over all time before function
-        let temp_robot_names = [];
-        let temp_n = 0;
-        for (let i = 0; i < topicsLength; i++) {
+        
+        let namespaces_in_curr_topic_list = [];
+        for (let i = 0; i < topicsList.length; i++) {
             if (topicsList[i].includes("odometry")) {
                 let name = topicsList[i].split('/')[1];
-                if (temp_robot_names.indexOf(name) == -1) {
-                    temp_robot_names.push(name);
+                if (namespaces_in_curr_topic_list.indexOf(name) == -1) {
+                    namespaces_in_curr_topic_list.push(name);
                 }
-                temp_n++;
-                if (this.robot_name.indexOf(name) == -1) {
-                    this.robot_name.push(name);
+                if (this.robots_discovered.indexOf(name) == -1) {
+                    this.robots_discovered.push(name);
                     this.tabs_robot_name.push(name);
                     this.x++;
                 }
@@ -89,27 +83,25 @@ class TabManager {
                 }
             } else if (topicsList[i].includes("vehicle_status")) {
                 let name = topicsList[i].split('/')[1];
-                temp_robot_names.push(name);
-                temp_n++;
-                if (this.robot_name.indexOf(name) == -1 && !this.robot_name.includes(name)) {
-                    this.robot_name.push(name);
+                namespaces_in_curr_topic_list.push(name);
+                if (this.robots_discovered.indexOf(name) == -1 && !this.robots_discovered.includes(name)) {
+                    this.robots_discovered.push(name);
                     this.tabs_robot_name.push(name);
                     this.x++;
                 }
             }
         }
 
-        let tab_flag = false; // Keeps track of if a change is made to the tabs that are currently displayed
-        let curr_robot_length = this.robot_name.length; // Length of entire robots seen over all time after function
+        let curr_robot_length = this.robots_discovered.length; // Length of entire robots seen over all time after function
         for (let i = 0; i < curr_robot_length; i++) {
-            if (temp_robot_names.indexOf(this.robot_name[i]) == -1 && this.tabs_robot_name.indexOf(this.robot_name[i]) != -1) {
+            if (namespaces_in_curr_topic_list.indexOf(this.robots_discovered[i]) == -1 && this.tabs_robot_name.indexOf(this.robots_discovered[i]) != -1) {
                 // notify when robots disconnect. robot pages are kept so info regarding their previous history
                 // is not lost and maintains subscribers to Artifact, Point Cloud 2, and Pose Graph topics
-                $('#connection_status_' + this.robot_name[i]).html('<font color="red">Disconnected</font>')
+                $('#connection_status_' + this.robots_discovered[i]).html('<font color="red">Disconnected</font>')
                 tab_flag = true;
             }
         }
-        if (curr_robot_length > prev_robot_length) {
+        if (curr_robot_length > this.robots_discovered.length) {
             for (this.i; this.i < curr_robot_length; this.i++) {
                 this.add_tab();
                 tab_flag = true;
@@ -120,60 +112,60 @@ class TabManager {
     // Function for adding additional vehicle tabs to gui, it will add whenever a vehicle with ROS topic ending in odometry is found
     add_tab() {
         let n = this.i;
-        console.log("Tab: " + this.robot_name[n]);
+        console.log("Tab: " + this.robots_discovered[n]);
 
         let input_str;
 
         // TODO: Remove and change all references to subT sim specific topics, change them to follow subT colorado format
         /* Establishes topics for specific robot and clarifies how many datasets should be used for chart */
         let titles_data = [];
-        let robot_name_front1 = this.robot_name[n].charAt(0);
-        let robot_name_front2 = this.robot_name[n].substring(0,2);
-        if (true){//robot_name_front2 == "X1" || robot_name_front2 == "X2" || robot_name_front1 == "G" || this.robot_name[n] == "HUSKY_SIM") {
+        let robot_name_front1 = this.robots_discovered[n].charAt(0);
+        let robot_name_front2 = this.robots_discovered[n].substring(0,2);
+        if (true){//robot_name_front2 == "X1" || robot_name_front2 == "X2" || robot_name_front1 == "G" || this.robots_discovered[n] == "HUSKY_SIM") {
             this.global_vehicleType[n] = "Ground Vehicle";
             titles_data = ['linear_x', 'angular_z', 'cmd_linear_x', 'cmd_angular_z'];
-        } else if (robot_name_front2 == "X3" || robot_name_front2 == "X4" || robot_name_front1 == "A" || this.robot_name[n] == "DJI_SIM") {
+        } else if (robot_name_front2 == "X3" || robot_name_front2 == "X4" || robot_name_front1 == "A" || this.robots_discovered[n] == "DJI_SIM") {
             this.global_vehicleType[n] = "Air Vehicle";
             // titles_data contains the name of each dataset that is represented on the robots chart
             titles_data = ['linear_x', 'linear_y', 'linear_z', 'angular_x', 'angular_y', 'angular_z', 'cmd_linear_x', 'cmd_linear_y', 'cmd_linear_z', 'cmd_angular_x', 'cmd_angular_y', 'cmd_angular_z'];
         } else {
-            console.log(this.robot_name[n] + " is not recognized by this application...")
+            console.log(this.robots_discovered[n] + " is not recognized by this application...")
             return;
         }
 
         let OdomTopic = {
-            topic: "/" + this.robot_name[n] + "/odometry",
+            topic: "/" + this.robots_discovered[n] + "/odometry",
             messageType: "nav_msgs/Odometry"
         };
-        let CmdVelTopic = "/" + this.robot_name[n] + "/cmd_vel";
+        let CmdVelTopic = "/" + this.robots_discovered[n] + "/cmd_vel";
         let CmdPosTopic = {
-            topic: "/" + this.robot_name[n] + "/current_goal",
+            topic: "/" + this.robots_discovered[n] + "/current_goal",
             messageType: "geometry_msgs/PoseStamped"
         };
         let BatteryTopic = {
-            topic: "/" + this.robot_name[n] + "/battery_status",
+            topic: "/" + this.robots_discovered[n] + "/battery_status",
             messageType: "std_msgs/Float32"
         };
         let ControlTopic = {
-            topic: "/" + this.robot_name[n] + "/control_status",
+            topic: "/" + this.robots_discovered[n] + "/control_status",
             messageType: "std_msgs/UInt8"
         };
         let ArtifactTopic = {
             // topic: "/artifact_record",  // For use when artifact detection is on ground station
-            topic: "/" + this.robot_name[n] + "/artifact_record",
+            topic: "/" + this.robots_discovered[n] + "/artifact_record",
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
         let ArtifactImgTopic = {
             // topic: "/artifact_record",  // For use to save images on ground station
-            topic: "/" + this.robot_name[n] + "/located_artifact_img",
+            topic: "/" + this.robots_discovered[n] + "/located_artifact_img",
             messageType: "marble_artifact_detection_msgs/ArtifactImg"
         };
         let VehicleStatusTopic = {
-            topic: "/" + this.robot_name[n] + "/status", //TODO: change to vehicle_status
+            topic: "/" + this.robots_discovered[n] + "/status", //TODO: change to vehicle_status
             messageType: "marble_common_msgs/VehicleStatus"
         }
         let PointCloudTopic = {
-            topic: "/" + this.robot_name[n] + "/octomap_point_cloud_occupied",
+            topic: "/" + this.robots_discovered[n] + "/octomap_point_cloud_occupied",
             // topic: "/octomap_point_cloud_occupied",
             messageType: "sensor_msgs/PointCloud2"
         };
@@ -221,14 +213,14 @@ class TabManager {
 
         // Creating tab at top of screen for selecting robot view
         $('#Robot_Tabs').prepend(`
-        <li class="nav-item" id="` + this.robot_name[n] + `_nav_link" robot_name="` + this.robot_name[n] + `">
-            <a  class="nav-link" onclick="window.openPage('` + this.robot_name[n] + `', ` + n + `)" >` + this.robot_name[n] + `<br><span id="connection_status_` + this.robot_name[n] + `"><font color="green">Connected</font></span></a>
+        <li class="nav-item" id="` + this.robots_discovered[n] + `_nav_link" robot_name="` + this.robots_discovered[n] + `">
+            <a  class="nav-link" onclick="window.openPage('` + this.robots_discovered[n] + `', ` + n + `)" >` + this.robots_discovered[n] + `<br><span id="connection_status_` + this.robots_discovered[n] + `"><font color="green">Connected</font></span></a>
         </li>
         `);
 
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");
-        tab_content.setAttribute("id", this.robot_name[n]);
+        tab_content.setAttribute("id", this.robots_discovered[n]);
         tab_content.setAttribute("class", "tabcontent");
 
         var wrapper1 = document.createElement("DIV");
@@ -255,7 +247,7 @@ class TabManager {
         viewer.innerHTML = `<dom-bind id="t">
           <template is="dom-bind">
             <ros-websocket auto id="websocket"ros="{{ros}}"url="ws://localhost:9090"></ros-websocket>
-            <ros-rviz id="` + this.robot_name[n] + `_rviz" ros="{{ros}}"websocket-url="ws://localhost:9090"></ros-rviz>
+            <ros-rviz id="` + this.robots_discovered[n] + `_rviz" ros="{{ros}}"websocket-url="ws://localhost:9090"></ros-rviz>
           </template>
         </dom-bind>`.trim();
 
@@ -435,7 +427,7 @@ class TabManager {
         wrapper2.appendChild(restart_btn);
 
                 // var batteryLevel = "<div class='ldBar' data-preset='circle' data-stroke='data:ldbar/res,gradient(0,1,#eb8,#ad6,#c94)' data-stroke-width='15' data-value='100' style='width:100%;height:130px'></div>";
-        // var other = "<div class='meter'><span id='" + this.robot_name[n] + "_battery' style='width: 100%'></span></div>";
+        // var other = "<div class='meter'><span id='" + this.robots_discovered[n] + "_battery' style='width: 100%'></span></div>";
         var other = "<div class='circle fill' data-fill='64'><p class='circle-text'>0%</p></div>";
         var battery_voltage = document.createElement("SPAN");
         battery_voltage.setAttribute("class", "badge badge-secondary battery_voltage");
@@ -466,15 +458,15 @@ class TabManager {
 
         $('#Robot_Pages').prepend(tab_content);
 
-        create_viewer(this.robot_name[n]);
+        create_viewer(this.robots_discovered[n]);
 
         var robot_artifact_container = document.createElement("DIV");
         robot_artifact_container.setAttribute("class", "col-sm-6");
-        robot_artifact_container.setAttribute("robot_name", this.robot_name[n]);
+        robot_artifact_container.setAttribute("robot_name", this.robots_discovered[n]);
         var robot_artifact_titles = document.createElement("DIV");
         robot_artifact_titles.setAttribute("class", "row");
         robot_artifact_titles.setAttribute("artifact_id", "title");
-        // robot_artifact_titles.innerHTML = '<span id="robot_name" class="badge badge-secondary col-sm-1" style="text-align: center">' + this.robot_name[n] + '</span>' +
+        // robot_artifact_titles.innerHTML = '<span id="robot_name" class="badge badge-secondary col-sm-1" style="text-align: center">' + this.robots_discovered[n] + '</span>' +
         robot_artifact_titles.innerHTML = '<span id="artifact_row_id" class="badge badge-secondary col-sm-1" style="text-align: center"><b>ID</b></span>' +
             '<span id="type" class="badge badge-secondary col-sm-3" style="text-align: center"><b>Type</b></span>' +
             '<span id="confidence" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Confidence</b></span>' +
@@ -486,7 +478,7 @@ class TabManager {
         var robot_artifact_header = document.createElement("DIV");
         robot_artifact_titles.setAttribute("class", "row");
         robot_artifact_titles.setAttribute("artifact_id", "header");
-        robot_artifact_header.innerHTML = '<span class="badge badge-secondary col-sm-12"><b>' + this.robot_name[n] + '</b></span>';
+        robot_artifact_header.innerHTML = '<span class="badge badge-secondary col-sm-12"><b>' + this.robots_discovered[n] + '</b></span>';
 
         robot_artifact_container.appendChild(robot_artifact_header);
         robot_artifact_container.appendChild(robot_artifact_titles);
@@ -495,7 +487,7 @@ class TabManager {
             robot_artifact_tracker.setAttribute("class", "row");
             robot_artifact_tracker.setAttribute("artifact_id", parseFloat(i));
             console.log(JSON.stringify({x: 0.00, y: 0.00, z: 0.00}) );
-            // robot_artifact_tracker.innerHTML = '<span id="robot_name" class="badge badge-secondary col-sm-1" style="text-align: center">' + this.robot_name[n] + '</span>' +
+            // robot_artifact_tracker.innerHTML = '<span id="robot_name" class="badge badge-secondary col-sm-1" style="text-align: center">' + this.robots_discovered[n] + '</span>' +
             robot_artifact_tracker.innerHTML = '<span id="artifact_row_id" class="badge badge-secondary col-sm-1" style="text-align: center">' + i + '</span>' +
                 '<span contenteditable="true" id="type" class="badge badge-secondary col-sm-3" style="text-align: center; min-height: 1px;" value="undefined"> undefined </span>' +
                 '<span contenteditable="true" id="confidence" class="badge badge-secondary col-sm-2" style="text-align: center" value="0.00">0.00</span>' +
@@ -505,7 +497,7 @@ class TabManager {
 
             let robot_artifact_tracker_yes_container = document.createElement("DIV");
             robot_artifact_tracker_yes_container.setAttribute("class", "badge badge-secondary col-sm-2");
-            robot_artifact_tracker_yes_container.setAttribute("id", this.robot_name[n] + "_" + i);
+            robot_artifact_tracker_yes_container.setAttribute("id", this.robots_discovered[n] + "_" + i);
             let robot_artifact_tracker_yes = document.createElement("BUTTON");
             robot_artifact_tracker_yes.innerText = "Submit";
             robot_artifact_tracker_yes.onclick = function () {
@@ -546,7 +538,7 @@ class TabManager {
         }
         // this.artifact_tracker.appendChild(robot_artifact_container);
         // Sets up all objects for vehicle artifact manager
-        this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n]);
+        this.global_vehicleArtifactsList[n] = new Artifact(this.robots_discovered[n]);
 
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
             // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
