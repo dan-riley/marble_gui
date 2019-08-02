@@ -53,14 +53,12 @@ class TabManager {
         let topicsLength = topicsList.length;
         let prev_robot_length = this.robot_name.length; // Length of entire robots seen over all time before function
         let temp_robot_names = [];
-        let temp_n = 0;
         for (let i = 0; i < topicsLength; i++) {
             if (topicsList[i].includes("odometry")) {
                 let name = topicsList[i].split('/')[1];
                 if (temp_robot_names.indexOf(name) == -1) {
                     temp_robot_names.push(name);
                 }
-                temp_n++;
                 if (this.robot_name.indexOf(name) == -1) {
                     this.robot_name.push(name);
                     this.tabs_robot_name.push(name);
@@ -75,7 +73,6 @@ class TabManager {
             } else if (topicsList[i].includes("vehicle_status")) {
                 let name = topicsList[i].split('/')[1];
                 temp_robot_names.push(name);
-                temp_n++;
                 if (this.robot_name.indexOf(name) == -1 && !this.robot_name.includes(name)) {
                     this.robot_name.push(name);
                     this.tabs_robot_name.push(name);
