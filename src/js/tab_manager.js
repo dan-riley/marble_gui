@@ -74,20 +74,17 @@ class TabManager {
             } 
         }
 
-        let tab_flag = false; // Keeps track of if a change is made to the tabs that are currently displayed
         let curr_robot_length = this.robot_name.length; // Length of entire robots seen over all time after function
         for (let i = 0; i < curr_robot_length; i++) {
             if (temp_robot_names.indexOf(this.robot_name[i]) == -1 && this.tabs_robot_name.indexOf(this.robot_name[i]) != -1) {
                 // notify when robots disconnect. robot pages are kept so info regarding their previous history
                 // is not lost and maintains subscribers to Artifact, Point Cloud 2, and Pose Graph topics
                 $('#connection_status_' + this.robot_name[i]).html('<font color="red">Disconnected</font>')
-                tab_flag = true;
             }
         }
         if (curr_robot_length > prev_robot_length) {
             for (this.i; this.i < curr_robot_length; this.i++) {
                 this.add_tab();
-                tab_flag = true;
             }
         }
     }
