@@ -1,3 +1,5 @@
+var ANALYZE_TOPICS_LIST_INTERVAL = 2000;
+
 class TabManager {
     constructor() {
         // Permanent subscribers for all vehicle tabs
@@ -36,7 +38,7 @@ class TabManager {
 
         this.i = 0;
 
-        window.setInterval(this.get_TopicsFromROS, 2000);
+        window.setInterval(this.get_TopicsFromROS, ANALYZE_TOPICS_LIST_INTERVAL);
     }
     remove_tab(name) {
         var content = document.getElementById("Robot_Pages").querySelector("[id='" + name + "']");
@@ -70,7 +72,7 @@ class TabManager {
         let now = new Date();
         for (let i = 0; i < curr_robot_length; i++) {
             var status_dom = $('#connection_status_' + this.robot_name[i]);
-            if (now - this.time_since_last_msg[i] < 2000) {
+            if (now - this.time_since_last_msg[i] < ANALYZE_TOPICS_LIST_INTERVAL + 1000) {
                 status_dom.html('<font color="green">Connected</font>');
             }
             else{
