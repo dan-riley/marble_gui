@@ -84,10 +84,9 @@ class TabManager {
                 status_dom.html('<font color="red">Disconnected</font>');
             }
         }
-        if (curr_robot_length > prev_robot_length) {
-            for (this.i; this.i < curr_robot_length; this.i++) {
-                this.add_tab();
-            }
+
+        for (this.i; this.i < curr_robot_length; this.i++) {
+            this.add_tab();
         }
     }
 
@@ -187,6 +186,7 @@ class TabManager {
             name: PointCloudTopic.topic,
             messageType: PointCloudTopic.messageType
         });
+        this.time_since_last_msg[n] = new Date();
         
         // ! Include if you want to send desired positions to robots
         input_str = "position_x: <input id='position_x' type='text' placeholder='0'> position_y: <input id='position_y' type='text' placeholder='0'> position_z: <input id='position_z' type='text' placeholder='0'>" +
