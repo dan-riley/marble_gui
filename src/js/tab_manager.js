@@ -53,9 +53,10 @@ class TabManager {
         let topicsLength = topicsList.length;
         let prev_robot_length = this.robot_name.length; // Length of entire robots seen over all time before function
         let temp_robot_names = [];
+        var patt = /\d\d/;
         for (let i = 0; i < topicsLength; i++) {
             let name = topicsList[i].split('/')[1];
-            if (topicsList[i].includes("odometry")) {
+            if (patt.test(name)) {
                 if (temp_robot_names.indexOf(name) == -1) {
                     temp_robot_names.push(name);
                 }
@@ -70,14 +71,7 @@ class TabManager {
                 else {
   
                 }
-            } else if (topicsList[i].includes("vehicle_status")) {
-                temp_robot_names.push(name);
-                if (this.robot_name.indexOf(name) == -1 && !this.robot_name.includes(name)) {
-                    this.robot_name.push(name);
-                    this.tabs_robot_name.push(name);
-                    this.x++;
-                }
-            }
+            } 
         }
 
         let tab_flag = false; // Keeps track of if a change is made to the tabs that are currently displayed
