@@ -33,7 +33,6 @@ class TabManager {
         for (let k = 0; k < this.colorsLength; k++) {
             this.fullColors[k] = this.colors[k] + "1.0)";
         }
-        let topicsLength = topicsList.length;
 
         this.i = 0;
 
@@ -51,16 +50,10 @@ class TabManager {
     //\brief Function for searching topics list for robot namespaces and adding those robots to the current robot name
     // list if they are not there already
     search_robots() {
-        let topicsLength = topicsList.length;
-        let prev_robot_length = this.robot_name.length; // Length of entire robots seen over all time before function
-        let temp_robot_names = [];
         var patt = /\d\d/;
-        for (let i = 0; i < topicsLength; i++) {
+        for (let i = 0; i < topicsList.length; i++) {
             let name = topicsList[i].split('/')[1];
             if (patt.test(name)) {
-                if (temp_robot_names.indexOf(name) == -1) {
-                    temp_robot_names.push(name);
-                }
                 if (this.robot_name.indexOf(name) == -1) {
                     this.robot_name.push(name);
                     this.tabs_robot_name.push(name);
