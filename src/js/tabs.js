@@ -3,7 +3,6 @@ var prev_time = []
 function subscribe_to_all_robot_topics(k) {
     ///\brief Subscriber to Odometry Topic for Vehicle. Grabs information and assigns it to chart
     global_tabManager.Tab_OdomSub[k].subscribe(function (message) {
-        global_tabManager.time_since_last_msg[k] = new Date();
         // window.setTimeout(function(){
         global_tabManager.Tab_OdomMsg[k] = message;
         var date = new Date();
@@ -96,14 +95,12 @@ function subscribe_to_all_robot_topics(k) {
 
     // Update voltage value on vehicle tab
     global_tabManager.Tab_BatterySub[k].subscribe(function (message) {
-        global_tabManager.time_since_last_msg[k] = new Date();
         var battery = document.getElementsByClassName("battery_voltage")[0];
         battery.innerText = "Voltage: " + Math.round( message.data * 10 ) / 10;
     });
 
     // Update vehicle control status on vehicle tab
     global_tabManager.Tab_ControlSub[k].subscribe(function (message) {
-        global_tabManager.time_since_last_msg[k] = new Date();
         var ctrStatus = document.getElementsByClassName("control_status")[0];
         
         switch(message.data){
@@ -150,7 +147,6 @@ function subscribe_to_all_robot_topics(k) {
 
     // Subscriber to point cloud topic for vehicle that publishes to darpa server
     global_tabManager.Tab_PointCloudSub[k].subscribe(function (msg) {
-        global_tabManager.time_since_last_msg[k] = new Date();
         var date = new Date();
 
         var now_time = date.getTime() / 1000;
@@ -181,7 +177,7 @@ window.openPage = function (pageName, k=-1 ){
     // Hide all elements with class="tabcontent" by default */
     var tabcontent;
 
-    // Attempts at unsubscribing from all topics when the tab is switched
+        // Attempts at unsubscribing from all topics when the tab is switched
     // Meant to reduce load of data being sent to the gui
     try {
         var OdomSubLength = global_tabManager.get_Tab_OdomSub().length;
@@ -195,7 +191,7 @@ window.openPage = function (pageName, k=-1 ){
     } catch {
 
     }
-
+    
     if (k >= 0) {
 
         // TODO: Create way of resetting data completely on chart

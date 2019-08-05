@@ -28,6 +28,12 @@ class TabManager {
         this.pages = document.getElementById("Robot_Pages");
         this.artifact_tracker = document.getElementById("Artifact_Page");
 
+        this.publishersClient = new ROSLIB.Service({
+            ros: ros,
+            name: '/rosapi/publishers',
+            serviceType: 'rosapi/Publishers'
+        });
+
         this.fullColors = [];
         // var colors = ['rgba(255,0,0,1.0)', 'rgba(0,255,0,1.0)', 'rgba(0,0,255, 1.0)', 'rgba(128,128,0, 1.0)', 'rgba(128,0,128, 1.0)', 'rgba(0,128,128, 1.0)']
         this.colors = ['rgba(128,0,0,', 'rgba(0,128,0,', 'rgba(0,0,128,', 'rgba(128,128,0,', 'rgba(128,0,128,', 'rgba(0,128,128,', 'rgba(255,0,0,', 'rgba(0,255,0,', 'rgba(0,0,255,', 'rgba(0,255,255,', 'rgba(255,0,255,', 'rgba(2555,255,0,', 'rgba(0,0,0,']
@@ -55,14 +61,30 @@ class TabManager {
         var patt = /\d\d/;
         for (let i = 0; i < topicsList.length; i++) {
             let name = topicsList[i].split('/')[1];
-            if (patt.test(name)) {
-                if (this.robot_name.indexOf(name) == -1) {
-                    this.robot_name.push(name);
-                    this.tabs_robot_name.push(name);
-                    this.x++;
-                }
+            var handled_names = [];
 
-            } 
+            if(handled_names.indexOf(name) == -1){
+                if (patt.test(name)) {
+                    if (this.robot_name.indexOf(name) == -1) {
+                        this.robot_name.push(name);
+                        this.tabs_robot_name.push(name);
+                        this.x++;
+                    }
+
+
+                    var my_n = this.robot_name.indexOf(name);
+                    var my_this = this;
+                    var pub_request = new ROSLIB.ServiceRequest({
+                        topic : topicsList[i]
+                    });
+                    this.publishersClient.callService(pub_request, function (result) {
+                        if(result.publishers.length > 0){
+                            my_this.time_since_last_msg[my_n] = new Date();
+                        }
+                    });
+                } 
+                handled_names.push(name);
+            }
         }
 
         let curr_robot_length = this.robot_name.length; // Length of entire robots seen over all time after function
@@ -181,7 +203,6 @@ class TabManager {
             name: PointCloudTopic.topic,
             messageType: PointCloudTopic.messageType
         });
-        this.time_since_last_msg[n] = new Date();
         
         // ! Include if you want to send desired positions to robots
         input_str = "position_x: <input id='position_x' type='text' placeholder='0'> position_y: <input id='position_y' type='text' placeholder='0'> position_z: <input id='position_z' type='text' placeholder='0'>" +
@@ -518,14 +539,12 @@ class TabManager {
         this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n]);
 
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
-            this.time_since_last_msg[n] = new Date();
             // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
                 global_tabManager.global_vehicleArtifactsList[n].set_artifacts(msg.artifacts);
             // }
 
         });
         this.Tab_ArtifactImgSub[n].subscribe(function (msg) {
-            this.time_since_last_msg[n] = new Date();
             // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
                 global_tabManager.global_vehicleArtifactsList[n].save_image(msg);
             // }

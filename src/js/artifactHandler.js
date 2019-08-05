@@ -10,7 +10,10 @@ class Artifact {
         this.robot_name = name;
         this.artifact_All = [];
         this.artifactsList = [];
-        this.reportedArtifacts = new Array(ARTIFACT_ARR_LEN);
+        this.reportedArtifacts = [];
+        for(let i = 0; i < ARTIFACT_ARR_LEN; i++){
+            this.artifactsList[i] = {};
+        }
 
         if (!this.read_file()) {
             for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
@@ -97,9 +100,12 @@ class Artifact {
             this.artifact_confidence[i].setAttribute("value", toString(confidence));
             this.artifact_position[i].setAttribute("value", JSON.stringify(position));
 
-            this.artifact_confidence[i].innerText = confidence.toFixed(2);
-            this.artifact_position[i].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
-            
+            if(confidence != undefined){
+                this.artifact_confidence[i].innerText = confidence.toFixed(2);
+            }
+            if(position != undefined){
+                this.artifact_position[i].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
+            }
             if(artifact.image_data == null){
                 this.artifact_image[i].innerText = "No Image";
             }
@@ -148,36 +154,31 @@ class Artifact {
         this.updateDisplay();
     }
     set_artifacts(msg) {
-        try{
-            if(msg.length != ARTIFACT_ARR_LEN){
-                console.log("number of artifacts in message received is not the same as the amount expected!!!");
-            }
-            for (let i = 0; i < ARTIFACT_ARR_LEN; i++){
-
-                // When there is not an artifact class declared, set all properties of the artifact
-                if (this.artifactsList[i].obj_class == ""){
-                    this.artifactsList[i].obj_class = msg[i].obj_class;
-                    this.artifactsList[i].obj_prob = msg[i].obj_prob;
-                    this.artifactsList[i].has_been_reported = msg[i].has_been_reported;
-                    this.artifactsList[i].header = msg[i].header;
-                    this.artifactsList[i].position = msg[i].position;
-                    this.artifactsList[i].image_id = msg[i].image_id;
-                    this.artifactsList[i].vehicle_reporter = msg[i].vehicle_reporter;
-                }
-                // When there is an artifact class declared, only set certain properties of the artifact
-                // this logic allows for the user to change the name of artifact class from the gui
-                else{
-                    // this.artifactsList = msg;
-                    // this.artifactsList[i].obj_class = "";
-                    this.artifactsList[i].obj_prob = msg[i].obj_prob;
-                    this.artifactsList[i].has_been_reported = msg[i].has_been_reported;
-                    this.artifactsList[i].header = msg[i].header;
-                    this.artifactsList[i].position = msg[i].position;
-                }
-            }
+        if(msg.length != ARTIFACT_ARR_LEN){
+            console.log("number of artifacts in message received is not the same as the amount expected!!!");
         }
-        catch{
-            this.artifactsList = msg;
+        for (let i = 0; i < ARTIFACT_ARR_LEN; i++){
+
+            // When there is not an artifact class declared, set all properties of the artifact
+            if (this.artifactsList[i].obj_class == undefined || this.artifactsList[i].obj_class == ""){
+                this.artifactsList[i].obj_class = msg[i].obj_class;
+                this.artifactsList[i].obj_prob = msg[i].obj_prob;
+                this.artifactsList[i].has_been_reported = msg[i].has_been_reported;
+                this.artifactsList[i].header = msg[i].header;
+                this.artifactsList[i].position = msg[i].position;
+                this.artifactsList[i].image_id = msg[i].image_id;
+                this.artifactsList[i].vehicle_reporter = msg[i].vehicle_reporter;
+            }
+            // When there is an artifact class declared, only set certain properties of the artifact
+            // this logic allows for the user to change the name of artifact class from the gui
+            else{
+                // this.artifactsList = msg;
+                // this.artifactsList[i].obj_class = "";
+                this.artifactsList[i].obj_prob = msg[i].obj_prob;
+                this.artifactsList[i].has_been_reported = msg[i].has_been_reported;
+                this.artifactsList[i].header = msg[i].header;
+                this.artifactsList[i].position = msg[i].position;
+            }
         }
         
         this.save_file();
