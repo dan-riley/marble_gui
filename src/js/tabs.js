@@ -27,6 +27,7 @@ window.openPage = function (pageName, k=-1 ){
 
         ///\brief Subscriber to Odometry Topic for Vehicle. Grabs information and assigns it to chart
         global_tabManager.Tab_OdomSub[k].subscribe(function (message) {
+            global_tabManager.time_since_last_msg[k] = new Date();
             // window.setTimeout(function(){
             global_tabManager.Tab_OdomMsg[k] = message;
             var date = new Date();
@@ -118,6 +119,7 @@ window.openPage = function (pageName, k=-1 ){
         });
         ///\brief Subscriber to Odometry Topic for Vehicle. Grabs information and assigns it to chart
         // Tab_CmdVelSub[k].subscribe(function (message) {
+        //     global_tabManager.time_since_last_msg[k] = new Date();
         //     // window.setTimeout(function(){
         //     var date = new Date();
         //     var now_time = date.getTime()/1000;
@@ -199,11 +201,13 @@ window.openPage = function (pageName, k=-1 ){
         // Changes voltage value on vehicle tab
         global_tabManager.Tab_BatterySub[k].subscribe(function (message) {
             // console.log(message);
+            global_tabManager.time_since_last_msg[k] = new Date();
             var battery = document.getElementsByClassName("battery_voltage")[0];
             battery.innerText = "Voltage: " + Math.round( message.data * 10 ) / 10;
         });
         // Changes vehicle control status on vehicle tab
         global_tabManager.Tab_ControlSub[k].subscribe(function (message) {
+            global_tabManager.time_since_last_msg[k] = new Date();
             // console.log(message);
             var ctrStatus = document.getElementsByClassName("control_status")[0];
             
@@ -251,6 +255,7 @@ window.openPage = function (pageName, k=-1 ){
 
         // Subscriber to point cloud topic for vehicle that publishes to darpa server
         global_tabManager.Tab_PointCloudSub[k].subscribe(function (msg) {
+            global_tabManager.time_since_last_msg[k] = new Date();
             var date = new Date();
 
             var now_time = date.getTime() / 1000;

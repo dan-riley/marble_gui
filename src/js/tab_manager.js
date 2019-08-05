@@ -19,6 +19,7 @@ class TabManager {
 
         this.rows = 0;
         this.robot_name = [];
+        this.time_since_last_msg = [];
         this.tabs_robot_name = [];
         this.x = 0;
         this.tabs = document.getElementById("Robot_Tabs");
@@ -65,21 +66,22 @@ class TabManager {
                     this.tabs_robot_name.push(name);
                     this.x++;
                 }
-                else if (this.tabs_robot_name.indexOf(name) == -1) {
-                    $('#connection_status_' + name).html('<font color="green">Connected</font>')
-                } 
-                else {
-  
-                }
+
             } 
         }
 
         let curr_robot_length = this.robot_name.length; // Length of entire robots seen over all time after function
+        
+        // report robot as "disconnect" if it was previously discovered but we are no longer
+        // receiving messages from it.
+        let now = new Date();
         for (let i = 0; i < curr_robot_length; i++) {
-            if (temp_robot_names.indexOf(this.robot_name[i]) == -1 && this.tabs_robot_name.indexOf(this.robot_name[i]) != -1) {
-                // notify when robots disconnect. robot pages are kept so info regarding their previous history
-                // is not lost and maintains subscribers to Artifact, Point Cloud 2, and Pose Graph topics
-                $('#connection_status_' + this.robot_name[i]).html('<font color="red">Disconnected</font>')
+            var status_dom = $('#connection_status_' + this.robot_name[i]);
+            if (now - this.time_since_last_msg[i] < 2000) {
+                status_dom.html('<font color="green">Connected</font>');
+            }
+            else{
+                status_dom.html('<font color="red">Disconnected</font>');
             }
         }
         if (curr_robot_length > prev_robot_length) {
@@ -194,7 +196,7 @@ class TabManager {
         // Creating tab at top of screen for selecting robot view
         $('#Robot_Tabs').prepend(`
         <li class="nav-item" id="` + this.robot_name[n] + `_nav_link" robot_name="` + this.robot_name[n] + `">
-            <a  class="nav-link" onclick="window.openPage('` + this.robot_name[n] + `', ` + n + `)" >` + this.robot_name[n] + `<br><span id="connection_status_` + this.robot_name[n] + `"><font color="green">Connected</font></span></a>
+            <a  class="nav-link" onclick="window.openPage('` + this.robot_name[n] + `', ` + n + `)" >` + this.robot_name[n] + `<br><span id="connection_status_` + this.robot_name[n] + `"></span></a>
         </li>
         `);
 
@@ -521,12 +523,14 @@ class TabManager {
         this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n]);
 
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
+            this.time_since_last_msg[n] = new Date();
             // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
                 global_tabManager.global_vehicleArtifactsList[n].set_artifacts(msg.artifacts);
             // }
 
         });
         this.Tab_ArtifactImgSub[n].subscribe(function (msg) {
+            this.time_since_last_msg[n] = new Date();
             // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
                 global_tabManager.global_vehicleArtifactsList[n].save_image(msg);
             // }
