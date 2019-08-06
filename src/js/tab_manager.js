@@ -323,7 +323,7 @@ class TabManager {
 
                 })
                 .fail(function(a, b, c) {
-                    alert( "error" );
+                    console.log("error reporting pose array: " + c);
                 });
                 global_tabManager.prev_time[n] = now_time;
             }
