@@ -605,8 +605,9 @@ class TabManager {
             topicsList = result.topics;
             topicsTypeList = result.types;
             window.autocomplete(document.getElementById("myInput"), topicsList);
+            global_tabManager.search_robots();
         });
-        global_tabManager.search_robots();
+        
     }
 }
 /* Plugin designed to fill the chart with white */
