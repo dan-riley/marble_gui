@@ -11,6 +11,7 @@ class TabManager {
         this.Tab_ArtifactImgSub = [];
         this.Tab_VehicleStatusSub = [];
         this.Tab_PointCloudSub = [];
+        this.Tab_OccupancyGridSub = [];
         this.Tab_CmdVelSub = [];
         this.Tab_OdomMsg = [];
         // Tab_BatteryMsg;
@@ -202,6 +203,11 @@ class TabManager {
             ros: ros,
             name: PointCloudTopic.topic,
             messageType: PointCloudTopic.messageType
+        });
+        this.Tab_OccupancyGridSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name:  "/" + this.robot_name[n] + "/map",
+            messageType: "nav_msgs/OccupancyGrid"
         });
         
         // ! Include if you want to send desired positions to robots

@@ -193,6 +193,40 @@ function subscribe_to_all_robot_topics(k) {
         }
     }, 1000);
 
+    var last_grid_report_success = "never";
+
+    // Subscriber to occupancy grid topic for vehicle that publishes to darpa server
+    global_tabManager.Tab_OccupancyGridSub[k].subscribe(function (msg) {
+        var now = new Date();
+        var now_time = now.getTime() / 1000;
+        if (now_time - prev_time[k] >= 0.05 || prev_time[k] == null) {
+            $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
+            .done(function(json, statusText, xhr) {
+                if(xhr.status == 200){
+                    last_grid_report_success = new Date();
+                    $('#mapping_grid_report_last_sent_raw').text(Math.round(now/100)/10);
+                }
+                else{
+                    console.log("error in sending /map/update occupancyGrid to DARPA server");
+                    console.log(statusText);
+                    console.log(xhr);
+                }
+
+            });
+            prev_time[k] = now_time;
+        }
+    });
+
+    setInterval(function(){ 
+        if(last_grid_report_success != "never"){
+            var now = new Date();
+            $('#mapping_grid_report_last_sent_secs_ago').text(
+                Math.round(
+                    (now - last_grid_report_success)/1000
+                ) + ' seconds ago');
+        }
+    }, 1000);
+
 }
 
 window.openPage = function (pageName, k=-1 ){
