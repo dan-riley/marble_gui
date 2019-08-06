@@ -164,10 +164,6 @@ $(document).ready(function () {
       topicsList = result.topics;
       topicsTypeList = result.types;
 
-      if (topicsList.includes("/clock")) {
-        startClock();
-      }
-
       createTab();
       window.autocomplete(document.getElementById("myInput"), topicsList);
       window.setInterval(function () {
@@ -177,18 +173,6 @@ $(document).ready(function () {
     });
 
 
-  }
-
-  // TODO: Get rid of dependency on /clock topic from Gazebo for competition
-  function startClock() {
-    // var topic = new ROSLIB.Topic({
-    //   ros: ros,
-    //   name: "/clock",
-    //   messageType: "rosgraph_msgs/Clock"
-    // });
-    // topic.subscribe(function (msg){
-    //   ROS_clock = msg.clock.secs + msg.clock.nsecs * 0.000000001;
-    // });
   }
 
 
