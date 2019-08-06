@@ -20,6 +20,7 @@ class TabManager {
  
        this.global_vehicleType = [];
        this.global_vehicleArtifactsList = [];
+       this.prev_time = []
  
        this.rows = 0;
        this.robot_name = [];
@@ -215,6 +216,129 @@ class TabManager {
            name:  "/" + this.robot_name[n] + "/map",
            messageType: "nav_msgs/OccupancyGrid"
        });
+       var date = new Date();
+       var now_time = date.getTime() / 1000;
+       global_tabManager.prev_time[n] = now_time;
+
+       function darpa_msg_from_ros_msg(msg, type){
+            var now = new Date();
+            var now_time = now.getTime() / 1000;
+            let objJsonB64 = Buffer.from(msg.data).toString("base64");
+            msg.header.stamp = now_time;
+            msg.data = objJsonB64;
+            msg.header.frame_id = "darpa";
+            var data = {
+                type: type,
+                msg: msg
+            };
+            return JSON.stringify(data)
+        }
+
+        var last_cloud_report_success = "never";
+
+        // Subscriber to point cloud topic for vehicle that publishes to darpa server
+        global_tabManager.Tab_PointCloudSub[n].subscribe(function (msg) {   
+            var now = new Date();
+            var now_time = now.getTime() / 1000;     
+            if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
+                $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
+                .done(function(json, statusText, xhr) {
+                    if(xhr.status == 200){
+                        last_cloud_report_success = new Date();
+                        $('#mapping_cloud_report_last_sent_raw').text(Math.round(now/100)/10);
+                    }
+                    else{
+                        console.log("error in sending /map/update PointCloud to DARPA server");
+                        console.log(statusText);
+                        console.log(xhr);
+                    }
+
+                });
+                global_tabManager.prev_time[n] = now_time;
+            }
+        });
+
+        setInterval(function(){ 
+            if(last_cloud_report_success != "never"){
+                var now = new Date();
+                $('#mapping_cloud_report_last_sent_secs_ago').text(
+                    Math.round(
+                        (now - last_cloud_report_success)/1000
+                    ) + ' seconds ago');
+            }
+        }, 1000);
+
+        var last_grid_report_success = "never";
+
+        // Subscriber to occupancy grid topic for vehicle that publishes to darpa server
+        global_tabManager.Tab_OccupancyGridSub[n].subscribe(function (msg) {
+            var now = new Date();
+            var now_time = now.getTime() / 1000;
+            if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
+                $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
+                .done(function(json, statusText, xhr) {
+                    if(xhr.status == 200){
+                        last_grid_report_success = new Date();
+                        $('#mapping_grid_report_last_sent_raw').text(Math.round(now/100)/10);
+                    }
+                    else{
+                        console.log("error in sending /map/update occupancyGrid to DARPA server");
+                        console.log(statusText);
+                        console.log(xhr);
+                    }
+
+                });
+                global_tabManager.prev_time[n] = now_time;
+            }
+        });
+
+        setInterval(function(){ 
+            if(last_grid_report_success != "never"){
+                var now = new Date();
+                $('#mapping_grid_report_last_sent_secs_ago').text(
+                    Math.round(
+                        (now - last_grid_report_success)/1000
+                    ) + ' seconds ago');
+            }
+        }, 1000);
+
+        var last_telem_report_success = "never";
+
+        // Subscriber to pose array topic for vehicle that publishes to darpa server
+        global_tabManager.Tab_PoseArraySub[n].subscribe(function (msg) {
+            var now = new Date();
+            var now_time = now.getTime() / 1000;
+            if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
+                $.post(SERVER_ROOT + "/state/update/", JSON.stringify(msg))
+                .done(function(json, statusText, xhr) {
+                    if(xhr.status == 200){
+                        last_telem_report_success = new Date();
+                        $('#telemetry_report_last_sent_raw').text(Math.round(now/100)/10);
+                    }
+                    else{
+                        console.log("error in sending /state/update PoseArray to DARPA server");
+                        console.log(statusText);
+                        console.log(xhr);
+                    }
+
+                })
+                .fail(function(a, b, c) {
+                    alert( "error" );
+                });
+                global_tabManager.prev_time[n] = now_time;
+            }
+        });
+
+        setInterval(function(){ 
+            if(last_telem_report_success != "never"){
+                var now = new Date();
+                $('#telemetry_report_last_sent_secs_ago').text(
+                    Math.round(
+                        (now - last_telem_report_success)/1000
+                    ) + ' seconds ago');
+            }
+        }, 1000);
+
       
        // ! Include if you want to send desired positions to robots
        input_str = "position_x: <input id='position_x' type='text' placeholder='0'> position_y: <input id='position_y' type='text' placeholder='0'> position_z: <input id='position_z' type='text' placeholder='0'>" +

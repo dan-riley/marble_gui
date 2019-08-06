@@ -1,5 +1,3 @@
-var prev_time = []
-
 function subscribe_to_all_robot_topics(k) {
     ///\brief Subscriber to Odometry Topic for Vehicle. Grabs information and assigns it to chart
     global_tabManager.Tab_OdomSub[k].subscribe(function (message) {
@@ -13,7 +11,7 @@ function subscribe_to_all_robot_topics(k) {
         var diff_time = 5;
 
 
-        if (now_time - prev_time[k] >= 0.05 || prev_time[k] == null) {
+        if (now_time - global_tabManager.prev_time[k] >= 0.05 || global_tabManager.prev_time[k] == null) {
             time >= diff_time ? min_time = time - diff_time : min_time = 0;
             // var json = {x: global_tabManager.Tab_OdomMsg[k].pose.pose.position.x, y: global_tabManager.Tab_OdomMsg[k].pose.pose.position.y};
             var vel_data = [];
@@ -88,7 +86,7 @@ function subscribe_to_all_robot_topics(k) {
 
             global_tabManager.Tab_OdomChart[k].update();
 
-            prev_time[k] = now_time;
+            global_tabManager.prev_time[k] = now_time;
         }
         // },100);
     });
@@ -144,126 +142,6 @@ function subscribe_to_all_robot_topics(k) {
         }
 
     });
-
-    function darpa_msg_from_ros_msg(msg, type){
-        var now = new Date();
-        var now_time = now.getTime() / 1000;
-        let objJsonB64 = Buffer.from(msg.data).toString("base64");
-        msg.header.stamp = now_time;
-        msg.data = objJsonB64;
-        msg.header.frame_id = "darpa";
-        data = {
-            type: type,
-            msg: msg
-        };
-        return JSON.stringify(data)
-    }
-
-    var last_cloud_report_success = "never";
-
-    // Subscriber to point cloud topic for vehicle that publishes to darpa server
-    global_tabManager.Tab_PointCloudSub[k].subscribe(function (msg) {   
-        var now = new Date();
-        var now_time = now.getTime() / 1000;     
-        if (now_time - prev_time[k] >= 0.05 || prev_time[k] == null) {
-            $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
-            .done(function(json, statusText, xhr) {
-                if(xhr.status == 200){
-                    last_cloud_report_success = new Date();
-                    $('#mapping_cloud_report_last_sent_raw').text(Math.round(now/100)/10);
-                }
-                else{
-                    console.log("error in sending /map/update PointCloud to DARPA server");
-                    console.log(statusText);
-                    console.log(xhr);
-                }
-
-            });
-            prev_time[k] = now_time;
-        }
-    });
-
-    setInterval(function(){ 
-        if(last_cloud_report_success != "never"){
-            var now = new Date();
-            $('#mapping_cloud_report_last_sent_secs_ago').text(
-                Math.round(
-                    (now - last_cloud_report_success)/1000
-                ) + ' seconds ago');
-        }
-    }, 1000);
-
-    var last_grid_report_success = "never";
-
-    // Subscriber to occupancy grid topic for vehicle that publishes to darpa server
-    global_tabManager.Tab_OccupancyGridSub[k].subscribe(function (msg) {
-        var now = new Date();
-        var now_time = now.getTime() / 1000;
-        if (now_time - prev_time[k] >= 0.05 || prev_time[k] == null) {
-            $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
-            .done(function(json, statusText, xhr) {
-                if(xhr.status == 200){
-                    last_grid_report_success = new Date();
-                    $('#mapping_grid_report_last_sent_raw').text(Math.round(now/100)/10);
-                }
-                else{
-                    console.log("error in sending /map/update occupancyGrid to DARPA server");
-                    console.log(statusText);
-                    console.log(xhr);
-                }
-
-            });
-            prev_time[k] = now_time;
-        }
-    });
-
-    setInterval(function(){ 
-        if(last_grid_report_success != "never"){
-            var now = new Date();
-            $('#mapping_grid_report_last_sent_secs_ago').text(
-                Math.round(
-                    (now - last_grid_report_success)/1000
-                ) + ' seconds ago');
-        }
-    }, 1000);
-
-    var last_telem_report_success = "never";
-
-    // Subscriber to pose array topic for vehicle that publishes to darpa server
-    global_tabManager.Tab_PoseArraySub[k].subscribe(function (msg) {
-        var now = new Date();
-        var now_time = now.getTime() / 1000;
-        if (now_time - prev_time[k] >= 0.05 || prev_time[k] == null) {
-            $.post(SERVER_ROOT + "/state/update/", JSON.stringify(msg))
-            .done(function(json, statusText, xhr) {
-                if(xhr.status == 200){
-                    last_telem_report_success = new Date();
-                    $('#telemetry_report_last_sent_raw').text(Math.round(now/100)/10);
-                }
-                else{
-                    console.log("error in sending /state/update PoseArray to DARPA server");
-                    console.log(statusText);
-                    console.log(xhr);
-                }
-
-            })
-            .fail(function(a, b, c) {
-                alert( "error" );
-            });
-            prev_time[k] = now_time;
-        }
-    });
-
-    setInterval(function(){ 
-        if(last_telem_report_success != "never"){
-            var now = new Date();
-            $('#telemetry_report_last_sent_secs_ago').text(
-                Math.round(
-                    (now - last_telem_report_success)/1000
-                ) + ' seconds ago');
-        }
-    }, 1000);
-
 }
 
 window.openPage = function (pageName, k=-1 ){
