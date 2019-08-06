@@ -227,6 +227,43 @@ function subscribe_to_all_robot_topics(k) {
         }
     }, 1000);
 
+    var last_telem_report_success = "never";
+
+    // Subscriber to pose array topic for vehicle that publishes to darpa server
+    global_tabManager.Tab_PoseArraySub[k].subscribe(function (msg) {
+        var now = new Date();
+        var now_time = now.getTime() / 1000;
+        if (now_time - prev_time[k] >= 0.05 || prev_time[k] == null) {
+            $.post(SERVER_ROOT + "/state/update/", JSON.stringify(msg))
+            .done(function(json, statusText, xhr) {
+                if(xhr.status == 200){
+                    last_telem_report_success = new Date();
+                    $('#telemetry_report_last_sent_raw').text(Math.round(now/100)/10);
+                }
+                else{
+                    console.log("error in sending /state/update PoseArray to DARPA server");
+                    console.log(statusText);
+                    console.log(xhr);
+                }
+
+            })
+            .fail(function(a, b, c) {
+                alert( "error" );
+            });
+            prev_time[k] = now_time;
+        }
+    });
+
+    setInterval(function(){ 
+        if(last_telem_report_success != "never"){
+            var now = new Date();
+            $('#telemetry_report_last_sent_secs_ago').text(
+                Math.round(
+                    (now - last_telem_report_success)/1000
+                ) + ' seconds ago');
+        }
+    }, 1000);
+
 }
 
 window.openPage = function (pageName, k=-1 ){

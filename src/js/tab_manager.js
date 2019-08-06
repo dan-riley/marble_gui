@@ -11,6 +11,7 @@ class TabManager {
         this.Tab_ArtifactImgSub = [];
         this.Tab_VehicleStatusSub = [];
         this.Tab_PointCloudSub = [];
+        this.Tab_PoseArraySub = [];
         this.Tab_OccupancyGridSub = [];
         this.Tab_CmdVelSub = [];
         this.Tab_OdomMsg = [];
@@ -203,6 +204,11 @@ class TabManager {
             ros: ros,
             name: PointCloudTopic.topic,
             messageType: PointCloudTopic.messageType
+        });
+        this.Tab_PoseArraySub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name:  "/" + this.robot_name[n] + "/explored_edges",
+            messageType: "geometry_msgs/PoseArray"
         });
         this.Tab_OccupancyGridSub[n] = new ROSLIB.Topic({
             ros: ros,

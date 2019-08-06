@@ -135,8 +135,8 @@
               time sent: <span id="mapping_cloud_report_last_sent_raw">-</span>
               <br>
               time elapsed since last sent: <span id="mapping_cloud_report_last_sent_secs_ago">-</span>
-          </div>
             </div>
+          </div>
           <div class="col-4">
             Last mapping report sent (OccupancyGrid):
             <div style="padding-left: 10px;">
@@ -145,25 +145,33 @@
               time elapsed since last sent: <span id="mapping_grid_report_last_sent_secs_ago">-</span>
             </div>
           </div>
-          
 
-              </div>
+          <div class="col-4">
+            Last telemetry report sent (PoseArray): <span id="telemetry_report_last_sent">-</span>
+            <div style="padding-left: 10px;">
+              time sent: <span id="telemetry_report_last_sent_raw">-</span>
+              <br>
+              time elapsed since last sent: <span id="telemetry_report_last_sent_secs_ago">-</span>
+            </div>
           </div>
 
+        </div>
+      </div>
+
       <div>
-      <h1>File Manager</h1>
-      <form autocomplete="on">
-        <!-- Source Directory: <input id='source_dir' type='text' placeholder='/home/' class='margin-bottom'> -->
-        <br>User: <input id='user' type='text' placeholder='admin' class='margin-bottom'>
-        <br>Host: <input id='host' type='text' placeholder='192.168.0.1' class='margin-bottom'>
-        <br>Password: <input id='password' type='password' placeholder='test123' class='margin-bottom'>
-        <br>Destination Directory: <input id='dest_dir' type='text' placeholder='/home/example.txt' class='margin-bottom'>
-        <br><input id='TransferFile' type='button' value='Copy File' class='margin-bottom'>
-        <br><label class="btn btn-default btn-file margin-bottom" style="background-color: white; cursor: pointer;">
-          Browse Files<input type='file' id='_file' style="display: none;" multiple>
-        </label>
-      </form>
-    </div>
+        <h1>File Manager</h1>
+        <form autocomplete="on">
+          <!-- Source Directory: <input id='source_dir' type='text' placeholder='/home/' class='margin-bottom'> -->
+          <br>User: <input id='user' type='text' placeholder='admin' class='margin-bottom'>
+          <br>Host: <input id='host' type='text' placeholder='192.168.0.1' class='margin-bottom'>
+          <br>Password: <input id='password' type='password' placeholder='test123' class='margin-bottom'>
+          <br>Destination Directory: <input id='dest_dir' type='text' placeholder='/home/example.txt' class='margin-bottom'>
+          <br><input id='TransferFile' type='button' value='Copy File' class='margin-bottom'>
+          <br><label class="btn btn-default btn-file margin-bottom" style="background-color: white; cursor: pointer;">
+            Browse Files<input type='file' id='_file' style="display: none;" multiple>
+          </label>
+          </form>
+      </div>
     </div>
     <div id="Artifact_Page" class="tabcontent">
 
