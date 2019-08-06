@@ -197,20 +197,11 @@ $(document).ready(function () {
   function startGET_Status() {
     // var http = new HTTP("/api/status/", {});
     $.get(SERVER_ROOT + "/api/status/", function( json ) {
-      var universal_page = document.getElementById("Universal_Page");
-      universal_page.getElementsByTagName("span")[0].innerText = "Time: " + json.run_clock;
-      universal_page.getElementsByTagName("span")[1].innerText = "Score: " + json.score;
-      universal_page.getElementsByTagName("span")[1].setAttribute("score", json.score);
-      universal_page.getElementsByTagName("span")[2].innerText = "Remaining Reports: " + json.remaining_reports;
-      universal_page.getElementsByTagName("span")[2].setAttribute("remaining_reports", json.remaining_reports);
+      $('#header_time').text(json.run_clock);
+      $('#header_score').text(json.score);
+      $('#header_remaining_reports').text(json.remaining_reports);
     });
-    // http.getResponse();
 
-
-    // count = count + 1;
-    // universal_page.getElementsByTagName("span")[0].innerText = "Time: " + count.toString();
-    // universal_page.getElementsByTagName("span")[1].innerText = "Score: " + count.toString();
-    // universal_page.getElementsByTagName("span")[2].innerText = "Remaining Artifacts: " + count.toString();
   }
 
 
