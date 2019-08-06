@@ -145,31 +145,35 @@ function subscribe_to_all_robot_topics(k) {
 
     });
 
-    var last_map_update_success = "never";
-
-    // Subscriber to point cloud topic for vehicle that publishes to darpa server
-    global_tabManager.Tab_PointCloudSub[k].subscribe(function (msg) {
+    function darpa_msg_from_ros_msg(msg, type){
         var now = new Date();
-
         var now_time = now.getTime() / 1000;
         let objJsonB64 = Buffer.from(msg.data).toString("base64");
         msg.header.stamp = now_time;
         msg.data = objJsonB64;
         msg.header.frame_id = "darpa";
         data = {
-            type: "PointCloud2",
+            type: type,
             msg: msg
         };
-        // console.log(data);
+        return JSON.stringify(data)
+    }
+
+    var last_cloud_report_success = "never";
+
+    // Subscriber to point cloud topic for vehicle that publishes to darpa server
+    global_tabManager.Tab_PointCloudSub[k].subscribe(function (msg) {   
+        var now = new Date();
+        var now_time = now.getTime() / 1000;     
         if (now_time - prev_time[k] >= 0.05 || prev_time[k] == null) {
-            $.post(SERVER_ROOT + "/map/update/", JSON.stringify(data))
+            $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
             .done(function(json, statusText, xhr) {
                 if(xhr.status == 200){
-                    last_map_update_success = new Date();
+                    last_cloud_report_success = new Date();
                     $('#mapping_cloud_report_last_sent_raw').text(Math.round(now/100)/10);
                 }
                 else{
-                    console.log("error in sending /map/update to DARPA server");
+                    console.log("error in sending /map/update PointCloud to DARPA server");
                     console.log(statusText);
                     console.log(xhr);
                 }
@@ -180,11 +184,11 @@ function subscribe_to_all_robot_topics(k) {
     });
 
     setInterval(function(){ 
-        if(last_map_update_success != "never"){
+        if(last_cloud_report_success != "never"){
             var now = new Date();
             $('#mapping_cloud_report_last_sent_secs_ago').text(
                 Math.round(
-                    (now - last_map_update_success)/1000
+                    (now - last_cloud_report_success)/1000
                 ) + ' seconds ago');
         }
     }, 1000);
