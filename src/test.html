@@ -72,7 +72,7 @@
           <a class="nav-link" onclick="window.openPage('Custom')" id="Custom_nav_link">Custom</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="window.openPage('File')" id="File_nav_link">File</a>
+          <a class="nav-link" onclick="window.openPage('DARPA')" id="DARPA_nav_link">DARPA<br><span id="connection_status_DARPA"></span></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" onclick="window.openPage('Artifact_Page')" id="Artifact_Page_nav_link">Artifacts</a>
@@ -122,27 +122,27 @@
       </div>
       <!-- <div class='ldBar' data-preset='circle' data-stroke='data:ldbar/res,gradient(0,1,#eb8,#ad6,#c94)' data-stroke-width='15px' data-value='100'></div> -->
     </div>
-    <div id="File" class="tabcontent">
-      <!-- <div class="col-sm-6">
+    <div id="DARPA" class="tabcontent">
+      <!-- add stuff here for DARPA server -->
+      <div style="margin-bottom: 40px;">
+        <h1>DARPA Reporting</h1>
+        <p><i>Systems Teams must provide real-time 3D volumetric map updates to the DARPA Command Post at a minimum frequency of one update per 10 seconds.</i></p>
+        
         <div class="row">
-          <div class="col-sm-6">
-            wow
+          <div class="col-4">
+            Last mapping report sent (PointCloud2): 
+            <div style="padding-left: 10px;">
+              time sent: <span id="mapping_cloud_report_last_sent_raw">-</span>
+              <br>
+              time elapsed since last sent: <span id="mapping_cloud_report_last_sent_secs_ago">-</span>
           </div>
-          <div class="col-sm-6">
-              wow
             </div>
-        </div>
-      </div>
-      <div class="col-sm-6">
-        <div class="row">
-            <div class="col-sm-3">
-              wow
-            </div>
-            <div class="col-sm-3">
-                wow
+          
+
               </div>
           </div>
-      </div> -->
+
+      <div>
       <h1>File Manager</h1>
       <form autocomplete="on">
         <!-- Source Directory: <input id='source_dir' type='text' placeholder='/home/' class='margin-bottom'> -->
@@ -155,6 +155,7 @@
           Browse Files<input type='file' id='_file' style="display: none;" multiple>
         </label>
       </form>
+    </div>
     </div>
     <div id="Artifact_Page" class="tabcontent">
 

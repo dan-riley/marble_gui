@@ -145,11 +145,13 @@ function subscribe_to_all_robot_topics(k) {
 
     });
 
+    var last_map_update_success = "never";
+
     // Subscriber to point cloud topic for vehicle that publishes to darpa server
     global_tabManager.Tab_PointCloudSub[k].subscribe(function (msg) {
-        var date = new Date();
+        var now = new Date();
 
-        var now_time = date.getTime() / 1000;
+        var now_time = now.getTime() / 1000;
         let objJsonB64 = Buffer.from(msg.data).toString("base64");
         msg.header.stamp = now_time;
         msg.data = objJsonB64;
@@ -161,15 +163,31 @@ function subscribe_to_all_robot_topics(k) {
         // console.log(data);
         if (now_time - prev_time[k] >= 0.05 || prev_time[k] == null) {
             $.post(SERVER_ROOT + "/map/update/", JSON.stringify(data))
-            .done(function(json) {
-                // var artifact_page = document.getElementById("Artifact_Page");
-                // this.artifact_tracker = artifact_page.querySelector("[robot_name = '" + name + "']");
-                console.log(json);
+            .done(function(json, statusText, xhr) {
+                if(xhr.status == 200){
+                    last_map_update_success = new Date();
+                    $('#mapping_cloud_report_last_sent_raw').text(Math.round(now/100)/10);
+                }
+                else{
+                    console.log("error in sending /map/update to DARPA server");
+                    console.log(statusText);
+                    console.log(xhr);
+                }
 
             });
             prev_time[k] = now_time;
         }
     });
+
+    setInterval(function(){ 
+        if(last_map_update_success != "never"){
+            var now = new Date();
+            $('#mapping_cloud_report_last_sent_secs_ago').text(
+                Math.round(
+                    (now - last_map_update_success)/1000
+                ) + ' seconds ago');
+        }
+    }, 1000);
 
 }
 

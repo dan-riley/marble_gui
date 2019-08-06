@@ -200,8 +200,12 @@ $(document).ready(function () {
       $('#header_time').text(json.run_clock);
       $('#header_score').text(json.score);
       $('#header_remaining_reports').text(json.remaining_reports);
-    });
 
+      $('#connection_status_DARPA').html('<font color="green">Connected</font>')
+    }).fail(function () {
+      $('#connection_status_DARPA').html('<font color="red">Disconnected</font>');
+    });
+    
   }
 
 
