@@ -165,11 +165,12 @@ $(document).ready(function () {
       topicsTypeList = result.types;
 
       createTab();
-      window.autocomplete(document.getElementById("myInput"), topicsList);
       window.setInterval(function () {
         startGET_Status();
       }, 2000);
       setTopicMsg();
+      window.autocomplete(document.getElementById("myInput"), topicsList);
+
     });
 
 

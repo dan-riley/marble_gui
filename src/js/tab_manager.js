@@ -604,8 +604,9 @@ class TabManager {
             // console.log("Getting topics...");
             topicsList = result.topics;
             topicsTypeList = result.types;
-            window.autocomplete(document.getElementById("myInput"), topicsList);
             global_tabManager.search_robots();
+            window.autocomplete(document.getElementById("myInput"), topicsList);
+            
         });
         
     }
