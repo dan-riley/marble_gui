@@ -2,6 +2,7 @@ var ros_connection = false;
 var topicsList = [];
 var topicsTypeList = [];
 var global_tabManager;
+var run_echo = false;
  
  
 _custom_prev_time = 0;
@@ -29,6 +30,40 @@ function update_topics_list(callback){
  
 $(document).ready(function () {
  console.log("ready!");
+
+ $('#clear_console').click(function(){
+  $('#echo_console').empty();
+ });
+
+ $('#begin_echo').click(function(){
+   run_echo = true;
+
+   var topic = new ROSLIB.Topic({
+    ros: ros,
+    name: topicsList[selected_topic_num],
+    messageType: topicsTypeList[selected_topic_num]
+  });
+
+  topic.subscribe(function (msg) {
+     topic_msg = msg;
+     if (run_echo) {
+       document.getElementById("echo_console").appendChild(renderjson.set_show_to_level(1).set_icons('⇣', '⇡')(msg));
+     }
+     else{
+       topic.unsubscribe();
+     }
+  });
+
+  $('#begin_echo').hide();
+  $('#stop_echo').show();
+ });
+
+ $('#stop_echo').click(function(){
+   run_echo = false;
+  $('#stop_echo').hide();
+  $('#begin_echo').show();
+ });
+
  var selected_topic_num = 0;
  
  window.autocomplete = function(inp, arr) {
@@ -70,8 +105,6 @@ $(document).ready(function () {
            /*close the list of autocompleted values,
            (or any other open lists of autocompleted values:*/
            closeAllLists();
- 
-           setTopicMsg(); //parseFloat(this.getElementsByTagName("input")[1].value));
          });
          a.appendChild(b);
        }
@@ -174,7 +207,6 @@ $(document).ready(function () {
      window.setInterval(function () {
        startGET_Status();
      }, 2000);
-     setTopicMsg();
    });
  
  }
@@ -196,441 +228,6 @@ $(document).ready(function () {
   
  }
  
- 
- 
- /*--- Subscribe to a chosen User Topic from the Custom Tab ---*/
- function setTopicMsg() {
-   var fullColors = [];
-   // var colors = ['rgba(255,0,0,1.0)', 'rgba(0,255,0,1.0)', 'rgba(0,0,255, 1.0)', 'rgba(128,128,0, 1.0)', 'rgba(128,0,128, 1.0)', 'rgba(0,128,128, 1.0)']
-   var colors = ['rgba(128,0,0,', 'rgba(0,128,0,', 'rgba(0,0,128,', 'rgba(128,128,0,', 'rgba(128,0,128,', 'rgba(0,128,128,', 'rgba(255,0,0,', 'rgba(0,255,0,', 'rgba(0,0,255,', 'rgba(0,255,255,', 'rgba(255,0,255,', 'rgba(2555,255,0,', 'rgba(0,0,0,']
-   var colorsLength = colors.length;
-   for (let k = 0; k < colorsLength; k++) {
-     fullColors[k] = colors[k] + "1.0)";
-   }
-   var topic_msg = new ROSLIB.Message();
-   var topic = new ROSLIB.Topic({
-     ros: ros,
-     name: topicsList[selected_topic_num],
-     messageType: topicsTypeList[selected_topic_num]
-   });
-   var e = document.getElementById("Custom");
-   var custom = document.createElement("DIV");
-   custom.setAttribute("id", "_custom");
-   e.appendChild(custom);
- 
- 
- 
-   /* Unsubscribes from the topic fi */
-   topic.subscribe(function (msg) {
-     var robot_name = topic.name.split('/');
-     topic_msg = msg;
-     let text;
-     switch (topic.messageType) {
-       case "geometry_msgs/Twist":
-         text = document.getElementById("_custom");
-         break;
-       case "geometry_msgs/PoseStamped":
-         var _custom = document.getElementById("_custom");
- 
-         var here = true;
- 
-         var time = msg.header.stamp.secs + msg.header.stamp.nsecs * 0.000000001;
-         ROS_clock = time;
-         var poseJSON = [];
-         poseJSON[0] = {
-           x: msg.pose.position.x,
-           y: msg.pose.position.y
-         }
-         poseJSON[1] = {
-           x: time,
-           y: msg.pose.position.y
-         }
-         poseJSON[2] = {
-           x: time,
-           y: msg.pose.position.z
-         }
-         poseJSON[3] = {
-           x: time,
-           y: msg.pose.orientation.x
- 
-         }
-         poseJSON[4] = {
-           x: time,
-           y: msg.pose.orientation.y
-         }
-         poseJSON[5] = {
-           x: time,
-           y: msg.pose.orientation.z
-         }
- 
-         // Creates a graph if there is not already an existing graph on the custom page
-         if (!_custom.querySelector("[id=graph]")) {
-           applyCSS(_custom, {
-             position: "relative",
-             height: "50vh",
-             width: "100%",
-             margin: "auto"
-           });
-           let graph = document.createElement("canvas");
-           graph.setAttribute("id", "graph");
-           let ctx = graph.getContext("2d");
-           let titles_data = ["position_x"]; //, "linear_y", "linear_z", "angular_x", "angular_y", "angular_z"];
-           CustomChart = new Chart(ctx, {
-             responsive: true,
-             type: 'scatter',
-             title: {
-               display: true,
-               text: 'Vehicle Odometry'
-             },
-             data: {
-               datasets: []
-             },
-             options: {
-               maintainAspectRatio: false,
-               // events: [],
-               scales: {
-                 yAxes: [{
-                   id: 'linear',
-                   position: 'left',
-                   ticks: {
-                     // beginAtZero: true,
-                     max: 5,
-                     min: -5,
-                     display: true
-                   },
-                   scaleLabel: {
-                     display: true,
-                     labelString: 'Linear Velocity (m/s)'
-                   },
-                   display: true
-                 }, {
-                   id: 'angular',
-                   position: 'right',
-                   ticks: {
-                     // beginAtZero: true,
-                     max: 3.14,
-                     min: -3.14,
-                     display: true
-                   },
-                   scaleLabel: {
-                     display: true,
-                     labelString: 'Angular Rate (Rad/s)'
-                   },
-                   display: true
-                 }],
-                 xAxes: [{
-                   ticks: {
-                     // autoskip: false,
-                     beginAtZero: true,
-                     min: 0,
-                     maxRotation: 0,
-                     minRotation: 0
-                   },
-                   scaleLabel: {
-                     display: true,
-                     labelString: 'Time (seconds)'
-                   }
-                   // display: true
-                 }]
-               },
-               chartArea: {
-                 backgroundColor: 'rgba(255, 255, 255, 1.0)'
-               }
-             }
-           });
-           var titles_dataLength = titles_data.length
-           for (let k = 0; k < titles_dataLength; k++) {
-             let Color = colors[(k + 1) % colorsLength];
-             let _hidden = false;
-             let yaxis_id = "linear";
-             // if (Color + "1.0)" == fullColors[i]) Color = colors[(k + 2) % colorsLength];
-             if (~titles_data[k].indexOf("angular")) {
-               _hidden = true;
-               yaxis_id = "angular";
-             }
-             console.log(titles_data[k]);
-             let newData = {
-               label: titles_data[k],
-               backgroundColor: Color + '1.0)',
-               data: [],
-               yAxisID: yaxis_id,
- 
-               pointBackgroundColor: Color + '0.5)',
-               pointBorderColor: Color + '0.5)',
-               pointRadius: 1,
-               pointHoverRadius: 1,
-               borderColor: Color + '0.5)',
- 
-               borderWidth: 4,
-               fill: false,
-               tension: 0,
-               showLine: true,
- 
-               hidden: _hidden
-             };
-             CustomChart.data.datasets.push(newData);
-           }
-           CustomChart.update();
- 
- 
-           _custom.appendChild(graph);
-         }
- 
-         var date = new Date();
-         var now_time = date.getTime() / 1000;
- 
-         var min_time;
-         var diff_time = 5;
- 
- 
-         if (now_time - _custom_prev_time >= 0.05 || _custom_prev_time == null) {
-           time >= diff_time ? min_time = time - diff_time : min_time = 0;
- 
-           if (CustomChart.data.datasets[0].data.length >= 1000) {
-             let length = CustomChart.data.datasets.length;
-             for (let j = 0; j < length; j++) {
-               CustomChart.data.datasets[j].data.shift();
-             }
-           }
-           let dataset_length = CustomChart.data.datasets.length;
- 
-           console.log(poseJSON[2].y);
-           for (let j = 0; j < dataset_length; j++) {
-             CustomChart.data.datasets[j].data.push(poseJSON[j]);
-           }
- 
-           CustomChart.options.scales.xAxes[0].ticks.max = time;
-           CustomChart.options.scales.xAxes[0].ticks.min = min_time;
- 
- 
-           // Y-axis linear values
-           // CustomChart.options.scales.yAxes[0].ticks.max = -5;
-           // CustomChart.options.scales.yAxes[0].ticks.min = 5;
-           // CustomChart.options.scales.yAxes[0].ticks.display = true; // TODO: Get rid of and fix issue where ticks dissapear after chart update
- 
- 
-           // Y-axis angular values
-           CustomChart.options.scales.yAxes[1].ticks.max = 3.14;
-           CustomChart.options.scales.yAxes[1].ticks.min = -3.14;
- 
-           CustomChart.update();
- 
-           _custom_prev_time = now_time;
-         }
-         break;
-       case "nav_msgs/Odometry":
-         var _custom = document.getElementById("_custom");
- 
-         var here = true;
- 
-         var time = msg.header.stamp.secs + msg.header.stamp.nsecs * 0.000000001;
-         ROS_clock = time;
-         var odomJSON = [];
-         odomJSON[0] = {
-           x: time,
-           y: msg.twist.twist.linear.x
-         }
-         odomJSON[1] = {
-           x: time,
-           y: msg.twist.twist.linear.y
-         }
-         odomJSON[2] = {
-           x: time,
-           y: msg.twist.twist.linear.z
-         }
-         odomJSON[3] = {
-           x: time,
-           y: msg.twist.twist.angular.x
- 
-         }
-         odomJSON[4] = {
-           x: time,
-           y: msg.twist.twist.angular.y
-         }
-         odomJSON[5] = {
-           x: time,
-           y: msg.twist.twist.angular.z
-         }
- 
-         // Creates a graph if there is not already an existing graph on the custom page
-         if (!_custom.querySelector("[id=graph]")) {
-           applyCSS(_custom, {
-             position: "relative",
-             height: "50vh",
-             width: "100%",
-             margin: "auto"
-           });
-           let graph = document.createElement("canvas");
-           graph.setAttribute("id", "graph");
-           let ctx = graph.getContext("2d");
-           let titles_data = ["linear_x", "linear_y", "linear_z", "angular_x", "angular_y", "angular_z"];
-           CustomChart = new Chart(ctx, {
-             responsive: true,
-             type: 'scatter',
-             title: {
-               display: true,
-               text: 'Vehicle Odometry'
-             },
-             data: {
-               datasets: []
-             },
-             options: {
-               maintainAspectRatio: false,
-               // events: [],
-               scales: {
-                 yAxes: [{
-                   id: 'linear',
-                   position: 'left',
-                   ticks: {
-                     // beginAtZero: true,
-                     max: 5,
-                     min: -5,
-                     display: true
-                   },
-                   scaleLabel: {
-                     display: true,
-                     labelString: 'Linear Velocity (m/s)'
-                   },
-                   display: true
-                 }, {
-                   id: 'angular',
-                   position: 'right',
-                   ticks: {
-                     // beginAtZero: true,
-                     max: 3.14,
-                     min: -3.14,
-                     display: true
-                   },
-                   scaleLabel: {
-                     display: true,
-                     labelString: 'Angular Rate (Rad/s)'
-                   },
-                   display: true
-                 }],
-                 xAxes: [{
-                   ticks: {
-                     // autoskip: false,
-                     beginAtZero: true,
-                     min: 0,
-                     maxRotation: 0,
-                     minRotation: 0
-                   },
-                   scaleLabel: {
-                     display: true,
-                     labelString: 'Time (seconds)'
-                   }
-                   // display: true
-                 }]
-               },
-               chartArea: {
-                 backgroundColor: 'rgba(255, 255, 255, 1.0)'
-               }
-             }
-           });
-           var titles_dataLength = titles_data.length
-           for (let k = 0; k < titles_dataLength; k++) {
-             let Color = colors[(k + 1) % colorsLength];
-             let _hidden = false;
-             let yaxis_id = "linear";
-             // if (Color + "1.0)" == fullColors[i]) Color = colors[(k + 2) % colorsLength];
-             if (~titles_data[k].indexOf("angular")) {
-               _hidden = true;
-               yaxis_id = "angular";
-             }
-             console.log(titles_data[k]);
-             let newData = {
-               label: titles_data[k],
-               backgroundColor: Color + '1.0)',
-               data: [],
-               yAxisID: yaxis_id,
- 
-               pointBackgroundColor: Color + '0.5)',
-               pointBorderColor: Color + '0.5)',
-               pointRadius: 1,
-               pointHoverRadius: 1,
-               borderColor: Color + '0.5)',
- 
-               borderWidth: 4,
-               fill: false,
-               tension: 0,
-               showLine: true,
- 
-               hidden: _hidden
-             };
-             CustomChart.data.datasets.push(newData);
-           }
-           CustomChart.update();
- 
- 
-           _custom.appendChild(graph);
-         }
- 
-         var date = new Date();
-         var now_time = date.getTime() / 1000;
- 
-         var min_time;
-         var diff_time = 5;
- 
- 
-         if (now_time - _custom_prev_time >= 0.05 || _custom_prev_time == null) {
-           time >= diff_time ? min_time = time - diff_time : min_time = 0;
- 
-           if (CustomChart.data.datasets[0].data.length >= 1000) {
-             let length = CustomChart.data.datasets.length;
-             for (let j = 0; j < length; j++) {
-               CustomChart.data.datasets[j].data.shift();
-             }
-           }
-           let dataset_length = CustomChart.data.datasets.length;
- 
-           console.log(odomJSON[2].y);
-           for (let j = 0; j < dataset_length; j++) {
-             CustomChart.data.datasets[j].data.push(odomJSON[j]);
-           }
- 
-           CustomChart.options.scales.xAxes[0].ticks.max = time;
-           CustomChart.options.scales.xAxes[0].ticks.min = min_time;
- 
- 
-           // Y-axis linear values
-           // CustomChart.options.scales.yAxes[0].ticks.max = -5;
-           // CustomChart.options.scales.yAxes[0].ticks.min = 5;
-           // CustomChart.options.scales.yAxes[0].ticks.display = true; // TODO: Get rid of and fix issue where ticks dissapear after chart update
- 
- 
-           // Y-axis angular values
-           CustomChart.options.scales.yAxes[1].ticks.max = 3.14;
-           CustomChart.options.scales.yAxes[1].ticks.min = -3.14;
- 
-           CustomChart.update();
- 
-           _custom_prev_time = now_time;
-         }
- 
-         // text.innerHTML = "<p>" + robot_name[1] + " Velocity { x: " + topic_msg.twist.twist.linear.x + " y: " + topic_msg.twist.twist.linear.y + " z: " + topic_msg.twist.twist.linear.z + " }\n" +
-         // robot_name[1] + " Angular Rate { x: " + topic_msg.twist.twist.angular.x + " y: " + topic_msg.twist.twist.angular.y + " z: " + topic_msg.twist.twist.angular.z + " }</p>";
-         // document.getElementById("Topic_Display").innerText = robot_name[1] + " Velocity { x: " + topic_msg.twist.twist.linear.x + " y: " + topic_msg.twist.twist.linear.y + " z: " + topic_msg.twist.twist.linear.z + " }\n" +
-         //   robot_name[1] + " Angular Rate { x: " + topic_msg.twist.twist.angular.x + " y: " + topic_msg.twist.twist.angular.y + " z: " + topic_msg.twist.twist.angular.z + " }";
-         // // console.log("Subscribed to " + topicsList[selected_topic_num]);
-         break;
-       default:
-         document.getElementById("_custom").innerText = "No topic selected or topic is not implemented";
-     }
-     if (topic.name != topicsList[selected_topic_num]) {
- 
-       let myNode = document.getElementById("_custom");
-       // while (myNode.firstChild) {
-       //   myNode.removeChild(myNode.firstChild);
-       // }
-       myNode.parentNode.removeChild(myNode);
-       myNode = null;
-       topic.unsubscribe();
- 
-       // cus.parentNode.removeChild(cus);
-     }
-   });
- 
- }
  
  /* Function to create tabs for all recognized robots when the ros server connects */
  function createTab() {

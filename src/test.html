@@ -38,6 +38,7 @@
   <script type="text/javascript" src="js/tabs.js"></script>
   <script type="text/javascript" src="js/fileCopy.js"></script>
   <script type="text/javascript" src="js/battery.js"></script>
+  <script type="text/javascript" src="js/renderjson.js"></script>
 
   <meta name="viewport"content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
@@ -109,14 +110,18 @@
   <!-- </div> -->
   <!--! DIV that contains all details within each tab, vehicle pages are added as subsections through javascript -->
   <div id="Robot_Pages">
-    <div id="Custom" class="tabcontent">
-      <h1>Topic Listener</h1>
-      <form>
-        <div class="autocomplete" style="width:300px;">
-          <input id="myInput" type="text" name="myTopics" placeholder="Topics">
-        </div>
-      </form>
-    </div>
+      <div id="Custom" class="tabcontent">
+        <h1>Topic Listener</h1>
+        <form>
+          <div class="autocomplete" style="width:300px;">
+            <input id="myInput" type="text" name="myTopics" placeholder="Topics">
+          </div>
+          <button type="button" class="btn btn-success" id="begin_echo">Echo</button>
+          <button type="button" class="btn btn-danger" id="stop_echo" style="display:none;">Stop Echo</button>
+          <button type="button" class="btn btn-secondary" id="clear_console">Clear Console</button>
+        </form>
+        <div id="echo_console"></div>
+      </div>
     <div id="DARPA" class="tabcontent">
       <!-- add stuff here for DARPA server -->
       <div style="margin-bottom: 40px;">

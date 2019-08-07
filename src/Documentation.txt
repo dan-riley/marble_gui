@@ -68,7 +68,6 @@ Description of each js file:
         - call window.autocomplete() to establish topic list in <div id="Custom"> (the Custom Tab)
         - call window.setInterval() with startGet_Status()
             - establish connection with darpa for streaming back information related to score, time, and number of artifact reports left    
-        - call setTopicMsg() to display values from default ros topic
         - set up window.pubTopicMsg() to handle publishing msgs in the future
         - call function to click on tab with id="defaultOpen", so that the Custom Tab loads initially
 - tabs.js
