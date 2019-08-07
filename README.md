@@ -53,6 +53,7 @@ The following notable GUI features should now be observable:
 * On the robot's page, a linear velocity graph visualizes odometry messages received from the robot
 * Also on the robot's page, a 3D visualization displays OccupancyGrid and PointCloud2 map data received under the robot's namespace.
 * On the Artifact page, a table for the robot can now be found. 4 artifacts are included and the first artifact includes an image
+* Assuming the DARPA test server is running, on the DARPA page, all three different methods of DARPA reporting should be active. The GUI automatically forwards OccupancyGrid, PointCloud2, and PoseArray messages received from robots to DARPA
 
 
 ## Trouble Shooting:
