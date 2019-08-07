@@ -547,9 +547,6 @@ class TabManager {
         wrapper2.appendChild(startup_btn);
         wrapper2.appendChild(restart_btn);
 
-        // var batteryLevel = "<div class='ldBar' data-preset='circle' data-stroke='data:ldbar/res,gradient(0,1,#eb8,#ad6,#c94)' data-stroke-width='15' data-value='100' style='width:100%;height:130px'></div>";
-        // var other = "<div class='meter'><span id='" + this.robot_name[n] + "_battery' style='width: 100%'></span></div>";
-        var other = "<div class='circle fill' data-fill='64'><p class='circle-text'>0%</p></div>";
         var battery_voltage = document.createElement("SPAN");
         battery_voltage.setAttribute("class", "badge badge-secondary battery_voltage");
         battery_voltage.style.fontSize = "30px";
@@ -562,7 +559,6 @@ class TabManager {
 
         chart_wrap.appendChild(control_status);
         chart_wrap.appendChild(battery_voltage);
-        // wrapper2.innerHTML += other;
 
 
         chart_wrap.appendChild(chart);
