@@ -46,11 +46,6 @@ class Artifact {
 
     }
 
-    skip_array() {
-        this.artifact_All[0].shift();
-        this.updateDisplay();
-    }
-
     updateDisplay() {
         for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
             let artifact = this.artifactsList[i];
