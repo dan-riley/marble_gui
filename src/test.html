@@ -3,11 +3,8 @@
 
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
-  <!--!   Bootstrap link for formatting GUI  -->
-  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
-  <link rel="stylesheet" href="bootstrap-4.3.1-dist/css/bootstrap.min.css">
-  <!-- <script type="text/javascript" src="jquery/jquery-3.3.1.min.js"></script> -->
   <!--! Electrons way of loading jquery into the application  -->
   <script>window.$ = window.jQuery = require('jquery');</script>
 
@@ -15,20 +12,11 @@
   <script type="text/javascript" src="bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="charts/Chart.min.js"> </script>
 
-  <!--! Personal CSS files used to change the style of default tabs and pages -->
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/tabs.css">
-
   <!--! Entire robotwebtoools library  -->
   <script type="text/javascript" src="robotwebtools/three.min.js"></script>
   <script type="text/javascript" src="robotwebtools/eventemitter2.min.js"></script>
   <script type="text/javascript" src="robotwebtools/roslib.min.js"></script>
   <script type="text/javascript" src="robotwebtools/ros3d.min.js"></script>
-
-  <!-- <link rel="stylesheet" href="loading-bar/loading-bar.css"> -->
-  <!-- <script type="text/javascript" src="loading-bar/loading-bar.min.js"></script> -->
-  <!-- <script type="text/javascript" src="loading-bar/radialIndicator.min.js"></script> -->
-  <!-- <script type="text/javascript" src="node_modules/jquery-circle-progress/dist/circle-progress.min.js"></script> -->
 
   <script type="text/javascript" src="js/artifactHandler.js"></script>
   <script type="text/javascript" src="js/darpaServerComm.js"></script>
@@ -40,18 +28,17 @@
   <script type="text/javascript" src="js/battery.js"></script>
   <script type="text/javascript" src="js/renderjson.js"></script>
 
-  <meta name="viewport"content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
-  <link rel="import"href="bower_components/ros-websocket/ros-websocket.html"/>
-  <link rel="import"href="bower_components/ros-rviz/ros-rviz.html"/>
-  <link rel="import"href="bower_components/polymer/lib/elements/dom-bind.html"/>
-  
-  <style>
-    html, body {
-      height:100%;
-      margin:0;
-    }
-  </style>
+
+  <link rel="stylesheet" href="bootstrap-4.3.1-dist/css/bootstrap.min.css">
+
+  <!--! Personal CSS files used to change the style of default tabs and pages -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tabs.css">
+
+  <link rel="import" href="bower_components/ros-websocket/ros-websocket.html" />
+  <link rel="import" href="bower_components/ros-rviz/ros-rviz.html" />
+  <link rel="import" href="bower_components/polymer/lib/elements/dom-bind.html" />
 
 </head>
 
@@ -63,7 +50,8 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <img src="images/ssci-logo.png" width="60" style="padding: 5px;">
     <img src="images/cu.png" width="50" style="padding: 5px;">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -73,7 +61,8 @@
           <a class="nav-link" onclick="window.openPage('Listener')" id="Listener_nav_link">Listener</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="window.openPage('DARPA')" id="DARPA_nav_link">DARPA<br><span id="connection_status_DARPA"></span></a>
+          <a class="nav-link" onclick="window.openPage('DARPA')" id="DARPA_nav_link">DARPA<br><span
+              id="connection_status_DARPA"></span></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" onclick="window.openPage('Artifact_Page')" id="Artifact_Page_nav_link">Artifacts</a>
@@ -85,52 +74,42 @@
   <!--! Top bar on web page that displays all information reported back by DARPA when getting the score -->
   <div id="Universal_Page" class="row">
     <!-- Score: <label style="background-color: white; padding: 2px;"> 10 </label> -->
-    <span class="badge badge-secondary col-sm-4" style="text-align: center">Time: <span id="header_time">nan</span></span>
-    <span class="badge badge-secondary col-sm-4" style="text-align: center">Score: <span id="header_score">0</span></span>
-    <span class="badge badge-secondary col-sm-4" style="text-align: center">Remaining Artifacts: <span id="header_remaining_reports">nan</span></span>
+    <span class="badge badge-secondary col-sm-4" style="text-align: center">Time: <span
+        id="header_time">nan</span></span>
+    <span class="badge badge-secondary col-sm-4" style="text-align: center">Score: <span
+        id="header_score">0</span></span>
+    <span class="badge badge-secondary col-sm-4" style="text-align: center">Remaining Artifacts: <span
+        id="header_remaining_reports">nan</span></span>
   </div>
 
-  <!--! Small artifact list user interface location -->
-  <!-- <div id="Universal_Artifact_Page"> -->
-      <!-- <div class="row">
-          <span class="badge badge-secondary col-sm-3" style="text-align: center">Type: </span>
-          <span class="badge badge-secondary col-sm-3" style="text-align: center">Confidence: </span>
-          <span class="badge badge-secondary col-sm-4" style="text-align: center">Position: </span>
-          <button class="col-sm-1">Yes</button>
-          <button class="col-sm-1">No</button>
-      </div>
-      <div class="row">
-          <span class="badge badge-secondary col-sm-3" style="text-align: center">Type: </span>
-          <span class="badge badge-secondary col-sm-3" style="text-align: center">Confidence: </span>
-          <span class="badge badge-secondary col-sm-4" style="text-align: center">Position: </span>
-          <button class="col-sm-1">Yes</button>
-          <button class="col-sm-1">No</button>
-      </div> -->
-      
-  <!-- </div> -->
   <!--! DIV that contains all details within each tab, vehicle pages are added as subsections through javascript -->
   <div id="Robot_Pages">
-      <div id="Listener" class="tabcontent">
-        <h1>Topic Listener</h1>
-        <form>
-          <div class="autocomplete" style="width:300px;">
-            <input id="myInput" type="text" name="myTopics" placeholder="Topics">
-          </div>
-          <button type="button" class="btn btn-success" id="begin_echo">Echo</button>
-          <button type="button" class="btn btn-danger" id="stop_echo" style="display:none;">Stop Echo</button>
-          <button type="button" class="btn btn-secondary" id="clear_console">Clear Console</button>
-        </form>
-        <div id="echo_console"></div>
-      </div>
+
+
+    <div id="Listener" class="tabcontent">
+      <h1>Topic Listener</h1>
+      <form>
+        <div class="autocomplete" style="width:300px;">
+          <input id="myInput" type="text" name="myTopics" placeholder="Topics">
+        </div>
+        <button type="button" class="btn btn-success" id="begin_echo">Echo</button>
+        <button type="button" class="btn btn-danger" id="stop_echo" style="display:none;">Stop Echo</button>
+        <button type="button" class="btn btn-secondary" id="clear_console">Clear Console</button>
+      </form>
+      <div id="echo_console"></div>
+    </div>
+
+
     <div id="DARPA" class="tabcontent">
       <!-- add stuff here for DARPA server -->
       <div style="margin-bottom: 40px;">
         <h1>DARPA Reporting</h1>
-        <p><i>Systems Teams must provide real-time 3D volumetric map updates to the DARPA Command Post at a minimum frequency of one update per 10 seconds.</i></p>
-        
+        <p><i>Systems Teams must provide real-time 3D volumetric map updates to the DARPA Command Post at a minimum
+            frequency of one update per 10 seconds.</i></p>
+
         <div class="row">
           <div class="col-4">
-            Last mapping report sent (PointCloud2): 
+            Last mapping report sent (PointCloud2):
             <div style="padding-left: 10px;">
               time sent: <span id="mapping_cloud_report_last_sent_raw">-</span>
               <br>
@@ -158,6 +137,7 @@
         </div>
       </div>
 
+
       <div>
         <h1>File Manager</h1>
         <form autocomplete="on">
@@ -165,18 +145,21 @@
           <br>User: <input id='user' type='text' placeholder='admin' class='margin-bottom'>
           <br>Host: <input id='host' type='text' placeholder='192.168.0.1' class='margin-bottom'>
           <br>Password: <input id='password' type='password' placeholder='test123' class='margin-bottom'>
-          <br>Destination Directory: <input id='dest_dir' type='text' placeholder='/home/example.txt' class='margin-bottom'>
+          <br>Destination Directory: <input id='dest_dir' type='text' placeholder='/home/example.txt'
+            class='margin-bottom'>
           <br><input id='TransferFile' type='button' value='Copy File' class='margin-bottom'>
           <br><label class="btn btn-default btn-file margin-bottom" style="background-color: white; cursor: pointer;">
             Browse Files<input type='file' id='_file' style="display: none;" multiple>
           </label>
-          </form>
+        </form>
       </div>
+
+
     </div>
     <div id="Artifact_Page" class="tabcontent">
 
     </div>
-    
+
   </div>
   <!-- </div> -->
 

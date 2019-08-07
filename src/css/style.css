@@ -2,6 +2,13 @@
 body {
   font: 16px Arial;
 }
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
 .autocomplete {
   /*the container must be positioned relative:*/
   position: relative;
