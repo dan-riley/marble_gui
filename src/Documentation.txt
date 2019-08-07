@@ -31,7 +31,7 @@ Hardcoded areas:
 - css styles for web page design
     - hardcoded associations between id and color for the page
     - any changes to id names need to be checked within the css files
-    - only ids for tabs "Custom", "File", "Universal_Page", and "Artifact_Page"
+    - only ids for tabs "Listener", "File", "Universal_Page", and "Artifact_Page"
 - marble_gui launch script in marble_gui/scripts/
     - hardcoded location of marble_gui/src/ folder
     - location is needed for calling npm start
@@ -65,11 +65,9 @@ Description of each js file:
         - grabs topics from rostopic list
             - used to find what robots are connected
         - call CreateTab() to setup all robots and their corresponding subscribers for each tab in the gui
-        - call window.autocomplete() to establish topic list in <div id="Custom"> (the Custom Tab)
         - call window.setInterval() with startGet_Status()
             - establish connection with darpa for streaming back information related to score, time, and number of artifact reports left    
         - set up window.pubTopicMsg() to handle publishing msgs in the future
-        - call function to click on tab with id="defaultOpen", so that the Custom Tab loads initially
 - tabs.js
     - file used to establish window.openPage() function for use with switching tabs and loading subscribers for robots
     - all robots immediately subscribe to their odometry and battery topics on tab load

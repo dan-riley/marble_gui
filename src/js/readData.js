@@ -66,6 +66,7 @@ $(document).ready(function () {
 
  var selected_topic_num = 0;
  
+ // establish topic list in the Listener Tab)
  window.autocomplete = function(inp, arr) {
    /*the autocomplete function takes two arguments,
    the text field element and an array of possible autocompleted values:*/
@@ -420,8 +421,8 @@ $(document).ready(function () {
 
   }
 
-
-  document.getElementById("Custom_nav_link").click(); //Opens Custom Tab on html load
+  // so that the Listener Tab loads initially
+  document.getElementById("Listener_nav_link").click();
 });
 
 
