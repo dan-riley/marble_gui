@@ -189,7 +189,3 @@ window.openPage = function (pageName, k=-1 ){
     document.getElementById(pageName).style.display = "block";
 
 }
-$(document).ready(function () {
-
-});
-
