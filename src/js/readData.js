@@ -1,4 +1,5 @@
 var ros_connection = false;
+var connected_to_darpa = false;
 var topicsList = [];
 var topicsTypeList = [];
 var global_tabManager;
@@ -222,9 +223,11 @@ $(document).ready(function () {
      $('#header_score').text(json.score);
      $('#header_remaining_reports').text(json.remaining_reports);
  
-     $('#connection_status_DARPA').html('<font color="green">Connected</font>')
+     $('#connection_status_DARPA').html('<font color="green">Connected</font>');
+     connected_to_darpa = true;
    }).fail(function () {
      $('#connection_status_DARPA').html('<font color="red">Disconnected</font>');
+     connected_to_darpa = false;
    });
   
  }

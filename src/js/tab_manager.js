@@ -253,20 +253,22 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
-                    .done(function (json, statusText, xhr) {
-                        if (xhr.status == 200) {
-                            last_cloud_report_success = new Date();
-                            $('#mapping_cloud_report_last_sent_raw').text(Math.round(now / 100) / 10);
-                        }
-                        else {
-                            console.log("error in sending /map/update PointCloud to DARPA server");
-                            console.log(statusText);
-                            console.log(xhr);
-                        }
+                if(connected_to_darpa){
+                    $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
+                        .done(function (json, statusText, xhr) {
+                            if (xhr.status == 200) {
+                                last_cloud_report_success = new Date();
+                                $('#mapping_cloud_report_last_sent_raw').text(Math.round(now / 100) / 10);
+                            }
+                            else {
+                                console.log("error in sending /map/update PointCloud to DARPA server");
+                                console.log(statusText);
+                                console.log(xhr);
+                            }
 
-                    });
-                global_tabManager.prev_time[n] = now_time;
+                        });
+                    global_tabManager.prev_time[n] = now_time;
+                }
             }
         });
 
@@ -287,20 +289,22 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
-                    .done(function (json, statusText, xhr) {
-                        if (xhr.status == 200) {
-                            last_grid_report_success = new Date();
-                            $('#mapping_grid_report_last_sent_raw').text(Math.round(now / 100) / 10);
-                        }
-                        else {
-                            console.log("error in sending /map/update occupancyGrid to DARPA server");
-                            console.log(statusText);
-                            console.log(xhr);
-                        }
+                if(connected_to_darpa){
+                    $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
+                        .done(function (json, statusText, xhr) {
+                            if (xhr.status == 200) {
+                                last_grid_report_success = new Date();
+                                $('#mapping_grid_report_last_sent_raw').text(Math.round(now / 100) / 10);
+                            }
+                            else {
+                                console.log("error in sending /map/update occupancyGrid to DARPA server");
+                                console.log(statusText);
+                                console.log(xhr);
+                            }
 
-                    });
-                global_tabManager.prev_time[n] = now_time;
+                        });
+                    global_tabManager.prev_time[n] = now_time;
+                }
             }
         });
 
@@ -321,23 +325,25 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                $.post(SERVER_ROOT + "/state/update/", JSON.stringify(msg))
-                    .done(function (json, statusText, xhr) {
-                        if (xhr.status == 200) {
-                            last_telem_report_success = new Date();
-                            $('#telemetry_report_last_sent_raw').text(Math.round(now / 100) / 10);
-                        }
-                        else {
-                            console.log("error in sending /state/update PoseArray to DARPA server");
-                            console.log(statusText);
-                            console.log(xhr);
-                        }
+                if(connected_to_darpa){
+                    $.post(SERVER_ROOT + "/state/update/", JSON.stringify(msg))
+                        .done(function (json, statusText, xhr) {
+                            if (xhr.status == 200) {
+                                last_telem_report_success = new Date();
+                                $('#telemetry_report_last_sent_raw').text(Math.round(now / 100) / 10);
+                            }
+                            else {
+                                console.log("error in sending /state/update PoseArray to DARPA server");
+                                console.log(statusText);
+                                console.log(xhr);
+                            }
 
-                    })
-                    .fail(function (a, b, c) {
-                        console.log("error reporting pose array: " + c);
-                    });
-                global_tabManager.prev_time[n] = now_time;
+                        })
+                        .fail(function (a, b, c) {
+                            //console.log("error reporting pose array: " + c);
+                        });
+                    global_tabManager.prev_time[n] = now_time;
+                }
             }
         });
 
@@ -524,19 +530,19 @@ class TabManager {
 
         var estop_btn = document.createElement("BUTTON");
         estop_btn.setAttribute("type", "button");
-        estop_btn.setAttribute("class", "btn btn-danger emergency_stop");
+        estop_btn.setAttribute("class", "btn btn-danger btn-space");
         estop_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop") };
         estop_btn.innerText = "Stop Vehicle";
 
         var startup_btn = document.createElement("BUTTON");
         startup_btn.setAttribute("type", "button");
-        startup_btn.setAttribute("class", "btn btn-success");
+        startup_btn.setAttribute("class", "btn btn-success btn-space");
         startup_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "startup") };
         startup_btn.innerText = "Start Vehicle";
 
         var restart_btn = document.createElement("BUTTON");
         restart_btn.setAttribute("type", "button");
-        restart_btn.setAttribute("class", "btn btn-primary");
+        restart_btn.setAttribute("class", "btn btn-primary btn-space");
         restart_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "restart") };
         restart_btn.innerText = "Restart Vehicle";
 
@@ -561,7 +567,7 @@ class TabManager {
         create_viewer(this.robot_name[n]);
 
         var robot_artifact_container = document.createElement("DIV");
-        robot_artifact_container.setAttribute("class", "col-sm-6");
+        robot_artifact_container.setAttribute("class", "col-sm-12");
         robot_artifact_container.setAttribute("robot_name", this.robot_name[n]);
         var robot_artifact_titles = document.createElement("DIV");
         robot_artifact_titles.setAttribute("class", "row");

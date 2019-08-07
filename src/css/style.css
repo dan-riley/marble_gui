@@ -9,6 +9,10 @@ body {
   margin: 0;
 }
 
+.btn-space {
+  margin-right: 5px;
+}
+
 .autocomplete {
   /*the container must be positioned relative:*/
   position: relative;
