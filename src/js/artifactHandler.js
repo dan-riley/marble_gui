@@ -133,56 +133,51 @@ class Artifact {
     }
 
     submit_artifact(vehicle_Artifacts, row_id) {
-        if(connected_to_darpa){
-            var robo_name = this.get_robot_name();
+        var robo_name = this.get_robot_name();
 
-            console.log(JSON.parse(this.artifact_position[row_id].getAttribute("value")));
-            var data = {
-                "x": JSON.parse(this.artifact_position[row_id].getAttribute("value")).x,
-                "y": JSON.parse(this.artifact_position[row_id].getAttribute("value")).y,
-                "z": JSON.parse(this.artifact_position[row_id].getAttribute("value")).z,
-                "type": this.artifact_type[row_id].innerText
-            };
-            var vehicle_Artifacts_length = vehicle_Artifacts.length;
-            var other_location = new Array(vehicle_Artifacts_length);
-            var best_prob = parseFloat(this.artifact_confidence[row_id].getAttribute("value"));
-            for (let i = 0; i < vehicle_Artifacts_length; i++) {
-                if (vehicle_Artifacts[i].get_robot_name() == robo_name) {
+        console.log(JSON.parse(this.artifact_position[row_id].getAttribute("value")));
+        var data = {
+            "x": JSON.parse(this.artifact_position[row_id].getAttribute("value")).x,
+            "y": JSON.parse(this.artifact_position[row_id].getAttribute("value")).y,
+            "z": JSON.parse(this.artifact_position[row_id].getAttribute("value")).z,
+            "type": this.artifact_type[row_id].innerText
+        };
+        var vehicle_Artifacts_length = vehicle_Artifacts.length;
+        var other_location = new Array(vehicle_Artifacts_length);
+        var best_prob = parseFloat(this.artifact_confidence[row_id].getAttribute("value"));
+        for (let i = 0; i < vehicle_Artifacts_length; i++) {
+            if (vehicle_Artifacts[i].get_robot_name() == robo_name) {
+                continue;
+            }
+            let other_artifactsList = vehicle_Artifacts[i].get_artifactsList();
+            let other_artifactsList_length = other_artifactsList.length;
+            for (let k = 0; k < other_artifactsList_length; k++) {
+                if (other_artifactsList[k] == null) {
+                    break;
+                }
+                if (other_artifactsList[k].obj_class != this.artifactsList[row_id].obj_class) {
                     continue;
                 }
-                let other_artifactsList = vehicle_Artifacts[i].get_artifactsList();
-                let other_artifactsList_length = other_artifactsList.length;
-                for (let k = 0; k < other_artifactsList_length; k++) {
-                    if (other_artifactsList[k] == null) {
-                        break;
-                    }
-                    if (other_artifactsList[k].obj_class != this.artifactsList[row_id].obj_class) {
-                        continue;
-                    }
-                    let dist_x = other_artifactsList[k].position.x - data.x;
-                    let dist_y = other_artifactsList[k].position.y - data.y;
+                let dist_x = other_artifactsList[k].position.x - data.x;
+                let dist_y = other_artifactsList[k].position.y - data.y;
 
-                    if (other_artifactsList[k].obj_prob > best_prob && Math.hypot(dist_x, dist_y) < this.dist_threshhold) {
-                        console.log("Choosing higher chance object");
-                        data.x = other_artifactsList[k].position.x;
-                        data.y = other_artifactsList[k].position.y;
-                        data.z = other_artifactsList[k].position.z;
-                        other_location[i] = k;
-                    } else if (Math.hypot(dist_x, dist_y) < this.dist_threshhold) {
-                        other_location[i] = k;
-                    }
+                if (other_artifactsList[k].obj_prob > best_prob && Math.hypot(dist_x, dist_y) < this.dist_threshhold) {
+                    console.log("Choosing higher chance object");
+                    data.x = other_artifactsList[k].position.x;
+                    data.y = other_artifactsList[k].position.y;
+                    data.z = other_artifactsList[k].position.z;
+                    other_location[i] = k;
+                } else if (Math.hypot(dist_x, dist_y) < this.dist_threshhold) {
+                    other_location[i] = k;
                 }
-
             }
-            console.log("submitting artifact to DARPA server. Waiting for response...");
-            $.post(SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
-                .done(function (json) {
-                    document.getElementById(robo_name + "_" + row_id).innerText = "submission result: +" + json.score_change + " points";
-                });
+
         }
-        else {
-            alert('Cannot submit. You are not connected to the DARPA server.');
-        }
+        console.log("submitting artifact to DARPA server. Waiting for response...");
+        $.post(SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
+            .done(function (json) {
+                document.getElementById(robo_name + "_" + row_id).innerText = "submission result: +" + json.score_change + " points";
+            });
     }
 
     get_robot_name() {

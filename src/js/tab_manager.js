@@ -607,8 +607,13 @@ class TabManager {
             let robot_artifact_tracker_yes = document.createElement("BUTTON");
             robot_artifact_tracker_yes.innerText = "Submit";
             robot_artifact_tracker_yes.onclick = function () {
-                robot_artifact_tracker_yes_container.innerText = "submitting...";
-                global_tabManager.global_vehicleArtifactsList[n].submit_artifact(global_tabManager.global_vehicleArtifactsList, i);
+                if(connected_to_darpa){
+                    robot_artifact_tracker_yes_container.innerText = "submitting...";
+                    global_tabManager.global_vehicleArtifactsList[n].submit_artifact(global_tabManager.global_vehicleArtifactsList, i);
+                }
+                else {
+                    alert('Cannot submit. You are not connected to the DARPA server.');
+                }
             };
             robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_yes);
 
