@@ -339,12 +339,6 @@ class TabManager {
             }
         }, 1000);
 
-
-        // ! Include if you want to send desired positions to robots
-        input_str = "position_x: <input id='position_x' type='text' placeholder='0'> position_y: <input id='position_y' type='text' placeholder='0'> position_z: <input id='position_z' type='text' placeholder='0'>" +
-            "<br><input type='submit' value='Publish Position'> <input id='topic' type='hidden' value='" + CmdPosTopic.topic + "'> <input id='type' type='hidden' value='" + CmdPosTopic.messageType + "'>";
-        //!
-
         // Creating tab at top of screen for selecting robot view
         $('#Robot_Tabs').prepend(`
        <li class="nav-item" id="` + this.robot_name[n] + `_nav_link" robot_name="` + this.robot_name[n] + `">
@@ -360,14 +354,6 @@ class TabManager {
         var wrapper1 = document.createElement("DIV");
         wrapper1.setAttribute("class", "row");
 
-
-        var cmdVel_form = document.createElement("FORM");
-
-        // Setups classes for cmd form on each robots tab. Also adds function that publishes data when the submit button is clicked on the form
-        cmdVel_form.setAttribute("class", "cmdVel_form col-sm-2");
-        cmdVel_form.setAttribute("onsubmit", "window.pubTopicMsg(this);return false;");
-
-        cmdVel_form.innerHTML = input_str;
 
         // Generate topics for each robot and subscribe
         var sub = document.createElement("DIV");
@@ -580,7 +566,6 @@ class TabManager {
 
         chart_wrap.appendChild(chart);
 
-        wrapper1.appendChild(cmdVel_form);
         wrapper1.appendChild(chart_wrap);
 
 
