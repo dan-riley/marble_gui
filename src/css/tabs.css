@@ -16,8 +16,8 @@ body{
   .tabcontent {
     display: none;
     padding: 20px 20px;
-    min-height: 100vh;
-    min-width: 100%;
+    max-width: 1200px;
+    margin: auto;
   }
   #Robot_Pages {
       min-height: 100%;

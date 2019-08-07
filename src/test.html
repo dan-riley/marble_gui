@@ -87,16 +87,20 @@
 
 
     <div id="Listener" class="tabcontent">
-      <h1>Topic Listener</h1>
-      <form>
-        <div class="autocomplete" style="width:300px;">
-          <input id="myInput" type="text" name="myTopics" placeholder="Topics">
+      <div class="card">
+        <div class="card-body">
+          <h2>Topic Listener</h2>
+          <form>
+            <div class="autocomplete" style="width:300px;">
+              <input id="myInput" type="text" name="myTopics" placeholder="Topics">
+            </div>
+            <button type="button" class="btn btn-success" id="begin_echo">Echo</button>
+            <button type="button" class="btn btn-danger" id="stop_echo" style="display:none;">Stop Echo</button>
+            <button type="button" class="btn btn-secondary" id="clear_console">Clear Console</button>
+          </form>
+          <div id="echo_console"></div>
         </div>
-        <button type="button" class="btn btn-success" id="begin_echo">Echo</button>
-        <button type="button" class="btn btn-danger" id="stop_echo" style="display:none;">Stop Echo</button>
-        <button type="button" class="btn btn-secondary" id="clear_console">Clear Console</button>
-      </form>
-      <div id="echo_console"></div>
+      </div>
     </div>
 
 
