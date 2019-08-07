@@ -1,5 +1,17 @@
 var ANALYZE_TOPICS_LIST_INTERVAL = 2000;
 
+function send_signal_to(robot_name, signal) {
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: "/" + robot_name + "/" + signal,
+        messageType: "std_msgs/Bool"
+    });
+    var msg = new ROSLIB.Message({
+        data: true
+    });
+    Topic.publish(msg);
+}
+
 class TabManager {
     constructor() {
         // Permanent subscribers for all vehicle tabs
@@ -498,17 +510,6 @@ class TabManager {
             "margin-top": "40px"
         });
 
-        function send_signal_to(robot_name, signal) {
-            var Topic = new ROSLIB.Topic({
-                ros: ros,
-                name: "/" + robot_name + "/" + signal,
-                messageType: "std_msgs/Bool"
-            });
-            var msg = new ROSLIB.Message({
-                data: true
-            });
-            Topic.publish(msg);
-        }
 
         var estop_btn = document.createElement("BUTTON");
         estop_btn.setAttribute("type", "button");
