@@ -514,31 +514,19 @@ class TabManager {
         var estop_btn = document.createElement("BUTTON");
         estop_btn.setAttribute("type", "button");
         estop_btn.setAttribute("class", "btn btn-danger emergency_stop");
-        estop_btn.onclick = function () {
-            send_signal_to(global_tabManager.robot_name[n], "estop")
-        };
+       estop_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop") };
         estop_btn.innerText = "Stop Vehicle";
 
         var startup_btn = document.createElement("BUTTON");
         startup_btn.setAttribute("type", "button");
-        startup_btn.setAttribute("class", "click-btn");
-        startup_btn.style.backgroundColor = "green";
-        startup_btn.style.border = "green";
-        startup_btn.style.color = "white";
-        startup_btn.onclick = function () {
-            send_signal_to(global_tabManager.robot_name[n], "startup")
-        };
+       startup_btn.setAttribute("class", "btn btn-success");
+       startup_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "startup") };
         startup_btn.innerText = "Start Vehicle";
 
         var restart_btn = document.createElement("BUTTON");
         restart_btn.setAttribute("type", "button");
-        restart_btn.setAttribute("class", "click-btn");
-        restart_btn.style.backgroundColor = "blue";
-        restart_btn.style.border = "blue";
-        restart_btn.style.color = "white";
-        restart_btn.onclick = function () {
-            send_signal_to(global_tabManager.robot_name[n], "restart")
-        };
+       restart_btn.setAttribute("class", "btn btn-primary");
+       restart_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "restart") };
         restart_btn.innerText = "Restart Vehicle";
 
 
