@@ -552,12 +552,12 @@ class TabManager {
         var battery_voltage = document.createElement("SPAN");
         battery_voltage.setAttribute("class", "badge badge-secondary battery_voltage");
         battery_voltage.style.fontSize = "30px";
-        battery_voltage.innerText = "Voltage: ";
+        battery_voltage.innerHTML = `Voltage: <span id="` + global_tabManager.robot_name[n] + `_voltage"></span>`;
 
         var control_status = document.createElement("SPAN");
         control_status.setAttribute("class", "badge badge-secondary control_status");
         control_status.style.fontSize = "30px";
-        control_status.innerText = "Status: ";
+        control_status.innerHTML = `Status: <span id="` + global_tabManager.robot_name[n] + `_status"></span>`;
 
         chart_wrap.appendChild(control_status);
         chart_wrap.appendChild(battery_voltage);

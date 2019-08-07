@@ -1,3 +1,12 @@
+var STATUS = {
+    0: "On Ground",
+    1: "Takeoff",
+    2: "Hover",
+    3: "Turn",
+    4: "Trajectory",
+    5: "Landing"
+}
+
 function subscribe_to_all_robot_topics(k) {
     ///\brief Subscriber to Odometry Topic for Vehicle. Grabs information and assigns it to chart
     global_tabManager.Tab_OdomSub[k].subscribe(function (message) {
@@ -93,54 +102,12 @@ function subscribe_to_all_robot_topics(k) {
 
     // Update voltage value on vehicle tab
     global_tabManager.Tab_BatterySub[k].subscribe(function (message) {
-        var battery = document.getElementsByClassName("battery_voltage")[0];
-        battery.innerText = "Voltage: " + Math.round( message.data * 10 ) / 10;
+        $('#' + global_tabManager.robot_name[k] + '_voltage').text(Math.round( message.data * 10 ) / 10);
     });
 
     // Update vehicle control status on vehicle tab
     global_tabManager.Tab_ControlSub[k].subscribe(function (message) {
-        var ctrStatus = document.getElementsByClassName("control_status")[0];
-        
-        switch(message.data){
-            case 0:
-                ctrStatus.innerText = "Status: On Ground";
-                ctrStatus.style.backgroundColor = "grey";
-                ctrStatus.style.border = "grey";
-                break;
-            case 1:
-                ctrStatus.innerText = "Status: Takeoff";
-                ctrStatus.style.backgroundColor = "yellow";
-                ctrStatus.style.border = "yellow";
-                break;
-            case 2:
-                ctrStatus.innerText = "Status: Hover";
-                ctrStatus.style.backgroundColor = "yellow";
-                ctrStatus.style.border = "yellow";
-                break;
-            case 3:
-                ctrStatus.innerText = "Status: Turn";
-                ctrStatus.style.backgroundColor = "green";
-                ctrStatus.style.border = "green";
-                break;
-            case 4:
-                ctrStatus.innerText = "Status: Trajectory";
-                ctrStatus.style.backgroundColor = "green";
-                ctrStatus.style.border = "green";
-                break;
-            case 5:
-                ctrStatus.innerText = "Status: Landing";
-                ctrStatus.style.backgroundColor = "yellow";
-                ctrStatus.style.border = "yellow";
-                break;
-            default:
-                ctrStatus.innerText = "Status: Unknown";
-                ctrStatus.style.backgroundColor = "red";
-                ctrStatus.style.border = "red";
-                break;
-
-
-        }
-
+        $('#' + global_tabManager.robot_name[k] + '_status').text(STATUS[message.data]);
     });
 }
 
