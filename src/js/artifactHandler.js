@@ -2,16 +2,16 @@
  * Artifact class for handling, sending, and checking known artifacts
  */
 
- // Fixed array size determined by University of Colorado Denver, meant to reduce overall maintenance across network
+// Fixed array size determined by University of Colorado Denver, meant to reduce overall maintenance across network
 var ARTIFACT_ARR_LEN = 20;
 
-class Artifact {  
-    constructor(name) {  
+class Artifact {
+    constructor(name) {
         this.robot_name = name;
         this.artifact_All = [];
         this.artifactsList = [];
         this.reportedArtifacts = [];
-        for(let i = 0; i < ARTIFACT_ARR_LEN; i++){
+        for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
             this.artifactsList[i] = {};
         }
 
@@ -35,7 +35,6 @@ class Artifact {
         this.artifact_image = new Array(ARTIFACT_ARR_LEN);
         this.artifact_image_id = new Array(ARTIFACT_ARR_LEN);
 
-
         // Establishes links to specific rows of artifact list for vehicle
         for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
             this.artifact_tracker[i] = artifact_page.querySelector("[robot_name = '" + name + "']").querySelector("[artifact_id = '" + parseFloat(i) + "']");
@@ -45,72 +44,40 @@ class Artifact {
             this.artifact_image[i] = this.artifact_tracker[i].querySelector("[id = image]");
         }
 
-
     }
 
-    change_artifact() {
-
-    }
     skip_array() {
         this.artifact_All[0].shift();
         this.updateDisplay();
     }
 
-    //! Deprecated for use with small artifact interface
-    skip_artifact(flag) {
-        // this.artifact_array.shift();
-        // if (this.location_array){
-
-        // }
-        var count = 0;
-        while (this.reportedArtifacts[this.location_array][1] == true || this.artifactsList[this.location_array].obj_class == "" || flag) {
-            flag = false;
-            this.location_array++;
-            console.log(this.location_array);
-            if (this.location_array >= this.artifactsList.length) {
-                this.location_array = 0;
-            }
-            count++;
-            if (count == this.artifactsList.length) {
-                break;
-            }
-        }
-        // console.log(this.location_array);
-        this.updateDisplay();
-    }
     updateDisplay() {
-        // let end = this.artifactsList.length - 1;
-        // let artifact = artifact_All[location_all][location_array];
         for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
             let artifact = this.artifactsList[i];
             let type = artifact.obj_class;
             let confidence = artifact.obj_prob;
             let position = artifact.position;
 
-            // let type = "survivor";
-            // let confidence = 70.3;
-            // let position = {x: 1.0, y: 2.0, z: 3.0};
-
             // When artifact class value has not been set, allow for code to set the class
             type == "" ? type = "undefined" : false;
-            if (this.artifact_type[i].getAttribute("value") == "undefined"){
+            if (this.artifact_type[i].getAttribute("value") == "undefined") {
                 this.artifact_type[i].innerText = type;
             }
             this.artifact_type[i].setAttribute("value", type);
             this.artifact_confidence[i].setAttribute("value", toString(confidence));
             this.artifact_position[i].setAttribute("value", JSON.stringify(position));
 
-            if(confidence != undefined){
+            if (confidence != undefined) {
                 this.artifact_confidence[i].innerText = confidence.toFixed(2);
             }
-            if(position != undefined){
+            if (position != undefined) {
                 this.artifact_position[i].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
             }
-            if(artifact.image_data == null){
+            if (artifact.image_data == null) {
                 this.artifact_image[i].innerText = "No Image";
             }
-            else{
-                if( this.artifact_image[i].children.length == 0){
+            else {
+                if (this.artifact_image[i].children.length == 0) {
                     this.artifact_image[i].innerText = "View Image";
                     let robot_artifact_image = document.createElement("IMG");
                     robot_artifact_image.setAttribute("id", "myPopup");
@@ -119,48 +86,35 @@ class Artifact {
                 }
                 this.artifact_image[i].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactsList[i].image_data);
 
-                this.artifact_image[i].onclick = function(){
+                this.artifact_image[i].onclick = function () {
                     $(this.children[0]).toggleClass("show");
                 }
             }
 
             let color = this.color_artifacts(type);
             this.artifact_type[i].style.color = color;
-            // this.artifact_confidence[i].style.color = color;
-            // this.artifact_position[i].style.color = color;
         }
-
-        //! The code below is meant for use with a smaller artifact list user interface, this interface only showed 1 artifact at a time from each vehicle
-        // let artifact = this.artifactsList[this.location_array];
-        // let type = artifact.obj_class;
-        // let confidence = artifact.obj_prob;
-        // let position = artifact.position;
-
-        // // let type = "survivor";
-        // // let confidence = 70.3;
-        // // let position = {x: 1.0, y: 2.0, z: 3.0};
-
-        // this.artifact_type.innerText = "Type: " + type;
-        // this.artifact_confidence.innerText = "Confidence: " + confidence.toFixed(2);
-        // this.artifact_position.innerText = "Position: {x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
     }
+
     add_array(array) {
         this.artifact_All.push(array);
     }
+
     // Use this to save the image received from ROS
-    save_image(msg){
+    save_image(msg) {
         this.artifactsList[msg.image_id.data].image_data = msg.artifact_img.data;
         this.save_file();
         this.updateDisplay();
     }
+
     set_artifacts(msg) {
-        if(msg.length != ARTIFACT_ARR_LEN){
+        if (msg.length != ARTIFACT_ARR_LEN) {
             console.log("number of artifacts in message received is not the same as the amount expected!!!");
         }
-        for (let i = 0; i < ARTIFACT_ARR_LEN; i++){
+        for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
 
             // When there is not an artifact class declared, set all properties of the artifact
-            if (this.artifactsList[i].obj_class == undefined || this.artifactsList[i].obj_class == ""){
+            if (this.artifactsList[i].obj_class == undefined || this.artifactsList[i].obj_class == "") {
                 this.artifactsList[i].obj_class = msg[i].obj_class;
                 this.artifactsList[i].obj_prob = msg[i].obj_prob;
                 this.artifactsList[i].has_been_reported = msg[i].has_been_reported;
@@ -171,16 +125,14 @@ class Artifact {
             }
             // When there is an artifact class declared, only set certain properties of the artifact
             // this logic allows for the user to change the name of artifact class from the gui
-            else{
-                // this.artifactsList = msg;
-                // this.artifactsList[i].obj_class = "";
+            else {
                 this.artifactsList[i].obj_prob = msg[i].obj_prob;
                 this.artifactsList[i].has_been_reported = msg[i].has_been_reported;
                 this.artifactsList[i].header = msg[i].header;
                 this.artifactsList[i].position = msg[i].position;
             }
         }
-        
+
         this.save_file();
         this.updateDisplay();
     }
@@ -213,7 +165,7 @@ class Artifact {
                 }
                 let dist_x = other_artifactsList[k].position.x - data.x;
                 let dist_y = other_artifactsList[k].position.y - data.y;
-                // console.log(Math.hypot(dist_x, dist_y));
+
                 if (other_artifactsList[k].obj_prob > best_prob && Math.hypot(dist_x, dist_y) < this.dist_threshhold) {
                     console.log("Choosing higher chance object");
                     data.x = other_artifactsList[k].position.x;
@@ -228,9 +180,9 @@ class Artifact {
         }
         console.log("submitting artifact to DARPA server. Waiting for response...");
         $.post(SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
-        .done(function( json ) {
-            document.getElementById(robo_name + "_" + row_id).innerText = "submission result: +" + json.score_change + " points";
-        });
+            .done(function (json) {
+                document.getElementById(robo_name + "_" + row_id).innerText = "submission result: +" + json.score_change + " points";
+            });
     }
 
     get_robot_name() {
@@ -240,19 +192,7 @@ class Artifact {
     get_artifactsList() {
         return this.artifactsList;
     }
-    // set reportedArtifacts(value){
-    //     console.log(value);
-    //     if (value != null){
-    //         this.save_file();
-    //     }   
-    // }
 
-    //! Deprecated for use with small artifact interface
-    check_location(location) {
-        if (this.location_array == location) {
-            this.skip_artifact(false);
-        }
-    }
     save_file() {
         const createCsvWriter = require('csv-writer').createArrayCsvWriter;
         const csvWriter = createCsvWriter({
@@ -263,6 +203,7 @@ class Artifact {
             .writeRecords(this.reportedArtifacts);//.then(() => console.log('The CSV file was written successfully'));
 
     }
+
     read_file() {
         const csv = require('csv-parser');
         const fs = require('fs');
