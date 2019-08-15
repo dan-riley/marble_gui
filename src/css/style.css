@@ -9,6 +9,21 @@ body {
   margin: 0;
 }
 
+.panel-default .panel-title a {
+  font-size: 20px;
+  color: white;
+}
+
+.panel-default .panel-title a:after {
+  content: "\f106";
+  color: grey;
+  float: right;
+  margin-top: -12px;
+}
+.panel-default .panel-title a.collapsed:after {
+  content: "\f107";
+}
+
 .btn-space {
   margin-right: 5px;
 }

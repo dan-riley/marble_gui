@@ -637,7 +637,21 @@ class TabManager {
         robot_artifact_container.setAttribute("robot_name", this.robot_name[n]);
         robot_artifact_container.innerHTML = `
             <span class="badge badge-secondary col-sm-12">
-                <b>` + this.robot_name[n] + `</b>
+                <div class="panel panel-default">
+                    <div class="panel-heading p-3 mb-3" role="tab" id="` + this.robot_name[n] + `_heading">
+                        <b class="panel-title">
+                            <a class="collapsed" role="button" title="" data-toggle="collapse" href="#` + this.robot_name[n] + `_collapse" aria-expanded="true" aria-controls="collapse1">
+                            ` + this.robot_name[n] + `
+                            </a>
+                        </b>
+                    </div>
+                
+                    <div id="` + this.robot_name[n] + `_collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="` + this.robot_name[n] + `_heading">
+                    <div class="panel-body px-3 mb-4">
+                        <p>This is where the buttons will be moved</p>
+                    </div>
+                    </div>
+                </div>
             </span>
             <div class="row" artifact_id="header">
                 <span class="col-sm-1"> </span>
