@@ -635,25 +635,19 @@ class TabManager {
         var robot_artifact_container = document.createElement("DIV");
         robot_artifact_container.setAttribute("class", "col-sm-12");
         robot_artifact_container.setAttribute("robot_name", this.robot_name[n]);
-        var robot_artifact_titles = document.createElement("DIV");
-        robot_artifact_titles.setAttribute("class", "row");
-        robot_artifact_titles.setAttribute("artifact_id", "title");
-        // robot_artifact_titles.innerHTML = '<span id="robot_name" class="badge badge-secondary col-sm-1" style="text-align: center">' + this.robot_name[n] + '</span>' +
-        robot_artifact_titles.innerHTML = '<span class="col-sm-1"> </span>' +
-            '<span id="type" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Type</b></span>' +
-            '<span id="confidence" class="badge badge-secondary col-sm-1" style="text-align: center"><b>Confidence</b></span>' +
-            '<span id="position" class="badge badge-secondary col-sm-3" style="text-align: center"><b>Position</b></span>' +
-            '<span class="badge badge-secondary col-sm-2" style="text-align: center"><b>DARPA</b></span>' +
-            '<span class="badge badge-secondary col-sm-2" style="text-align: center"><b>Image</b></span>';
+        robot_artifact_container.innerHTML = `
+            <span class="badge badge-secondary col-sm-12">
+                <b>` + this.robot_name[n] + `</b>
+            </span>
+            <div class="row" artifact_id="header">
+                <span class="col-sm-1"> </span>
+                <span id="type" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Type</b></span>
+                <span id="confidence" class="badge badge-secondary col-sm-1" style="text-align: center"><b>Confidence</b></span>
+                <span id="position" class="badge badge-secondary col-sm-3" style="text-align: center"><b>Position</b></span>
+                <span class="badge badge-secondary col-sm-2" style="text-align: center"><b>DARPA</b></span>
+                <span class="badge badge-secondary col-sm-2" style="text-align: center"><b>Image</b></span>
+            </div>`;
 
-
-        var robot_artifact_header = document.createElement("DIV");
-        robot_artifact_titles.setAttribute("class", "row");
-        robot_artifact_titles.setAttribute("artifact_id", "header");
-        robot_artifact_header.innerHTML = '<span class="badge badge-secondary col-sm-12"><b>' + this.robot_name[n] + '</b></span>';
-
-        robot_artifact_container.appendChild(robot_artifact_header);
-        robot_artifact_container.appendChild(robot_artifact_titles);
         // Artifact rows get created by the artifact handler now
 
         // Creates a DIV element that is placed either on the left or right side of the screen depending on how many robots there currently are
@@ -668,7 +662,6 @@ class TabManager {
             let row_artifact_containers = this.artifact_tracker.querySelector("[row_id = '" + this.rows + "']");
             row_artifact_containers.appendChild(robot_artifact_container);
         }
-        // this.artifact_tracker.appendChild(robot_artifact_container);
         // Sets up all objects for vehicle artifact manager
         this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n], n);
 
