@@ -1,13 +1,25 @@
 var ANALYZE_TOPICS_LIST_INTERVAL = 2000;
 
-function send_signal_to(robot_name, signal) {
+function send_signal_to(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
         name: "/" + robot_name + "/" + signal,
         messageType: "std_msgs/Bool"
     });
     var msg = new ROSLIB.Message({
-        data: true
+        data: value
+    });
+    Topic.publish(msg);
+}
+
+function send_string_to(robot_name, signal, text) {
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: "/" + robot_name + "/" + signal,
+        messageType: "std_msgs/String"
+    });
+    var msg = new ROSLIB.Message({
+        data: text
     });
     Topic.publish(msg);
 }
@@ -15,6 +27,7 @@ function send_signal_to(robot_name, signal) {
 class TabManager {
     constructor() {
         // Permanent subscribers for all vehicle tabs
+        this.Tab_TaskSub = [];
         this.Tab_OdomSub = [];
         this.Tab_OdomChart = [];
         this.Tab_BatterySub = [];
@@ -31,8 +44,10 @@ class TabManager {
         // Tab_CmdVelMsg;
 
         this.global_vehicleType = [];
+	this.tasks = [];
         this.global_vehicleArtifactsList = [];
-        this.prev_time = []
+        this.prev_time = [];
+        this.fusedArtifacts = new Artifact('Base', 0);
 
         this.rows = 0;
         this.robot_name = [];
@@ -80,23 +95,13 @@ class TabManager {
             var handled_names = [];
 
             if (handled_names.indexOf(name) == -1) {
-                if (patt.test(name)) {
+                if (patt.test(name) && (name != 'S01')) {
                     if (_this.robot_name.indexOf(name) == -1) {
                         _this.robot_name.push(name);
                         _this.tabs_robot_name.push(name);
                         _this.x++;
                     }
 
-
-                    var my_n = _this.robot_name.indexOf(name);
-                    var pub_request = new ROSLIB.ServiceRequest({
-                        topic: topicsList[i]
-                    });
-                    _this.publishersClient.callService(pub_request, function (result) {
-                        if (result.publishers.length > 0) {
-                            _this.time_since_last_msg[my_n] = new Date();
-                        }
-                    });
                 }
                 handled_names.push(name);
             }
@@ -115,6 +120,20 @@ class TabManager {
             else {
                 status_dom.html('<font color="red">Disconnected</font>');
             }
+
+	    var task_dom = $('#task_status_' + _this.robot_name[i]);
+	    var task = global_tabManager.tasks[i];
+	    if (task == "Home") {
+	        task_dom.html('<font color="yellow">Going Home</font>');
+	    } else if (task == "Report") {
+	        task_dom.html('<font color="yellow">Reporting</font>');
+	    } else if (task == "Explore") {
+	        task_dom.html('<font color="green">Exploring</font>');
+	    } else {
+		if (task == undefined) task = '';
+	        task_dom.html('<font color="red">' + task + '</font>');
+	    }
+
         }
 
         for (_this.i; _this.i < curr_robot_length; _this.i++) {
@@ -146,6 +165,10 @@ class TabManager {
             return;
         }
 
+        let TaskTopic = {
+            topic: "/" + this.robot_name[n] + "/task_update",
+            messageType: "std_msgs/String"
+        };
         let OdomTopic = {
             topic: "/" + this.robot_name[n] + "/odometry",
             messageType: "nav_msgs/Odometry"
@@ -165,12 +188,14 @@ class TabManager {
         };
         let ArtifactTopic = {
             // topic: "/artifact_record",  // For use when artifact detection is on ground station
-            topic: "/" + this.robot_name[n] + "/artifact_record",
+            // topic: "/" + this.robot_name[n] + "/artifact_record",
+            topic: "/" + this.robot_name[n] + "/artifact_array/relay",
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
         let ArtifactImgTopic = {
             // topic: "/artifact_record",  // For use to save images on ground station
-            topic: "/" + this.robot_name[n] + "/located_artifact_img",
+            // topic: "/" + this.robot_name[n] + "/located_artifact_img",
+            topic: "/" + this.robot_name[n] + "/located_artifact_img/relay",
             messageType: "marble_artifact_detection_msgs/ArtifactImg"
         };
         let VehicleStatusTopic = {
@@ -178,11 +203,16 @@ class TabManager {
             messageType: "marble_common_msgs/VehicleStatus"
         }
         let PointCloudTopic = {
-            topic: "/" + this.robot_name[n] + "/octomap_point_cloud_occupied",
+            topic: "/" + this.robot_name[n] + "/pc2_out",
             // topic: "/octomap_point_cloud_occupied",
             messageType: "sensor_msgs/PointCloud2"
         };
 
+        this.Tab_TaskSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: TaskTopic.topic,
+            messageType: TaskTopic.messageType
+        });
         this.Tab_OdomSub[n] = new ROSLIB.Topic({
             ros: ros,
             name: OdomTopic.topic,
@@ -247,6 +277,13 @@ class TabManager {
         }
 
         var last_cloud_report_success = "never";
+
+	global_tabManager.Tab_TaskSub[n].subscribe(function (msg) {
+            // Save our current time to update connection status
+            // The service call isn't reliable!
+            global_tabManager.time_since_last_msg[n] = new Date();
+	    global_tabManager.tasks[n] = msg.data
+        });
 
         // Subscriber to point cloud topic for vehicle that publishes to darpa server
         global_tabManager.Tab_PointCloudSub[n].subscribe(function (msg) {
@@ -363,6 +400,7 @@ class TabManager {
                 <a  class="nav-link" onclick="window.openPage('` + this.robot_name[n] + `', ` + n + `)" >
                     ` + this.robot_name[n] + `
                     <br><span id="connection_status_` + this.robot_name[n] + `"></span>
+                    <br><span id="task_status_` + this.robot_name[n] + `"></span>
                 </a>
             </li>`);
 
@@ -506,7 +544,6 @@ class TabManager {
         }
         this.Tab_OdomChart[n].update();
 
-
         var top_card = document.createElement("DIV");
         top_card.setAttribute("class", "card");
 
@@ -520,7 +557,6 @@ class TabManager {
         top_card.appendChild(top_card_header);
         top_card.appendChild(top_card_body);
 
-
         var battery_voltage = document.createElement("P");
         battery_voltage.innerHTML = `Voltage: <span id="` + global_tabManager.robot_name[n] + `_voltage"></span>`;
         var control_status = document.createElement("P");
@@ -528,39 +564,69 @@ class TabManager {
         top_card_body.appendChild(control_status);
         top_card_body.appendChild(battery_voltage);
 
+        var radio_btn = document.createElement("BUTTON");
+        radio_btn.setAttribute("type", "button");
+        radio_btn.setAttribute("class", "btn btn-success btn-space");
+        radio_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "radio_enable_cmd", true) };
+        radio_btn.innerText = "Radio Reset";
+
         var estop_btn = document.createElement("BUTTON");
         estop_btn.setAttribute("type", "button");
         estop_btn.setAttribute("class", "btn btn-danger btn-space");
-        estop_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop") };
-        estop_btn.innerText = "Stop Vehicle";
+        estop_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", true) };
+        estop_btn.innerText = "Emergency Stop";
+
+	var estop_off_btn = document.createElement("BUTTON");
+        estop_off_btn.setAttribute("type", "button");
+        estop_off_btn.setAttribute("class", "btn btn-success btn-space");
+        estop_off_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", false) };
+        estop_off_btn.innerText = "Emergency Stop Disabled";
+
+	var stop_btn = document.createElement("BUTTON");
+        stop_btn.setAttribute("type", "button");
+        stop_btn.setAttribute("class", "btn btn-danger btn-space");
+        stop_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop", true) };
+        stop_btn.innerText = "Stop Vehicle";
 
         var startup_btn = document.createElement("BUTTON");
         startup_btn.setAttribute("type", "button");
         startup_btn.setAttribute("class", "btn btn-success btn-space");
-        startup_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "startup") };
-        startup_btn.innerText = "Start Vehicle";
+        startup_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop", false) };
+        startup_btn.innerText = "Start Mission";
 
-        var restart_btn = document.createElement("BUTTON");
-        restart_btn.setAttribute("type", "button");
-        restart_btn.setAttribute("class", "btn btn-primary btn-space");
-        restart_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "restart") };
-        restart_btn.innerText = "Restart Vehicle";
+	// estop_status  sw_state (1=stop -- the estop!, 0=go), radio_state (0=go/enabled)
+        // var restart_btn = document.createElement("BUTTON");
+        // restart_btn.setAttribute("type", "button");
+        // restart_btn.setAttribute("class", "btn btn-primary btn-space");
+        // restart_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "restart", "true") };
+        // restart_btn.innerText = "Restart Vehicle";
 
+        var home_btn = document.createElement("BUTTON");
+        home_btn.setAttribute("type", "button");
+        home_btn.setAttribute("class", "btn btn-danger btn-space");
+        home_btn.onclick = function () { send_string_to(global_tabManager.robot_name[n], "task", "Home") };
+        home_btn.innerText = "Return Home";
 
+        var explore_btn = document.createElement("BUTTON");
+        explore_btn.setAttribute("type", "button");
+        explore_btn.setAttribute("class", "btn btn-success btn-space");
+        explore_btn.onclick = function () { send_string_to(global_tabManager.robot_name[n], "task", "Explore") };
+        explore_btn.innerText = "Explore";
+
+        top_card_body.appendChild(radio_btn);
         top_card_body.appendChild(estop_btn);
+        top_card_body.appendChild(estop_off_btn);
+        top_card_body.appendChild(stop_btn);
         top_card_body.appendChild(startup_btn);
-        top_card_body.appendChild(restart_btn);
-
-
-
+        // top_card_body.appendChild(restart_btn);
+        top_card_body.appendChild(home_btn);
+        top_card_body.appendChild(explore_btn);
 
         chart_wrap.appendChild(chart);
 
         tab_content.appendChild(top_card);
         tab_content.appendChild(chart_wrap);
         tab_content.appendChild(viewer_row);
-
-
 
         $('#Robot_Pages').prepend(tab_content);
 
@@ -573,12 +639,12 @@ class TabManager {
         robot_artifact_titles.setAttribute("class", "row");
         robot_artifact_titles.setAttribute("artifact_id", "title");
         // robot_artifact_titles.innerHTML = '<span id="robot_name" class="badge badge-secondary col-sm-1" style="text-align: center">' + this.robot_name[n] + '</span>' +
-        robot_artifact_titles.innerHTML = '<span id="artifact_row_id" class="badge badge-secondary col-sm-1" style="text-align: center"><b>ID</b></span>' +
-            '<span id="type" class="badge badge-secondary col-sm-3" style="text-align: center"><b>Type</b></span>' +
-            '<span id="confidence" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Confidence</b></span>' +
+        robot_artifact_titles.innerHTML = '<span class="col-sm-1"> </span>' +
+            '<span id="type" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Type</b></span>' +
+            '<span id="confidence" class="badge badge-secondary col-sm-1" style="text-align: center"><b>Confidence</b></span>' +
             '<span id="position" class="badge badge-secondary col-sm-3" style="text-align: center"><b>Position</b></span>' +
             '<span class="badge badge-secondary col-sm-2" style="text-align: center"><b>DARPA</b></span>' +
-            '<span class="badge badge-secondary col-sm-1" style="text-align: center"><b>Image</b></span>';
+            '<span class="badge badge-secondary col-sm-2" style="text-align: center"><b>Image</b></span>';
 
 
         var robot_artifact_header = document.createElement("DIV");
@@ -588,46 +654,8 @@ class TabManager {
 
         robot_artifact_container.appendChild(robot_artifact_header);
         robot_artifact_container.appendChild(robot_artifact_titles);
-        for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
-            let robot_artifact_tracker = document.createElement("DIV");
-            robot_artifact_tracker.setAttribute("class", "row");
-            robot_artifact_tracker.setAttribute("artifact_id", parseFloat(i));
-            console.log(JSON.stringify({ x: 0.00, y: 0.00, z: 0.00 }));
-            // robot_artifact_tracker.innerHTML = '<span id="robot_name" class="badge badge-secondary col-sm-1" style="text-align: center">' + this.robot_name[n] + '</span>' +
-            robot_artifact_tracker.innerHTML = '<span id="artifact_row_id" class="badge badge-secondary col-sm-1" style="text-align: center">' + i + '</span>' +
-                '<span contenteditable="true" id="type" class="badge badge-secondary col-sm-3" style="text-align: center; min-height: 1px;" value="undefined"> undefined </span>' +
-                '<span contenteditable="true" id="confidence" class="badge badge-secondary col-sm-2" style="text-align: center" value="0.00">0.00</span>' +
-                "<span contenteditable='true' id='position' class='badge badge-secondary col-sm-3' style='text-align: center' value='" + JSON.stringify({ x: 0.00, y: 0.00, z: 0.00 }) + "'>{x: 0.00 y: 0.00 z: 0.00}</span>";
-            // '<button class="col-sm-1">Yes</button>' +
-            // '<button class="col-sm-1">No</button>';
+        // Artifact rows get created by the artifact handler now
 
-            let robot_artifact_tracker_yes_container = document.createElement("DIV");
-            robot_artifact_tracker_yes_container.setAttribute("class", "badge badge-secondary col-sm-2");
-            robot_artifact_tracker_yes_container.setAttribute("id", this.robot_name[n] + "_" + i);
-            let robot_artifact_tracker_yes = document.createElement("BUTTON");
-            robot_artifact_tracker_yes.innerText = "Submit";
-            robot_artifact_tracker_yes.onclick = function () {
-                if(connected_to_darpa){
-                    robot_artifact_tracker_yes_container.innerText = "submitting...";
-                    global_tabManager.global_vehicleArtifactsList[n].submit_artifact(global_tabManager.global_vehicleArtifactsList, i);
-                }
-                else {
-                    alert('Cannot submit. You are not connected to the DARPA server.');
-                }
-            };
-            robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_yes);
-
-            let robot_artifact_image_container = document.createElement("DIV");
-            robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-1 popup");
-            robot_artifact_image_container.setAttribute("id", "image");
-            robot_artifact_image_container.innerText = "No Image";
-
-            robot_artifact_tracker.appendChild(robot_artifact_tracker_yes_container);
-            robot_artifact_tracker.appendChild(robot_artifact_image_container);
-            // robot_artifact_tracker.appendChild(robot_artifact_tracker_no);
-
-            robot_artifact_container.appendChild(robot_artifact_tracker);
-        }
         // Creates a DIV element that is placed either on the left or right side of the screen depending on how many robots there currently are
         if (n % 2 == 0) {
             this.rows++;
@@ -642,7 +670,7 @@ class TabManager {
         }
         // this.artifact_tracker.appendChild(robot_artifact_container);
         // Sets up all objects for vehicle artifact manager
-        this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n]);
+        this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n], n);
 
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
             // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
