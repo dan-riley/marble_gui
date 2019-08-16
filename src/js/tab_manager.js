@@ -25,12 +25,19 @@ function send_string_to(robot_name, signal, text) {
 }
 
 function create_pose_array(robot_name, poses) {
+    var now = new Date();
+    let now_time = now.getTime() / 1000;
+
     var Topic = new ROSLIB.Topic({
         ros: ros,
         name: "/" + robot_name + "/posearray",
         messageType: "geometry_msgs/PoseArray"
     })
     var msg = new ROSLIB.Message({
+        header: {
+            stamp: 0.0,
+            frame_id: "darpa",
+        },
         poses: poses
     })
     Topic.publish(msg);
@@ -392,7 +399,6 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                console.log(msg.poses.length)
                 $.post(MAP_SERVER_ROOT + "/state/update/", JSON.stringify(msg))
                     .done(function (json, statusText, xhr) {
                         if (xhr.status == 200) {
@@ -401,12 +407,14 @@ class TabManager {
                         }
                         else {
                             console.log("error in sending /state/update PoseArray to DARPA server");
+                            console.log(json);
                             console.log(statusText);
                             console.log(xhr);
                         }
 
                     })
                     .fail(function (a, b, c) {
+                        console.log(a, b, c);
                         //console.log("error reporting pose array: " + c);
                     });
                 global_tabManager.prev_time[n] = now_time;

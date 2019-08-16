@@ -71,10 +71,15 @@ class Artifact {
         let robot_artifact_tracker_yes = document.createElement("BUTTON");
         robot_artifact_tracker_yes.innerText = "Submit";
         var n = this.n;
+        var robot_name = this.robot_name;
         robot_artifact_tracker_yes.onclick = function () {
             if(connected_to_scoring_server){
                 robot_artifact_tracker_yes_container.innerText = "submitting...";
-                global_tabManager.global_vehicleArtifactsList[n].submit_artifact(id);
+                if (robot_name == 'Base') {
+                    global_tabManager.fusedArtifacts.submit_artifact(id);
+                } else {
+                    global_tabManager.global_vehicleArtifactsList[n].submit_artifact(id);
+                }
             }
             else {
                 alert('Cannot submit. You are not connected to the DARPA server.');
@@ -131,6 +136,10 @@ class Artifact {
                 this.artifact_position[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_image[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").style.backgroundColor = "#aaaaaa";
+
+                if (artifact.submitted) {
+                    this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").firstChild.style.color = "#aaaaaa";
+                }
             }
 
             this.artifact_confidence[id].setAttribute("value", toString(confidence));
@@ -343,6 +352,7 @@ class Artifact {
                 this.artifactsList[id].id = id;
                 this.artifactsList[id].n = this.n;
                 this.artifactsList[id].fused = false;
+                this.artifactsList[id].submitted = false;
 
                 // When there is not an artifact class declared, set all properties of the artifact
                 if (this.artifactsList[id].obj_class == undefined || this.artifactsList[i].obj_class == "") {
@@ -419,10 +429,18 @@ class Artifact {
                 }
             }
         }
+
+        var org_artifacts = this.artifactsList[id].originals;
         console.log("submitting artifact to DARPA server. Waiting for response...");
         $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
             .done(function (json) {
                 document.getElementById(robo_name + "_" + id).innerText = "submission result: +" + json.score_change + " points";
+                if (robo_name == "Base") {
+                    for (let id2 in org_artifacts) {
+                        let artifact = org_artifacts[id2];
+                        global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].submitted = true;
+                    }
+                }
             });
     }
 
