@@ -24,11 +24,24 @@ function send_string_to(robot_name, signal, text) {
     Topic.publish(msg);
 }
 
+function create_pose_array(robot_name, poses) {
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: "/" + robot_name + "/posearray",
+        messageType: "geometry_msgs/PoseArray"
+    })
+    var msg = new ROSLIB.Message({
+        poses: poses
+    })
+    Topic.publish(msg);
+}
+
 class TabManager {
     constructor() {
         // Permanent subscribers for all vehicle tabs
         this.Tab_TaskSub = [];
         this.Tab_OdomSub = [];
+        this.Tab_OdometrySub = [];
         this.Tab_OdomChart = [];
         this.Tab_BatterySub = [];
         this.Tab_ControlSub = [];
@@ -49,6 +62,7 @@ class TabManager {
         this.prev_time = [];
         this.fusedArtifacts = new Artifact('Base', 0);
 
+        this.poses = [];
         this.rows = 0;
         this.robot_name = [];
         this.time_since_last_msg = [];
@@ -146,6 +160,8 @@ class TabManager {
         let n = this.i;
         console.log("Tab: " + this.robot_name[n]);
 
+        this.poses[n] = [];
+
         let input_str;
 
         // TODO: Remove and change all references to subT sim specific topics, change them to follow subT colorado format
@@ -204,6 +220,7 @@ class TabManager {
         }
         let PointCloudTopic = {
             topic: "/" + this.robot_name[n] + "/pc2_out",
+            // topic: "/merged_map",
             // topic: "/octomap_point_cloud_occupied",
             messageType: "sensor_msgs/PointCloud2"
         };
@@ -214,6 +231,11 @@ class TabManager {
             messageType: TaskTopic.messageType
         });
         this.Tab_OdomSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: OdomTopic.topic,
+            messageType: OdomTopic.messageType
+        });
+        this.Tab_OdometrySub[n] = new ROSLIB.Topic({
             ros: ros,
             name: OdomTopic.topic,
             messageType: OdomTopic.messageType
@@ -250,14 +272,17 @@ class TabManager {
         });
         this.Tab_PoseArraySub[n] = new ROSLIB.Topic({
             ros: ros,
-            name: "/" + this.robot_name[n] + "/explored_edges",
+            name: "/" + this.robot_name[n] + "/posearray",
+            // name: "/merged_poses",
             messageType: "geometry_msgs/PoseArray"
+            // messageType: "nav_msgs/Odometry"
         });
         this.Tab_OccupancyGridSub[n] = new ROSLIB.Topic({
             ros: ros,
             name: "/" + this.robot_name[n] + "/map",
             messageType: "nav_msgs/OccupancyGrid"
         });
+
         var date = new Date();
         var now_time = date.getTime() / 1000;
         global_tabManager.prev_time[n] = now_time;
@@ -290,22 +315,20 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                if(connected_to_darpa){
-                    $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
-                        .done(function (json, statusText, xhr) {
-                            if (xhr.status == 200) {
-                                last_cloud_report_success = new Date();
-                                $('#mapping_cloud_report_last_sent_raw').text(Math.round(now / 100) / 10);
-                            }
-                            else {
-                                console.log("error in sending /map/update PointCloud to DARPA server");
-                                console.log(statusText);
-                                console.log(xhr);
-                            }
+                $.post(MAP_SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
+                    .done(function (json, statusText, xhr) {
+                        if (xhr.status == 200) {
+                            last_cloud_report_success = new Date();
+                            $('#mapping_cloud_report_last_sent_raw').text(Math.round(now / 100) / 10);
+                        }
+                        else {
+                            console.log("error in sending /map/update PointCloud to DARPA server");
+                            console.log(statusText);
+                            console.log(xhr);
+                        }
 
-                        });
-                    global_tabManager.prev_time[n] = now_time;
-                }
+                    });
+                global_tabManager.prev_time[n] = now_time;
             }
         });
 
@@ -326,22 +349,20 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                if(connected_to_darpa){
-                    $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
-                        .done(function (json, statusText, xhr) {
-                            if (xhr.status == 200) {
-                                last_grid_report_success = new Date();
-                                $('#mapping_grid_report_last_sent_raw').text(Math.round(now / 100) / 10);
-                            }
-                            else {
-                                console.log("error in sending /map/update occupancyGrid to DARPA server");
-                                console.log(statusText);
-                                console.log(xhr);
-                            }
+                $.post(MAP_SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
+                    .done(function (json, statusText, xhr) {
+                        if (xhr.status == 200) {
+                            last_grid_report_success = new Date();
+                            $('#mapping_grid_report_last_sent_raw').text(Math.round(now / 100) / 10);
+                        }
+                        else {
+                            console.log("error in sending /map/update occupancyGrid to DARPA server");
+                            console.log(statusText);
+                            console.log(xhr);
+                        }
 
-                        });
-                    global_tabManager.prev_time[n] = now_time;
-                }
+                    });
+                global_tabManager.prev_time[n] = now_time;
             }
         });
 
@@ -357,30 +378,38 @@ class TabManager {
 
         var last_telem_report_success = "never";
 
+        global_tabManager.Tab_OdometrySub[n].subscribe(function (msg) {
+            let poses = global_tabManager.poses[n];
+            poses.push(msg.pose.pose);
+            if (poses.length > 10) {
+                create_pose_array(global_tabManager.robot_name[n], poses);
+                global_tabManager.poses[n] = [];
+            }
+        });
+
         // Subscriber to pose array topic for vehicle that publishes to darpa server
         global_tabManager.Tab_PoseArraySub[n].subscribe(function (msg) {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                if(connected_to_darpa){
-                    $.post(SERVER_ROOT + "/state/update/", JSON.stringify(msg))
-                        .done(function (json, statusText, xhr) {
-                            if (xhr.status == 200) {
-                                last_telem_report_success = new Date();
-                                $('#telemetry_report_last_sent_raw').text(Math.round(now / 100) / 10);
-                            }
-                            else {
-                                console.log("error in sending /state/update PoseArray to DARPA server");
-                                console.log(statusText);
-                                console.log(xhr);
-                            }
+                console.log(msg.poses.length)
+                $.post(MAP_SERVER_ROOT + "/state/update/", JSON.stringify(msg))
+                    .done(function (json, statusText, xhr) {
+                        if (xhr.status == 200) {
+                            last_telem_report_success = new Date();
+                            $('#telemetry_report_last_sent_raw').text(Math.round(now / 100) / 10);
+                        }
+                        else {
+                            console.log("error in sending /state/update PoseArray to DARPA server");
+                            console.log(statusText);
+                            console.log(xhr);
+                        }
 
-                        })
-                        .fail(function (a, b, c) {
-                            //console.log("error reporting pose array: " + c);
-                        });
-                    global_tabManager.prev_time[n] = now_time;
-                }
+                    })
+                    .fail(function (a, b, c) {
+                        //console.log("error reporting pose array: " + c);
+                    });
+                global_tabManager.prev_time[n] = now_time;
             }
         });
 
@@ -633,13 +662,13 @@ class TabManager {
                 <div class="panel panel-default">
                     <div class="panel-heading p-3" role="tab" id="` + this.robot_name[n] + `_heading">
                         <b class="panel-title">
-                            <a class="collapsed" role="button" title="" data-toggle="collapse" href="#` + this.robot_name[n] + `_collapse" aria-expanded="true" aria-controls="collapse1">
+                            <a class="" role="button" title="" data-toggle="collapse" href="#` + this.robot_name[n] + `_collapse" aria-expanded="true" aria-controls="collapse1">
                             ` + this.robot_name[n] + `
                             </a>
                         </b>
                     </div>
-                
-                    <div id="` + this.robot_name[n] + `_collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="` + this.robot_name[n] + `_heading">
+
+                    <div id="` + this.robot_name[n] + `_collapse" class="panel-collapse collapse show" role="tabpanel" aria-labelledby="` + this.robot_name[n] + `_heading">
                     <div class="panel-body mb-4">
                         ` + top_card_body.innerHTML +`
                     </div>

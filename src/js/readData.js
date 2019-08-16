@@ -1,5 +1,5 @@
 var ros_connection = false;
-var connected_to_darpa = false;
+var connected_to_scoring_server = false;
 var topicsList = [];
 var topicsTypeList = [];
 var global_tabManager;
@@ -218,16 +218,16 @@ $(document).ready(function () {
  // TODO: Replace count with values from response
  function startGET_Status() {
    // var http = new HTTP("/api/status/", {});
-   $.get(SERVER_ROOT + "/api/status/", function( json ) {
+   $.get(SCORING_SERVER_ROOT + "/api/status/", function( json ) {
      $('#header_time').text(json.run_clock);
      $('#header_score').text(json.score);
      $('#header_remaining_reports').text(json.remaining_reports);
  
      $('#connection_status_DARPA').html('<font color="green">Connected</font>');
-     connected_to_darpa = true;
+     connected_to_scoring_server = true;
    }).fail(function () {
      $('#connection_status_DARPA').html('<font color="red">Disconnected</font>');
-     connected_to_darpa = false;
+     connected_to_scoring_server = false;
    });
   
  }

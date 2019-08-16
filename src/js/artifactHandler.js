@@ -72,7 +72,7 @@ class Artifact {
         robot_artifact_tracker_yes.innerText = "Submit";
         var n = this.n;
         robot_artifact_tracker_yes.onclick = function () {
-            if(connected_to_darpa){
+            if(connected_to_scoring_server){
                 robot_artifact_tracker_yes_container.innerText = "submitting...";
                 global_tabManager.global_vehicleArtifactsList[n].submit_artifact(id);
             }
@@ -420,7 +420,7 @@ class Artifact {
             }
         }
         console.log("submitting artifact to DARPA server. Waiting for response...");
-        $.post(SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
+        $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
             .done(function (json) {
                 document.getElementById(robo_name + "_" + id).innerText = "submission result: +" + json.score_change + " points";
             });
