@@ -9,19 +9,24 @@ body {
   margin: 0;
 }
 
+.artifact_table {
+  margin-top: 10px;
+}
+
 .panel-default .panel-title a {
   font-size: 20px;
   color: white;
 }
 
 .panel-default .panel-title a:after {
-  content: "\f106";
-  color: grey;
+  padding-top: 5px;
+  font-size: 30px;
+  content: "-";
   float: right;
   margin-top: -12px;
 }
 .panel-default .panel-title a.collapsed:after {
-  content: "\f107";
+  content: "+";
 }
 
 .btn-space {

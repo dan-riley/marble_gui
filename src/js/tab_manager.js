@@ -552,17 +552,18 @@ class TabManager {
         top_card_header.innerText = global_tabManager.robot_name[n];
 
         var top_card_body = document.createElement("DIV");
-        top_card_body.setAttribute("class", "card-body");
+        var robot_info = document.createElement("DIV");
+        robot_info.setAttribute("class", "card-body");
 
         top_card.appendChild(top_card_header);
-        top_card.appendChild(top_card_body);
+        top_card.appendChild(robot_info);
 
         var battery_voltage = document.createElement("P");
         battery_voltage.innerHTML = `Voltage: <span id="` + global_tabManager.robot_name[n] + `_voltage"></span>`;
         var control_status = document.createElement("P");
         control_status.innerHTML = `Status: <span id="` + global_tabManager.robot_name[n] + `_status"></span>`;
-        top_card_body.appendChild(control_status);
-        top_card_body.appendChild(battery_voltage);
+        robot_info.appendChild(control_status);
+        robot_info.appendChild(battery_voltage);
 
         var radio_btn = document.createElement("BUTTON");
         radio_btn.setAttribute("type", "button");
@@ -576,13 +577,13 @@ class TabManager {
         estop_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", true) };
         estop_btn.innerText = "Emergency Stop";
 
-	var estop_off_btn = document.createElement("BUTTON");
+	    var estop_off_btn = document.createElement("BUTTON");
         estop_off_btn.setAttribute("type", "button");
         estop_off_btn.setAttribute("class", "btn btn-success btn-space");
         estop_off_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", false) };
         estop_off_btn.innerText = "Emergency Stop Disabled";
 
-	var stop_btn = document.createElement("BUTTON");
+	    var stop_btn = document.createElement("BUTTON");
         stop_btn.setAttribute("type", "button");
         stop_btn.setAttribute("class", "btn btn-danger btn-space");
         stop_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop", true) };
@@ -593,13 +594,6 @@ class TabManager {
         startup_btn.setAttribute("class", "btn btn-success btn-space");
         startup_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop", false) };
         startup_btn.innerText = "Start Mission";
-
-	// estop_status  sw_state (1=stop -- the estop!, 0=go), radio_state (0=go/enabled)
-        // var restart_btn = document.createElement("BUTTON");
-        // restart_btn.setAttribute("type", "button");
-        // restart_btn.setAttribute("class", "btn btn-primary btn-space");
-        // restart_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "restart", "true") };
-        // restart_btn.innerText = "Restart Vehicle";
 
         var home_btn = document.createElement("BUTTON");
         home_btn.setAttribute("type", "button");
@@ -618,7 +612,6 @@ class TabManager {
         top_card_body.appendChild(estop_off_btn);
         top_card_body.appendChild(stop_btn);
         top_card_body.appendChild(startup_btn);
-        // top_card_body.appendChild(restart_btn);
         top_card_body.appendChild(home_btn);
         top_card_body.appendChild(explore_btn);
 
@@ -633,12 +626,12 @@ class TabManager {
         create_viewer(this.robot_name[n]);
 
         var robot_artifact_container = document.createElement("DIV");
-        robot_artifact_container.setAttribute("class", "col-sm-12");
+        robot_artifact_container.setAttribute("class", "col-sm-12 artifact_table");
         robot_artifact_container.setAttribute("robot_name", this.robot_name[n]);
         robot_artifact_container.innerHTML = `
             <span class="badge badge-secondary col-sm-12">
                 <div class="panel panel-default">
-                    <div class="panel-heading p-3 mb-3" role="tab" id="` + this.robot_name[n] + `_heading">
+                    <div class="panel-heading p-3" role="tab" id="` + this.robot_name[n] + `_heading">
                         <b class="panel-title">
                             <a class="collapsed" role="button" title="" data-toggle="collapse" href="#` + this.robot_name[n] + `_collapse" aria-expanded="true" aria-controls="collapse1">
                             ` + this.robot_name[n] + `
@@ -647,8 +640,8 @@ class TabManager {
                     </div>
                 
                     <div id="` + this.robot_name[n] + `_collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="` + this.robot_name[n] + `_heading">
-                    <div class="panel-body px-3 mb-4">
-                        <p>This is where the buttons will be moved</p>
+                    <div class="panel-body mb-4">
+                        ` + top_card_body.innerHTML +`
                     </div>
                     </div>
                 </div>
