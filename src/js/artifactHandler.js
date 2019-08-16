@@ -38,11 +38,11 @@ class Artifact {
 
     set_artifact_tracker(robot_artifacts, id) {
         this.artifact_tracker[id] = robot_artifacts.querySelector("[artifact_id = '" + id + "']");
-        this.artifact_position[id] = this.artifact_tracker[id].querySelector("[id = 'position'");
-        this.artifact_type[id] = this.artifact_tracker[id].querySelector("[id = 'type'");
+        this.artifact_position[id] = this.artifact_tracker[id].querySelector("[id = 'position']");
+        this.artifact_type[id] = this.artifact_tracker[id].querySelector("[id = 'type']");
         // this.artifact_num_seen[id] = this.artifact_tracker[id].querySelector("[id = 'num_seen'");
-        this.artifact_seen_by[id] = this.artifact_tracker[id].querySelector("[id = 'seen_by'");
-        this.artifact_confidence[id] = this.artifact_tracker[id].querySelector("[id = 'confidence'");
+        this.artifact_seen_by[id] = this.artifact_tracker[id].querySelector("[id = 'seen_by']");
+        this.artifact_confidence[id] = this.artifact_tracker[id].querySelector("[id = 'confidence']");
         this.artifact_image[id] = this.artifact_tracker[id].querySelector("[id = image]");
     }
 
@@ -100,13 +100,11 @@ class Artifact {
         for (let id in this.artifactsList) {
             let artifact = this.artifactsList[id];
             let type = artifact.obj_class;
-            let seen_by = artifact.vehicle_reporter;
             let confidence = artifact.obj_prob;
             let position = artifact.position;
             let image_id = artifact.image_id;
 
-            let artifact_tracker = robot_artifacts.querySelector("[artifact_id = '" + id + "']");
-            if (artifact_tracker == null) {
+            if (this.artifact_tracker[id] == null) {
                 let new_row = this.add_artifact(id);
                 robot_artifacts.appendChild(new_row);
                 this.set_artifact_tracker(robot_artifacts, id);
@@ -122,7 +120,17 @@ class Artifact {
             if (this.robot_name == 'Base') {
                 // let num_seen = seen_by.split(',').length;
                 // this.artifact_num_seen[id].innerText = num_seen;
-                this.artifact_seen_by[id].innerText = seen_by;
+                let seen_by = '';
+                for (let robot in artifact.robots) {
+                    seen_by += robot + ',';
+                }
+                this.artifact_seen_by[id].innerText = seen_by.slice(0, -1);
+            } else if (artifact.fused) {
+                this.artifact_type[id].style.backgroundColor = "#aaaaaa";
+                this.artifact_confidence[id].style.backgroundColor = "#aaaaaa";
+                this.artifact_position[id].style.backgroundColor = "#aaaaaa";
+                this.artifact_image[id].style.backgroundColor = "#aaaaaa";
+                this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").style.backgroundColor = "#aaaaaa";
             }
 
             this.artifact_confidence[id].setAttribute("value", toString(confidence));
@@ -138,17 +146,32 @@ class Artifact {
                 this.artifact_image[id].innerText = "No Image";
             }
             else {
-                if (this.artifact_image[id].children.length == 0) {
-                    this.artifact_image[id].innerText = "View Image";
-                    let robot_artifact_image = document.createElement("IMG");
-                    robot_artifact_image.setAttribute("id", "myPopup");
-                    robot_artifact_image.setAttribute("class", "popuptext");
-                    this.artifact_image[id].appendChild(robot_artifact_image);
-                }
-                this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
+                if (this.robot_name == 'Base') {
+                    if (this.artifact_image[id].children.length == 0) {
+                        this.artifact_image[id].innerText = "View Image";
+                        let robot_artifact_image = document.createElement("IMG");
+                        robot_artifact_image.setAttribute("id", "myPopup");
+                        robot_artifact_image.setAttribute("class", "popuptext");
+                        this.artifact_image[id].appendChild(robot_artifact_image);
+                    }
+                    this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
 
-                this.artifact_image[id].onclick = function () {
-                    $(this.children[0]).toggleClass("show");
+                    this.artifact_image[id].onclick = function () {
+                        $(this.children[0]).toggleClass("show");
+                    }
+                } else {
+                    if (this.artifact_image[id].children.length == 0) {
+                        this.artifact_image[id].innerText = "View Image";
+                        let robot_artifact_image = document.createElement("IMG");
+                        robot_artifact_image.setAttribute("id", "myPopup");
+                        robot_artifact_image.setAttribute("class", "popuptext");
+                        this.artifact_image[id].appendChild(robot_artifact_image);
+                    }
+                    this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
+
+                    this.artifact_image[id].onclick = function () {
+                        $(this.children[0]).toggleClass("show");
+                    }
                 }
             }
 
@@ -179,35 +202,115 @@ class Artifact {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
     }
 
-    fuse_artifacts(id) {
-        let artifact = this.artifactsList[id];
+    fuse_artifacts(id, useFusedArtifact) {
+        let artifact;
+        let fusedArtifacts = global_tabManager.fusedArtifacts.artifactsList;
+        if (useFusedArtifact) {
+            artifact = fusedArtifacts[id];
+        } else {
+            artifact = this.artifactsList[id];
+        }
         let fuse = false;
-        if (artifact.obj_class == 'Drill')
-            console.log('stop');
-        // Compare to all of the other robots' artifacts
-        for (let n in global_tabManager.global_vehicleArtifactsList) {
-            if (global_tabManager.global_vehicleArtifactsList[n].robot_name == this.robot_name) {
-                continue;
-            }
+        let new_ids = [];
+        let remove_ids = [];
 
-            for (let id2 in global_tabManager.global_vehicleArtifactsList[n].artifactsList) {
-                let artifact2 = global_tabManager.global_vehicleArtifactsList[n].artifactsList[id2];
+        // Compare to all of the other artifacts in the fuse array
+        for (let id2 in fusedArtifacts) {
+            // If the id's are the same then it's the same artifact
+            // Note that if by some miracle multiple vehicles get the exact same position
+            // then some of this may break!
+            if (id2 != id) {
+                let artifact2 = fusedArtifacts[id2];
                 let dist = this.getDist(artifact, artifact2);
 
-                if (dist < 2) {
+                if (dist < 3) {
                     console.log("fusing", id, id2);
                     fuse = true;
 
+                    if (useFusedArtifact) {
+                        for (let id3 in artifact.originals) {
+                            if (artifact2.originals[id3] == undefined) {
+                                artifact2.originals[id3] = Object.assign({}, artifact.originals[id3]);
+                                artifact2.originals[id3].position = Object.assign({}, artifact.originals[id3].position);
+                            }
+                        }
+                    } else {
+                        if (artifact2.originals[id] == undefined) {
+                            artifact2.originals[id] = Object.assign({}, this.artifactsList[id]);
+                            artifact2.originals[id].position = Object.assign({}, this.artifactsList[id].position);
+                        }
+                    }
+
+                    let newArtifact = artifact2;
+                    let x = 0;
+                    let y = 0;
+                    let z = 0;
+                    let obj_prob = 0;
+                    let robots = [];
+                    for (let id3 in artifact2.originals) {
+                        let artifact3 = artifact2.originals[id3];
+                        x += artifact3.position.x;
+                        y += artifact3.position.y;
+                        z += artifact3.position.z;
+                        obj_prob += artifact3.obj_prob;
+                        robots[artifact3.vehicle_reporter] = artifact3.vehicle_reporter;
+
+                        global_tabManager.global_vehicleArtifactsList[artifact3.n].artifactsList[id3].fused = true;
+                    }
+
+                    length = Object.keys(artifact2.originals).length;
+                    newArtifact.position.x = x / length;
+                    newArtifact.position.y = y / length;
+                    newArtifact.position.z = z / length;
+                    newArtifact.obj_prob = obj_prob / length;
+                    let newid = newArtifact.position.x + '-' + newArtifact.position.y + '-' + newArtifact.position.z;
+
+                    fusedArtifacts[newid] = newArtifact;
+                    fusedArtifacts[newid].id = newid;
+                    fusedArtifacts[newid].robots = robots;
+                    new_ids.push(newid);
+                    remove_ids.push(id2);
                 }
             }
         }
 
-        if (!fuse) {
-            global_tabManager.fusedArtifacts.artifactsList[id] = this.artifactsList[id];
-            global_tabManager.fusedArtifacts.artifactsList[id].vehicle_reporter = this.robot_name;
+        for (let i in remove_ids) {
+            delete fusedArtifacts[remove_ids[i]];
+            let elem = document.getElementById("Artifact_Page").querySelector("[robot_name = 'Base']").querySelector("[artifact_id = '" + remove_ids[i] + "']");
+            if (elem != null)
+                elem.parentNode.removeChild(elem);
+        }
+
+        if (new_ids.length > 1) {
+            for (let i in new_ids) {
+                if (fusedArtifacts[new_ids[i]] != undefined) {
+                    if (this.fuse_artifacts(new_ids[i], true)) {
+                        delete fusedArtifacts[new_ids[i]];
+                        let elem = document.getElementById("Artifact_Page").querySelector("[robot_name = 'Base']").querySelector("[artifact_id = '" + new_ids[i] + "']");
+                        if (elem != null)
+                            elem.parentNode.removeChild(elem);
+
+                    }
+                }
+            }
+        }
+
+
+        if (!useFusedArtifact && !fuse) {
+            fusedArtifacts[id] = Object.assign({}, this.artifactsList[id]);
+            fusedArtifacts[id].position = Object.assign({}, this.artifactsList[id].position);
+            fusedArtifacts[id].vehicle_reporter = this.robot_name;
+
+            fusedArtifacts[id].originals = [];
+            fusedArtifacts[id].originals[id] = this.artifactsList[id];
+
+            fusedArtifacts[id].robots = [];
+            fusedArtifacts[id].robots[this.robot_name] = this.robot_name;
         }
 
         global_tabManager.fusedArtifacts.updateDisplay();
+
+        return fuse;
     }
 
     set_artifacts(msg) {
@@ -238,6 +341,8 @@ class Artifact {
             if (this.artifactsList[id] == undefined) {
                 this.artifactsList[id] = {}
                 this.artifactsList[id].id = id;
+                this.artifactsList[id].n = this.n;
+                this.artifactsList[id].fused = false;
 
                 // When there is not an artifact class declared, set all properties of the artifact
                 if (this.artifactsList[id].obj_class == undefined || this.artifactsList[i].obj_class == "") {
@@ -247,7 +352,7 @@ class Artifact {
                     this.artifactsList[id].header = msg[i].header;
                     this.artifactsList[id].position = msg[i].position;
                     this.artifactsList[id].image_id = msg[i].image_id;
-                    this.artifactsList[id].vehicle_reporter = msg[i].vehicle_reporter;
+                    this.artifactsList[id].vehicle_reporter = this.robot_name;
                 }
                 // When there is an artifact class declared, only set certain properties of the artifact
                 // this logic allows for the user to change the name of artifact class from the gui
@@ -259,7 +364,7 @@ class Artifact {
                 }
 
                 // Check if we need to fuse this with another artifact
-                this.fuse_artifacts(id);
+                this.fuse_artifacts(id, false);
             }
         }
 

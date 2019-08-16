@@ -247,7 +247,7 @@ $(document).ready(function () {
  }
 
   // so that the Listener Tab loads initially
-  document.getElementById("Listener_nav_link").click();
+  document.getElementById("Artifact_Page_nav_link").click();
 });
 
 
