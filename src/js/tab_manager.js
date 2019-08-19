@@ -77,7 +77,6 @@ class TabManager {
         this.x = 0;
         this.tabs = document.getElementById("Robot_Tabs");
         this.pages = document.getElementById("Robot_Pages");
-        this.artifact_tracker = document.getElementById("Artifact_Page");
 
         this.publishersClient = new ROSLIB.Service({
             ros: ros,
@@ -741,6 +740,7 @@ class TabManager {
 
         // Artifact rows get created by the artifact handler now
 
+        let artifact_tracker = document.getElementById("robot_artifact_tables");
         // Creates a DIV element that is placed either on the left or right side of the screen depending on how many robots there currently are
         if (n % 2 == 0) {
             this.rows++;
@@ -748,12 +748,11 @@ class TabManager {
             row_artifact_containers.setAttribute("class", "row");
             row_artifact_containers.setAttribute("row_id", this.rows);
             row_artifact_containers.appendChild(robot_artifact_container);
-            this.artifact_tracker.appendChild(row_artifact_containers);
+            artifact_tracker.appendChild(row_artifact_containers);
         } else {
-            let row_artifact_containers = this.artifact_tracker.querySelector("[row_id = '" + this.rows + "']");
+            let row_artifact_containers = artifact_tracker.querySelector("[row_id = '" + this.rows + "']");
             row_artifact_containers.appendChild(robot_artifact_container);
         }
-        // this.artifact_tracker.appendChild(robot_artifact_container);
 
         // Buttons have to be added here or jquery doesn't see it in the DOM
         $('#' + this.robot_name[n] + '_buttons').clone(true, true).appendTo('#' + this.robot_name[n] + '_buttons_container');
