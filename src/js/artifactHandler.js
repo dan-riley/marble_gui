@@ -155,9 +155,10 @@ class Artifact {
                 this.artifact_image[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").style.backgroundColor = "#aaaaaa";
 
-                if (artifact.submitted) {
-                    this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").firstChild.style.color = "#aaaaaa";
-                }
+            }
+
+            if (artifact.submitted) {
+                this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").firstChild.style.color = "#aaaaaa";
             }
 
             this.artifact_confidence[id].setAttribute("value", toString(confidence));
@@ -330,14 +331,17 @@ class Artifact {
             fusedArtifacts[id].vehicle_reporter = this.robot_name;
 
             fusedArtifacts[id].originals = [];
-            fusedArtifacts[id].originals[id] = this.artifactsList[id];
+            fusedArtifacts[id].originals[id] = Object.assign({}, this.artifactsList[id]);
+            fusedArtifacts[id].originals[id].position = Object.assign({}, this.artifactsList[id].position);
 
             fusedArtifacts[id].robots = [];
             fusedArtifacts[id].robots[this.robot_name] = this.robot_name;
         }
 
         global_tabManager.fusedArtifacts.updateDisplay();
-
+        for (let n in global_tabManager.global_vehicleArtifactsList) {
+            global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
+        }
         return fuse;
     }
 
@@ -459,11 +463,23 @@ class Artifact {
         $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
             .done(function (json) {
                 document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: +" + json.score_change + " points";
+                document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
                 if (robo_name == "Base") {
                     for (let id2 in org_artifacts) {
                         let artifact = org_artifacts[id2];
                         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].submitted = true;
+                        global_tabManager.global_vehicleArtifactsList[artifact.n].updateDisplay();
                     }
+                } else {
+                    for (let id2 in global_tabManager.fusedArtifacts.artifactsList) {
+                        let fartifact = global_tabManager.fusedArtifacts.artifactsList[id2];
+                        for (let id3 in fartifact.originals) {
+                            if (id3 == id) {
+                                fartifact.submitted = true;
+                            }
+                        }
+                    }
+                    global_tabManager.fusedArtifacts.updateDisplay();
                 }
             });
     }

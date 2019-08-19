@@ -709,6 +709,7 @@ class TabManager {
 
         var robot_artifact_header = document.createElement("SPAN");
         robot_artifact_header.setAttribute("class", "badge badge-secondary col-sm-12");
+        robot_artifact_header.setAttribute("style", "height: 95px;")
 
         var robot_artifact_header_inner = document.createElement("DIV");
         robot_artifact_header_inner.setAttribute("class", "panel panel-default");
