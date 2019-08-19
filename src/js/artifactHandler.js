@@ -102,7 +102,6 @@ class Artifact {
                 global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
             }
         }
-        robot_artifact_tracker_reset.innerHTML = 'Duplicate';
         robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_reset);
 
         let robot_artifact_image_container = document.createElement("DIV");
