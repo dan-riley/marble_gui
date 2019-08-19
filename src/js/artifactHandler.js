@@ -61,7 +61,7 @@ class Artifact {
         }
 
         robot_artifact_tracker.innerHTML += '<span contenteditable="false" id="confidence" class="badge badge-secondary col-sm-1" style="text-align: center" value="0.00">0.00</span>' +
-            "<span contenteditable='false' id='position' class='badge badge-secondary col-sm-3' style='text-align: center' value='" + JSON.stringify({ x: 0.00, y: 0.00, z: 0.00 }) + "'>{x: 0.00 y: 0.00 z: 0.00}</span>";
+            "<span contenteditable='true' id='position' class='badge badge-secondary col-sm-3' style='text-align: center' value='" + JSON.stringify({ x: 0.00, y: 0.00, z: 0.00 }) + "'>{x: 0.00 y: 0.00 z: 0.00}</span>";
         // '<button class="col-sm-1">Yes</button>' +
         // '<button class="col-sm-1">No</button>';
 
@@ -69,12 +69,13 @@ class Artifact {
         robot_artifact_tracker_yes_container.setAttribute("class", "badge badge-secondary col-sm-2");
         robot_artifact_tracker_yes_container.setAttribute("id", this.robot_name + "_" + id);
         let robot_artifact_tracker_yes = document.createElement("BUTTON");
+        robot_artifact_tracker_yes.setAttribute("id", "submit_" + this.robot_name + "_" + id);
         robot_artifact_tracker_yes.innerText = "Submit";
         var n = this.n;
         var robot_name = this.robot_name;
         robot_artifact_tracker_yes.onclick = function () {
             if(connected_to_scoring_server){
-                robot_artifact_tracker_yes_container.innerText = "submitting...";
+                robot_artifact_tracker_yes.innerText = "submitting...";
                 if (robot_name == 'Base') {
                     global_tabManager.fusedArtifacts.submit_artifact(id);
                 } else {
@@ -86,6 +87,23 @@ class Artifact {
             }
         };
         robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_yes);
+
+        let robot_artifact_tracker_reset = document.createElement("DIV");
+        robot_artifact_tracker_reset.onclick = function () {
+            if (robot_name == 'Base') {
+                let artifacts = global_tabManager.fusedArtifacts.artifactsList;
+                artifacts['dupe_' + id] = Object.assign({}, artifacts[id]);
+                artifacts['dupe_' + id].position = Object.assign({}, artifacts[id].position);
+                global_tabManager.fusedArtifacts.updateDisplay();
+            } else {
+                let artifacts = global_tabManager.global_vehicleArtifactsList[n].artifactsList;
+                artifacts['dupe_' + id] = Object.assign({}, artifacts[id]);
+                artifacts['dupe_' + id].position = Object.assign({}, artifacts[id].position);
+                global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
+            }
+        }
+        robot_artifact_tracker_reset.innerHTML = 'Duplicate';
+        robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_reset);
 
         let robot_artifact_image_container = document.createElement("DIV");
         robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-2 popup");
@@ -208,7 +226,8 @@ class Artifact {
         var y2 = artifact2.position.y;
         var z2 = artifact2.position.z;
 
-        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
+        // return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
     fuse_artifacts(id, useFusedArtifact) {
@@ -232,7 +251,7 @@ class Artifact {
                 let artifact2 = fusedArtifacts[id2];
                 let dist = this.getDist(artifact, artifact2);
 
-                if (dist < 3) {
+                if ((dist < 3) && (artifact.obj_class == artifact2.obj_class)) {
                     console.log("fusing", id, id2);
                     fuse = true;
 
@@ -347,7 +366,7 @@ class Artifact {
             // Set a unique id.  Position never changes, but index can
             // Only update the list if it's a new artifact
             let id = msg[i].position.x + '-' + msg[i].position.y + '-' + msg[i].position.z;
-            if (this.artifactsList[id] == undefined) {
+            if ((this.artifactsList[id] == undefined) && (msg[i].position.x > 0)) {
                 this.artifactsList[id] = {}
                 this.artifactsList[id].id = id;
                 this.artifactsList[id].n = this.n;
@@ -382,7 +401,7 @@ class Artifact {
         this.updateDisplay();
     }
 
-    submit_artifact(id) {
+    async submit_artifact(id) {
         var robo_name = this.get_robot_name();
 
         var data = {
@@ -391,7 +410,6 @@ class Artifact {
             "z": JSON.parse(this.artifact_position[id].getAttribute("value")).z,
             "type": this.artifact_type[id].innerText
         };
-        console.log(data);
 
         // Old code for finding the highest confidence.  We're doing this using
         // base_artifact_fusion.  If this comes back, need to check code for new layout
@@ -432,9 +450,15 @@ class Artifact {
 
         var org_artifacts = this.artifactsList[id].originals;
         console.log("submitting artifact to DARPA server. Waiting for response...");
+        let t = new Date();
+        t.setSeconds(t.getSeconds() - 1);
+        if (t <= scoringTimer) {
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            scoringTimer = new Date();
+        }
         $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
             .done(function (json) {
-                document.getElementById(robo_name + "_" + id).innerText = "submission result: +" + json.score_change + " points";
+                document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: +" + json.score_change + " points";
                 if (robo_name == "Base") {
                     for (let id2 in org_artifacts) {
                         let artifact = org_artifacts[id2];

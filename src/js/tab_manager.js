@@ -35,7 +35,7 @@ function create_pose_array(robot_name, poses) {
     })
     var msg = new ROSLIB.Message({
         header: {
-            stamp: 0.0,
+            stamp: 1.0,
             frame_id: "darpa",
         },
         poses: poses
@@ -48,7 +48,7 @@ class TabManager {
         // Permanent subscribers for all vehicle tabs
         this.Tab_TaskSub = [];
         this.Tab_OdomSub = [];
-        this.Tab_OdometrySub = [];
+        // this.Tab_OdometrySub = [];
         this.Tab_OdomChart = [];
         this.Tab_BatterySub = [];
         this.Tab_ControlSub = [];
@@ -123,6 +123,16 @@ class TabManager {
                         _this.x++;
                     }
 
+
+                    // var my_n = _this.robot_name.indexOf(name);
+                    // var pub_request = new ROSLIB.ServiceRequest({
+                    //     topic: topicsList[i]
+                    // });
+                    // _this.publishersClient.callService(pub_request, function (result) {
+                    //     if (result.publishers.length > 0) {
+                    //         _this.time_since_last_msg[my_n] = new Date();
+                    //     }
+                    // });
                 }
                 handled_names.push(name);
             }
@@ -166,8 +176,6 @@ class TabManager {
     add_tab() {
         let n = this.i;
         console.log("Tab: " + this.robot_name[n]);
-
-        this.poses[n] = [];
 
         let input_str;
 
@@ -217,8 +225,8 @@ class TabManager {
         };
         let ArtifactImgTopic = {
             // topic: "/artifact_record",  // For use to save images on ground station
-            // topic: "/" + this.robot_name[n] + "/located_artifact_img",
-            topic: "/" + this.robot_name[n] + "/located_artifact_img/relay",
+            topic: "/" + this.robot_name[n] + "/located_artifact_img",
+            // topic: "/" + this.robot_name[n] + "/located_artifact_img/relay",
             messageType: "marble_artifact_detection_msgs/ArtifactImg"
         };
         let VehicleStatusTopic = {
@@ -226,7 +234,7 @@ class TabManager {
             messageType: "marble_common_msgs/VehicleStatus"
         }
         let PointCloudTopic = {
-            topic: "/" + this.robot_name[n] + "/pc2_out",
+            topic: "/" + this.robot_name[n] + "/disabled1",
             // topic: "/merged_map",
             // topic: "/octomap_point_cloud_occupied",
             messageType: "sensor_msgs/PointCloud2"
@@ -242,11 +250,11 @@ class TabManager {
             name: OdomTopic.topic,
             messageType: OdomTopic.messageType
         });
-        this.Tab_OdometrySub[n] = new ROSLIB.Topic({
-            ros: ros,
-            name: OdomTopic.topic,
-            messageType: OdomTopic.messageType
-        });
+        // this.Tab_OdometrySub[n] = new ROSLIB.Topic({
+        //     ros: ros,
+        //     name: OdomTopic.topic,
+        //     messageType: OdomTopic.messageType
+        // });
         this.Tab_BatterySub[n] = new ROSLIB.Topic({
             ros: ros,
             name: BatteryTopic.topic,
@@ -279,10 +287,9 @@ class TabManager {
         });
         this.Tab_PoseArraySub[n] = new ROSLIB.Topic({
             ros: ros,
-            name: "/" + this.robot_name[n] + "/posearray",
+            name: "/" + this.robot_name[n] + "/disabled2",
             // name: "/merged_poses",
             messageType: "geometry_msgs/PoseArray"
-            // messageType: "nav_msgs/Odometry"
         });
         this.Tab_OccupancyGridSub[n] = new ROSLIB.Topic({
             ros: ros,
@@ -322,20 +329,22 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                $.post(MAP_SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
-                    .done(function (json, statusText, xhr) {
-                        if (xhr.status == 200) {
-                            last_cloud_report_success = new Date();
-                            $('#mapping_cloud_report_last_sent_raw').text(Math.round(now / 100) / 10);
-                        }
-                        else {
-                            console.log("error in sending /map/update PointCloud to DARPA server");
-                            console.log(statusText);
-                            console.log(xhr);
-                        }
+                if(connected_to_darpa){
+                    $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
+                        .done(function (json, statusText, xhr) {
+                            if (xhr.status == 200) {
+                                last_cloud_report_success = new Date();
+                                $('#mapping_cloud_report_last_sent_raw').text(Math.round(now / 100) / 10);
+                            }
+                            else {
+                                console.log("error in sending /map/update PointCloud to DARPA server");
+                                console.log(statusText);
+                                console.log(xhr);
+                            }
 
-                    });
-                global_tabManager.prev_time[n] = now_time;
+                        });
+                    global_tabManager.prev_time[n] = now_time;
+                }
             }
         });
 
@@ -356,20 +365,22 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                $.post(MAP_SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
-                    .done(function (json, statusText, xhr) {
-                        if (xhr.status == 200) {
-                            last_grid_report_success = new Date();
-                            $('#mapping_grid_report_last_sent_raw').text(Math.round(now / 100) / 10);
-                        }
-                        else {
-                            console.log("error in sending /map/update occupancyGrid to DARPA server");
-                            console.log(statusText);
-                            console.log(xhr);
-                        }
+                if(connected_to_darpa){
+                    $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
+                        .done(function (json, statusText, xhr) {
+                            if (xhr.status == 200) {
+                                last_grid_report_success = new Date();
+                                $('#mapping_grid_report_last_sent_raw').text(Math.round(now / 100) / 10);
+                            }
+                            else {
+                                console.log("error in sending /map/update occupancyGrid to DARPA server");
+                                console.log(statusText);
+                                console.log(xhr);
+                            }
 
-                    });
-                global_tabManager.prev_time[n] = now_time;
+                        });
+                    global_tabManager.prev_time[n] = now_time;
+                }
             }
         });
 
@@ -385,39 +396,41 @@ class TabManager {
 
         var last_telem_report_success = "never";
 
-        global_tabManager.Tab_OdometrySub[n].subscribe(function (msg) {
-            let poses = global_tabManager.poses[n];
-            poses.push(msg.pose.pose);
-            if (poses.length > 10) {
-                create_pose_array(global_tabManager.robot_name[n], poses);
-                global_tabManager.poses[n] = [];
-            }
-        });
+        // global_tabManager.Tab_OdometrySub[n].subscribe(function (msg) {
+        //     // Disabled for now while using relay
+        //     let poses = global_tabManager.poses[n];
+        //     poses.push(msg.pose.pose);
+        //     if (poses.length > 10) {
+        //         create_pose_array(global_tabManager.robot_name[n], poses);
+        //         global_tabManager.poses[n] = [];
+        //     }
+        // });
+
 
         // Subscriber to pose array topic for vehicle that publishes to darpa server
         global_tabManager.Tab_PoseArraySub[n].subscribe(function (msg) {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                $.post(MAP_SERVER_ROOT + "/state/update/", JSON.stringify(msg))
-                    .done(function (json, statusText, xhr) {
-                        if (xhr.status == 200) {
-                            last_telem_report_success = new Date();
-                            $('#telemetry_report_last_sent_raw').text(Math.round(now / 100) / 10);
-                        }
-                        else {
-                            console.log("error in sending /state/update PoseArray to DARPA server");
-                            console.log(json);
-                            console.log(statusText);
-                            console.log(xhr);
-                        }
+                if(connected_to_darpa){
+                    $.post(SERVER_ROOT + "/state/update/", JSON.stringify(msg))
+                        .done(function (json, statusText, xhr) {
+                            if (xhr.status == 200) {
+                                last_telem_report_success = new Date();
+                                $('#telemetry_report_last_sent_raw').text(Math.round(now / 100) / 10);
+                            }
+                            else {
+                                console.log("error in sending /state/update PoseArray to DARPA server");
+                                console.log(statusText);
+                                console.log(xhr);
+                            }
 
-                    })
-                    .fail(function (a, b, c) {
-                        console.log(a, b, c);
-                        //console.log("error reporting pose array: " + c);
-                    });
-                global_tabManager.prev_time[n] = now_time;
+                        })
+                        .fail(function (a, b, c) {
+                            //console.log("error reporting pose array: " + c);
+                        });
+                    global_tabManager.prev_time[n] = now_time;
+                }
             }
         });
 
@@ -590,10 +603,14 @@ class TabManager {
 
         var top_card_body = document.createElement("DIV");
         var robot_info = document.createElement("DIV");
+        top_card_body.setAttribute("class", "card-body");
+        top_card_body.setAttribute("id", global_tabManager.robot_name[n] + "_buttons");
         robot_info.setAttribute("class", "card-body");
 
         top_card.appendChild(top_card_header);
+        top_card.appendChild(top_card_body);
         top_card.appendChild(robot_info);
+
 
         var battery_voltage = document.createElement("P");
         battery_voltage.innerHTML = `Voltage: <span id="` + global_tabManager.robot_name[n] + `_voltage"></span>`;
@@ -603,45 +620,47 @@ class TabManager {
         robot_info.appendChild(battery_voltage);
 
         var radio_btn = document.createElement("BUTTON");
+        radio_btn.setAttribute("id", this.robot_name[n] + "_radio");
         radio_btn.setAttribute("type", "button");
         radio_btn.setAttribute("class", "btn btn-success btn-space");
-        radio_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "radio_enable_cmd", true) };
         radio_btn.innerText = "Radio Reset";
 
         var estop_btn = document.createElement("BUTTON");
+        estop_btn.setAttribute("id", this.robot_name[n] + "_estop");
         estop_btn.setAttribute("type", "button");
         estop_btn.setAttribute("class", "btn btn-danger btn-space");
-        estop_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", true) };
         estop_btn.innerText = "Emergency Stop";
 
-	    var estop_off_btn = document.createElement("BUTTON");
+	var estop_off_btn = document.createElement("BUTTON");
+        estop_off_btn.setAttribute("id", this.robot_name[n] + "_estop_off");
         estop_off_btn.setAttribute("type", "button");
         estop_off_btn.setAttribute("class", "btn btn-success btn-space");
-        estop_off_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", false) };
         estop_off_btn.innerText = "Emergency Stop Disabled";
 
-	    var stop_btn = document.createElement("BUTTON");
+	var stop_btn = document.createElement("BUTTON");
+        stop_btn.setAttribute("id", this.robot_name[n] + "_stop");
         stop_btn.setAttribute("type", "button");
         stop_btn.setAttribute("class", "btn btn-danger btn-space");
-        stop_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop", true) };
         stop_btn.innerText = "Stop Vehicle";
 
         var startup_btn = document.createElement("BUTTON");
+        startup_btn.setAttribute("id", this.robot_name[n] + "_startup");
         startup_btn.setAttribute("type", "button");
         startup_btn.setAttribute("class", "btn btn-success btn-space");
-        startup_btn.onclick = function () { send_signal_to(global_tabManager.robot_name[n], "estop", false) };
         startup_btn.innerText = "Start Mission";
 
+	// estop_status  sw_state (1=stop -- the estop!, 0=go), radio_state (0=go/enabled)
+
         var home_btn = document.createElement("BUTTON");
+        home_btn.setAttribute("id", this.robot_name[n] + "_home");
         home_btn.setAttribute("type", "button");
         home_btn.setAttribute("class", "btn btn-danger btn-space");
-        home_btn.onclick = function () { send_string_to(global_tabManager.robot_name[n], "task", "Home") };
         home_btn.innerText = "Return Home";
 
         var explore_btn = document.createElement("BUTTON");
+        explore_btn.setAttribute("id", this.robot_name[n] + "_explore");
         explore_btn.setAttribute("type", "button");
         explore_btn.setAttribute("class", "btn btn-success btn-space");
-        explore_btn.onclick = function () { send_string_to(global_tabManager.robot_name[n], "task", "Explore") };
         explore_btn.innerText = "Explore";
 
         top_card_body.appendChild(radio_btn);
@@ -660,37 +679,64 @@ class TabManager {
 
         $('#Robot_Pages').prepend(tab_content);
 
+        // Need these here in jquery so the events can be cloned properly for the artifact page
+        $('#' + this.robot_name[n] + '_radio').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "radio_reset_cmd", true) });
+        $('#' + this.robot_name[n] + '_estop').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", true) });
+        $('#' + this.robot_name[n] + '_estop_off').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", false) });
+        $('#' + this.robot_name[n] + '_stop').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop", true) });
+        $('#' + this.robot_name[n] + '_startup').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop", false) });
+        $('#' + this.robot_name[n] + '_home').on('click', function () { send_string_to(global_tabManager.robot_name[n], "task", "Home") });
+        $('#' + this.robot_name[n] + '_explore').on('click', function () { send_string_to(global_tabManager.robot_name[n], "task", "Explore") });
+
         create_viewer(this.robot_name[n]);
 
         var robot_artifact_container = document.createElement("DIV");
         robot_artifact_container.setAttribute("class", "col-sm-12 artifact_table");
         robot_artifact_container.setAttribute("robot_name", this.robot_name[n]);
-        robot_artifact_container.innerHTML = `
-            <span class="badge badge-secondary col-sm-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading p-3" role="tab" id="` + this.robot_name[n] + `_heading">
-                        <b class="panel-title">
-                            <a class="" role="button" title="" data-toggle="collapse" href="#` + this.robot_name[n] + `_collapse" aria-expanded="true" aria-controls="collapse1">
-                            ` + this.robot_name[n] + `
-                            </a>
-                        </b>
-                    </div>
 
-                    <div id="` + this.robot_name[n] + `_collapse" class="panel-collapse collapse show" role="tabpanel" aria-labelledby="` + this.robot_name[n] + `_heading">
-                    <div class="panel-body mb-4">
-                        ` + top_card_body.innerHTML +`
-                    </div>
-                    </div>
-                </div>
-            </span>
-            <div class="row" artifact_id="header">
+        var robot_artifact_titles = document.createElement("DIV");
+        robot_artifact_titles.setAttribute("class", "row");
+        robot_artifact_titles.setAttribute("artifact_id", "title");
+        robot_artifact_titles.setAttribute("class", "row");
+        robot_artifact_titles.setAttribute("artifact_id", "header");
+        robot_artifact_titles.innerHTML = `
                 <span class="col-sm-1"> </span>
                 <span id="type" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Type</b></span>
                 <span id="confidence" class="badge badge-secondary col-sm-1" style="text-align: center"><b>Confidence</b></span>
                 <span id="position" class="badge badge-secondary col-sm-3" style="text-align: center"><b>Position</b></span>
                 <span class="badge badge-secondary col-sm-2" style="text-align: center"><b>DARPA</b></span>
-                <span class="badge badge-secondary col-sm-2" style="text-align: center"><b>Image</b></span>
-            </div>`;
+                <span class="badge badge-secondary col-sm-2" style="text-align: center"><b>Image</b></span>`;
+
+        var robot_artifact_header = document.createElement("SPAN");
+        robot_artifact_header.setAttribute("class", "badge badge-secondary col-sm-12");
+
+        var robot_artifact_header_inner = document.createElement("DIV");
+        robot_artifact_header_inner.setAttribute("class", "panel panel-default");
+        robot_artifact_header_inner.innerHTML = `
+                    <div class="panel-heading" role="tab" id="` + this.robot_name[n] + `_heading">
+                        <b class="panel-title">
+                            <a class="" role="button" title="" data-toggle="collapse" href="#` + this.robot_name[n] + `_collapse" aria-expanded="true" aria-controls="collapse1">
+                            ` + this.robot_name[n] + `
+                            </a>
+                        </b>
+                    </div>`;
+
+        var robot_artifact_header_inner2 = document.createElement("DIV");
+        robot_artifact_header_inner2.setAttribute("id", this.robot_name[n] + "_collapse");
+        robot_artifact_header_inner2.setAttribute("class", "panel-collapse collapse show");
+        robot_artifact_header_inner2.setAttribute("role", "tabpanel");
+        robot_artifact_header_inner2.setAttribute("aria-labelledby", this.robot_name[n] + "_heading");
+
+        var robot_buttons_container = document.createElement("DIV");
+        robot_buttons_container.setAttribute("class", "panel-body mb-4");
+        robot_buttons_container.setAttribute("id", this.robot_name[n] + '_buttons_container');
+
+        robot_artifact_header_inner2.appendChild(robot_buttons_container);
+        robot_artifact_header_inner.appendChild(robot_artifact_header_inner2);
+        robot_artifact_header.appendChild(robot_artifact_header_inner);
+
+        robot_artifact_container.appendChild(robot_artifact_header);
+        robot_artifact_container.appendChild(robot_artifact_titles);
 
         // Artifact rows get created by the artifact handler now
 
@@ -706,6 +752,11 @@ class TabManager {
             let row_artifact_containers = this.artifact_tracker.querySelector("[row_id = '" + this.rows + "']");
             row_artifact_containers.appendChild(robot_artifact_container);
         }
+        // this.artifact_tracker.appendChild(robot_artifact_container);
+
+        // Buttons have to be added here or jquery doesn't see it in the DOM
+        $('#' + this.robot_name[n] + '_buttons').clone(true, true).appendTo('#' + this.robot_name[n] + '_buttons_container');
+
         // Sets up all objects for vehicle artifact manager
         this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n], n);
 

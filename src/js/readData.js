@@ -4,6 +4,7 @@ var topicsList = [];
 var topicsTypeList = [];
 var global_tabManager;
 var run_echo = false;
+var scoringTimer = new Date();
  
  
 _custom_prev_time = 0;
@@ -201,14 +202,19 @@ $(document).ready(function () {
  ros.on("close", function () {
    console.log("Connection to websocket server closed.");
  });
- 
+
  /* Get List of ROS Topics */
  function getTopics() {
    update_topics_list(function(){
      createTab();
      window.setInterval(function () {
-       startGET_Status();
-     }, 2000);
+       let t = new Date();
+       t.setSeconds(t.getSeconds() - 2);
+       if (t > scoringTimer) {
+         startGET_Status();
+         scoringTimer = new Date();
+       }
+     }, 5000);
    });
  
  }
