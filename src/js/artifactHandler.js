@@ -77,9 +77,9 @@ class Artifact {
             if(connected_to_scoring_server){
                 robot_artifact_tracker_yes.innerText = "submitting...";
                 if (robot_name == 'Base') {
-                    global_tabManager.fusedArtifacts.submit_artifact(id);
+                    global_tabManager.fusedArtifacts.open_edit_submit_modal(id);
                 } else {
-                    global_tabManager.global_vehicleArtifactsList[n].submit_artifact(id);
+                    global_tabManager.global_vehicleArtifactsList[n].open_edit_submit_modal(id);
                 }
             }
             else {
@@ -404,14 +404,28 @@ class Artifact {
         this.updateDisplay();
     }
 
-    async submit_artifact(id) {
-        var robo_name = this.get_robot_name();
+    open_edit_submit_modal(id){
+        $('#edit_x_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).x);
+        $('#edit_y_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).y);
+        $('#edit_z_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).z);
+        $('#edit_type').val(this.artifact_type[id].innerText);
+
+        var my_this = this
+        $('#edit_submit').click(function(){
+            my_this.submit_artifact(id, my_this);
+        });
+        $('#myModal').modal({backdrop: 'static', keyboard: false});
+        $('#myModal').modal('show');
+    }
+
+    async submit_artifact(id, _this) {
+        var robo_name = _this.get_robot_name();
 
         var data = {
-            "x": JSON.parse(this.artifact_position[id].getAttribute("value")).x,
-            "y": JSON.parse(this.artifact_position[id].getAttribute("value")).y,
-            "z": JSON.parse(this.artifact_position[id].getAttribute("value")).z,
-            "type": this.artifact_type[id].innerText
+            "x": parseFloat($('#edit_x_pos').val()),
+            "y": parseFloat($('#edit_y_pos').val()),
+            "z": parseFloat($('#edit_z_pos').val()),
+            "type": $('#edit_z_pos').val()
         };
 
         // Old code for finding the highest confidence.  We're doing this using
@@ -451,7 +465,15 @@ class Artifact {
             }
         }
 
-        var org_artifacts = this.artifactsList[id].originals;
+        $('#submission_tbody').append(`
+        <tr>
+            <td>` + $('#edit_type').val() + `</td>
+            <td>` + position_string + `</td>
+            <td>` + $('#edit_notes ').val() + `</td>
+            <td id="` + position_string + `">No result yet</td>
+        </tr>`);
+
+        var org_artifacts = _this.artifactsList[id].originals;
         console.log("submitting artifact to DARPA server. Waiting for response...");
         let t = new Date();
         t.setSeconds(t.getSeconds() - 1);
@@ -459,9 +481,16 @@ class Artifact {
             await new Promise(resolve => setTimeout(resolve, 1500));
             scoringTimer = new Date();
         }
+
+        var position_string =  $('#edit_x_pos').val() + ',' + $('#edit_y_pos').val() + ',' + $('#edit_z_pos').val();
+
+
+
         $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
             .done(function (json) {
-                document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: +" + json.score_change + " points";
+                var submission_result = "+" + json.score_change + " points"
+                $('#' + position_string).text(submission_result);
+                document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
                 document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
                 if (robo_name == "Base") {
                     for (let id2 in org_artifacts) {
@@ -480,7 +509,12 @@ class Artifact {
                     }
                     global_tabManager.fusedArtifacts.updateDisplay();
                 }
+                if(json.score_change > 0){
+                    $('#' + position_string).html('Success');
+                }
             });
+        
+        $('#myModal').modal('hide');
     }
 
     get_robot_name() {

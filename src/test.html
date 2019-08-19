@@ -194,7 +194,7 @@
                             <th>Response</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="submission_tbody">
                         <!--
                           <tr>
                               <td>sam</td>
@@ -212,7 +212,7 @@
 
 
         <!-- Button to Open the Modal -->
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" data-backdrop="static" data-keyboard="false">
           New Report
         </button>
 
@@ -232,8 +232,17 @@
                   <div class="form-group">
                       <input id="edit_type" type="text" class="form-control" placeholder="obj type" required>   
                   </div>
-                  <div class="form-group">
-                      <input id="edit_position" type="text" class="form-control" placeholder="position" ng-model="personalDetails.lname" required>   
+                  <div class="form-group form-inline">
+                      <label style="width: 30px;">X:</label>
+                      <input id="edit_x_pos" type="text" class="form-control" placeholder="position" ng-model="personalDetails.lname" required>   
+                  </div>
+                  <div class="form-group form-inline">
+                      <label style="width: 30px;">Y:</label>
+                      <input id="edit_y_pos" type="text" class="form-control" placeholder="position" ng-model="personalDetails.lname" required>   
+                  </div>
+                  <div class="form-group form-inline">
+                      <label style="width: 30px;">Z:</label>
+                      <input id="edit_z_pos" type="text" class="form-control" placeholder="position" ng-model="personalDetails.lname" required>   
                   </div>
                   <div class="form-group">
                       <input id="edit_notes" type="text" class="form-control" placeholder="notes" ng-model="personalDetails.email" required>  
@@ -242,7 +251,7 @@
 
               <!-- Modal footer -->
               <div class="modal-footer">
-                <button type="button" class="btn btn-primary">This form doesn't work yet</button>
+                <button id="edit_submit" type="button" class="btn btn-primary">This form doesn't work yet</button>
               </div>
 
             </div>
