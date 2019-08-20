@@ -405,9 +405,9 @@ class Artifact {
     }
 
     open_edit_submit_modal(id){
-        $('#edit_x_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).x);
-        $('#edit_y_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).y);
-        $('#edit_z_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).z);
+        $('#edit_x_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).x.toFixed(2));
+        $('#edit_y_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).y.toFixed(2));
+        $('#edit_z_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).z.toFixed(2));
         $('#edit_type').val(this.artifact_type[id].innerText);
 
         var my_this = this
@@ -465,7 +465,7 @@ class Artifact {
                 }
             }
         }
-        var position_string =  $('#edit_x_pos').val() + ',' + $('#edit_y_pos').val() + ',' + $('#edit_z_pos').val();
+        var position_string =  $('#edit_x_pos').val() + ', ' + $('#edit_y_pos').val() + ', ' + $('#edit_z_pos').val();
 
         $('#submission_tbody').append(`
         <tr>
