@@ -488,7 +488,7 @@ class Artifact {
         $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
             .done(function (json) {
                 var submission_result = "+" + json.score_change + " points";
-                $('#' + position_string).text(submission_result);
+                $("[id='" + position_string + "']").text(submission_result);
                 document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
                 document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
                 if (robo_name == "Base") {
