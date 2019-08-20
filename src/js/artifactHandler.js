@@ -411,9 +411,10 @@ class Artifact {
         $('#edit_type').val(this.artifact_type[id].innerText);
 
         var my_this = this
-        $('#edit_submit').click(function(){
+        $('#edit_submit').off('click').on('click', function () {
             my_this.submit_artifact(id, my_this);
         });
+        
         $('#myModal').modal({backdrop: 'static', keyboard: false});
         $('#myModal').modal('show');
     }
