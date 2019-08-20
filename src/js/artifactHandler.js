@@ -464,6 +464,7 @@ class Artifact {
                 }
             }
         }
+        var position_string =  $('#edit_x_pos').val() + ',' + $('#edit_y_pos').val() + ',' + $('#edit_z_pos').val();
 
         $('#submission_tbody').append(`
         <tr>
@@ -482,13 +483,10 @@ class Artifact {
             scoringTimer = new Date();
         }
 
-        var position_string =  $('#edit_x_pos').val() + ',' + $('#edit_y_pos').val() + ',' + $('#edit_z_pos').val();
-
-
 
         $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
             .done(function (json) {
-                var submission_result = "+" + json.score_change + " points"
+                var submission_result = "+" + json.score_change + " points";
                 $('#' + position_string).text(submission_result);
                 document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
                 document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
