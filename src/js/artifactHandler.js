@@ -158,6 +158,7 @@ class Artifact {
 
             if (artifact.submitted) {
                 this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").firstChild.style.color = "#aaaaaa";
+                this.artifact_tracker[id].querySelector("[id = 'submit_" + this.robot_name + "_" + id + "']").innerText = 'submission result: ' + this.artifactsList[id].result;
             }
 
             this.artifact_confidence[id].setAttribute("value", toString(confidence));
@@ -275,6 +276,9 @@ class Artifact {
                     let z = 0;
                     let obj_prob = 0;
                     let robots = [];
+                    let result = 0;
+                    let submitted = false;
+
                     for (let id3 in artifact2.originals) {
                         let artifact3 = artifact2.originals[id3];
                         x += artifact3.position.x;
@@ -284,6 +288,10 @@ class Artifact {
                         robots[artifact3.vehicle_reporter] = artifact3.vehicle_reporter;
 
                         global_tabManager.global_vehicleArtifactsList[artifact3.n].artifactsList[id3].fused = true;
+                        if (global_tabManager.global_vehicleArtifactsList[artifact3.n].artifactsList[id3].submitted) {
+                            submitted = true;
+                            result += global_tabManager.global_vehicleArtifactsList[artifact3.n].artifactsList[id3].result;
+                        }
                     }
 
                     length = Object.keys(artifact2.originals).length;
@@ -296,6 +304,10 @@ class Artifact {
                     fusedArtifacts[newid] = newArtifact;
                     fusedArtifacts[newid].id = newid;
                     fusedArtifacts[newid].robots = robots;
+                    if (submitted) {
+                        fusedArtifacts[newid].submitted = true;
+                        fusedArtifacts[newid].result = result;
+                    }
                     new_ids.push(newid);
                     remove_ids.push(id2);
                 }
@@ -345,6 +357,7 @@ class Artifact {
     }
 
     set_artifacts(msg) {
+        let update = false;
         for (let i = 0; i < msg.length; i++) {
             // Remap the artifacts to the DARPA required names
             let obj_class = msg[i].obj_class;
@@ -370,6 +383,7 @@ class Artifact {
             // Only update the list if it's a new artifact
             let id = msg[i].position.x + '-' + msg[i].position.y + '-' + msg[i].position.z;
             if ((this.artifactsList[id] == undefined) && (msg[i].position.x > 0)) {
+                update = true;
                 this.artifactsList[id] = {}
                 this.artifactsList[id].id = id;
                 this.artifactsList[id].n = this.n;
@@ -400,8 +414,10 @@ class Artifact {
             }
         }
 
-        this.save_file();
-        this.updateDisplay();
+        if (update) {
+            this.save_file();
+            this.updateDisplay();
+        }
     }
 
     open_edit_submit_modal(id){
@@ -414,7 +430,7 @@ class Artifact {
         $('#edit_submit').off('click').on('click', function () {
             my_this.submit_artifact(id, my_this);
         });
-        
+
         $('#myModal').modal({backdrop: 'static', keyboard: false});
         $('#myModal').modal('show');
     }
@@ -426,7 +442,7 @@ class Artifact {
             "x": parseFloat($('#edit_x_pos').val()),
             "y": parseFloat($('#edit_y_pos').val()),
             "z": parseFloat($('#edit_z_pos').val()),
-            "type": $('#edit_z_pos').val()
+            "type": $('#edit_type').val()
         };
 
         // Old code for finding the highest confidence.  We're doing this using
@@ -494,13 +510,23 @@ class Artifact {
                     color_class = 'table-success';
                 }
                 $("[id='" + position_string + "']").parent().addClass(color_class);
-                
+
                 document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
-                document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
+
+                if (json.score_change > 0) {
+                    document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
+                }
+
                 if (robo_name == "Base") {
                     for (let id2 in org_artifacts) {
                         let artifact = org_artifacts[id2];
                         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].submitted = true;
+                        global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].result = json.score_change;
+                        let robot_name = global_tabManager.global_vehicleArtifactsList[artifact.n].robot_name;
+                        if (json.score_change > 0) {
+                            document.getElementById("submit_" + robot_name + "_" + id2).disabled = true;
+                        }
+
                         global_tabManager.global_vehicleArtifactsList[artifact.n].updateDisplay();
                     }
                 } else {
@@ -509,6 +535,10 @@ class Artifact {
                         for (let id3 in fartifact.originals) {
                             if (id3 == id) {
                                 fartifact.submitted = true;
+                                fartifact.result = json.score_change;
+                                if (json.score_change > 0) {
+                                    document.getElementById("submit_Base_" + id2).disabled = true;
+                                }
                             }
                         }
                     }
@@ -518,7 +548,7 @@ class Artifact {
                     $('#' + position_string).html('Success');
                 }
             });
-        
+
         $('#myModal').modal('hide');
     }
 
