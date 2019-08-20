@@ -408,7 +408,7 @@ class Artifact {
         $('#edit_x_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).x.toFixed(2));
         $('#edit_y_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).y.toFixed(2));
         $('#edit_z_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).z.toFixed(2));
-        $('#edit_type').val(this.artifact_type[id].innerText);
+        $("#edit_type").val(this.artifact_type[id].innerText).change();
 
         var my_this = this
         $('#edit_submit').off('click').on('click', function () {
