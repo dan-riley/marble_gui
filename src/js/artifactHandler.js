@@ -489,6 +489,12 @@ class Artifact {
             .done(function (json) {
                 var submission_result = "+" + json.score_change + " points";
                 $("[id='" + position_string + "']").text(submission_result);
+                var color_class = 'table-danger';
+                if(json.score_change > 0){
+                    color_class = 'table-success';
+                }
+                $("[id='" + position_string + "']").parent().addClass(color_class);
+                
                 document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
                 document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
                 if (robo_name == "Base") {
