@@ -224,8 +224,9 @@ class TabManager {
         };
         let ArtifactImgTopic = {
             // topic: "/artifact_record",  // For use to save images on ground station
-            topic: "/" + this.robot_name[n] + "/located_artifact_img",
-            // topic: "/" + this.robot_name[n] + "/located_artifact_img/relay",
+            // topic: "/" + this.robot_name[n] + "/located_artifact_img",
+            topic: "/" + this.robot_name[n] + "/artifact_image_to_base",
+            // topic: "/disabled3",
             messageType: "marble_artifact_detection_msgs/ArtifactImg"
         };
         let VehicleStatusTopic = {
@@ -233,7 +234,7 @@ class TabManager {
             messageType: "marble_common_msgs/VehicleStatus"
         }
         let PointCloudTopic = {
-            topic: "/" + this.robot_name[n] + "/disabled1",
+            topic: "/disabled1",
             // topic: "/merged_map",
             // topic: "/octomap_point_cloud_occupied",
             messageType: "sensor_msgs/PointCloud2"
@@ -286,7 +287,7 @@ class TabManager {
         });
         this.Tab_PoseArraySub[n] = new ROSLIB.Topic({
             ros: ros,
-            name: "/" + this.robot_name[n] + "/disabled2",
+            name: "/disabled2",
             // name: "/merged_poses",
             messageType: "geometry_msgs/PoseArray"
         });

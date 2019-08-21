@@ -193,6 +193,10 @@ class Artifact {
                         let robot_artifact_image = document.createElement("IMG");
                         robot_artifact_image.setAttribute("id", "myPopup");
                         robot_artifact_image.setAttribute("class", "popuptext");
+                        robot_artifact_image.style.height = '480px';
+                        robot_artifact_image.style.width = '640px';
+                        robot_artifact_image.style.left = '-300px';
+                        robot_artifact_image.style.top = '-300px';
                         this.artifact_image[id].appendChild(robot_artifact_image);
                     }
                     this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
@@ -214,7 +218,7 @@ class Artifact {
 
     // Use this to save the image received from ROS
     save_image(msg) {
-        this.artifactImages[msg.image_id.data] = msg.artifact_img.data;
+        this.artifactImages[msg.image_id] = msg.artifact_img.data;
         this.save_file();
         this.updateDisplay();
     }
