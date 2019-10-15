@@ -1,0 +1,23 @@
+When it complains it doesn't know about marble_gui
+source catkin_ws/devel/setup.bash
+
+=================================================
+ERRORS
+=================================================
+ERROR: cannot launch node of type [rosbridge_server/rosbridge_websocket]: rosbridge_server
+FIX: sudo apt-get install ros-<rosdistro>-rosbridge-server
+
+
+ERROR: cannot launch node of type [rosapi/rosapi_node]: rosapi
+FIX: fixed by rosbridge
+
+
+ERROR: cannot launch node of type [tf2_web_republisher/tf2_web_republisher]: tf2_web_republisher
+FIX: 	clone the following to src
+	git clone https://github.com/RobotWebTools/tf2_web_republisher
+     	hit it with a catkin_make
+	might need boost libraries 	
+
+THIS DOESN'T WORK, FIX THIS
+sudo apt -y install ros-$ROS_DISTRO-rosbridge-server ros-$ROS_DISTRO-tf2-web-republisher ros-$ROS_DISTRO-rosapi nodejs
+
