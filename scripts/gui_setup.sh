@@ -7,7 +7,9 @@ source ~/catkin_ws/devel/setup.bash
 
 sudo apt -y install ros-melodic-rosbridge-server
 
-git clone https://github.com/RobotWebTools/tf2_web_republisher ~/catkin_ws/src/
+cd ~/catkin_ws/src/
+
+git clone https://github.com/RobotWebTools/tf2_web_republisher 
 
 cd ~/catkin_ws
 
@@ -17,3 +19,9 @@ catkin_make
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
 sudo apt -y install nodejs
+
+npm install electron -g
+
+cd ~/catkin_ws/src/marble_gui/src
+
+npm install
