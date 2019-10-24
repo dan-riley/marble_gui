@@ -32,13 +32,17 @@ def main(argv):
                 os.system(source + "rosbag play " + arg)
             elif opt in ("-m", "--mods"):
                 # Option 1
-                os.system(source + "roslaunch marble_common launch_multimaster.launch")
+                o1 = "roslaunch marble_common launch_multimaster.launch"
+                os.system("gnome-terminal -e 'bash -c \"" + source + o1 + "; exec bash\"'")
                 # Option 2
-                os.system(source + "roslaunch base_mapping.launch")
+                o2 = "roslaunch base_mapping.launch"
+                os.system("gnome-terminal -e 'bash -c \"" + source + o2 + "; exec bash\"'")
                 # Option 3
-                os.system(source + "roslaunch marble_gui marble_gui.launch")
+                o3 = "roslaunch marble_gui marble_gui.launch"
+                os.system("gnome-terminal -e 'bash -c \"" + source + o3 + "; exec bash\"'")
                 # Option 4
-                os.system(source + "roslaunch marble_multi_agent multi_agent.launch")
+                o4 = "roslaunch marble_multi_agent multi_agent.launch"
+                os.system("gnome-terminal -e 'bash -c \"" + source + o4 + "; exec bash\"'")
 
 
 if __name__ == "__main__":

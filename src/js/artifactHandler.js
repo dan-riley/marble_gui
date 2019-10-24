@@ -2,7 +2,7 @@
  * Artifact class for handling, sending, and checking known artifacts
  */
 
-// Fixed array size determined by University of Colorado Denver, meant to reduce overall maintenance across network
+// How can this be made not a fixed length?
 var ARTIFACT_ARR_LEN = 80;
 
 class Artifact {
@@ -439,6 +439,10 @@ class Artifact {
         $('#myModal').modal('show');
     }
 
+
+// ================================================================================================
+// THIS IS SUBMITTING AN ARTIFACT
+// ================================================================================================
     async submit_artifact(id, _this) {
         var robo_name = _this.get_robot_name();
 
@@ -504,11 +508,20 @@ class Artifact {
             scoringTimer = new Date();
         }
 
-
+        // ==================================================
+        // DARPA SCORING STUFF
+        // ==================================================
         $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
             .done(function (json) {
+                // This is for testing a bad artifact and darpa responding with "0"
+                if(data.type == "score 0"){
+                    json.score_change = 0;
+                }
+                // This is where we get the darpa score back - specifically json.score_change
                 var submission_result = "+" + json.score_change + " points";
+                // Here down is mostly formatting
                 $("[id='" + position_string + "']").text(submission_result);
+
                 var color_class = 'table-danger';
                 if(json.score_change > 0){
                     color_class = 'table-success';
