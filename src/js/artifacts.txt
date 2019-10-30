@@ -1,0 +1,7 @@
+baloon
+robot
+dan
+tasty water
+fire extinguisher
+cave monster
+return 0

@@ -444,6 +444,7 @@ class Artifact {
 // THIS IS SUBMITTING AN ARTIFACT
 // ================================================================================================
     async submit_artifact(id, _this) {
+        console.log("here I am");
         var robo_name = _this.get_robot_name();
 
         var data = {
@@ -514,10 +515,11 @@ class Artifact {
         $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
             .done(function (json) {
                 // This is for testing a bad artifact and darpa responding with "0"
-                if(data.type == "score 0"){
-                    json.score_change = 0;
-                }
+                // if(data.type == "score 0"){
+                //     json.score_change = 0;
+                // }
                 // This is where we get the darpa score back - specifically json.score_change
+                console.log("WOWAH!");
                 var submission_result = "+" + json.score_change + " points";
                 // Here down is mostly formatting
                 $("[id='" + position_string + "']").text(submission_result);
