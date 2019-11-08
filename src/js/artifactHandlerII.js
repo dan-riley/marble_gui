@@ -1,20 +1,15 @@
+// This file deals with artifacts
+//      putting artifacts on the page
+//      submitting artifacts
+//      fusing artifacts
+
 // THIS GETS ALL OF OUR ARTIFACTS TO USE
 var fs = require("fs");
 // you might wnat to change where the artifact file is
 // It works by putting each artifact on a new line
 var artifact_file = fs.readFileSync("js/artifacts.txt", "utf-8");
 var artifacts = artifact_file.split("\n")
-
-
-// Populate modal options
-// var modal_options = document.getElementById("NewReportForm");
-// for(var i = 0; i < artifacts.length; i++){
-//     var artifact = artifacts[i];
-//     radioInput = document.createElement('INPUT');
-//     radioInput.setAttribute('type', 'radio');
-//     radioInput.setAttribute('name', artifact);
-//     modal_options.appendChild(radioInput);
-// }
+var ARTIFACT_ARR_LEN = artifacts.length
 function populateOpts(){
     var modal_options = document.getElementById("artifactSelect");
     for(var i = 0; i < artifacts.length; i++){
@@ -24,7 +19,17 @@ function populateOpts(){
         option.value = artifact;
         modal_options.add(option);
     }
+    console.log("made artifacts array")
 }
+
+
+
+function reportArtifact(artifact_name){
+    // get form data and send it to darpa
+
+}
+
+
 
 
 class Artifact {
@@ -36,11 +41,11 @@ class Artifact {
         this.artifactImages = [];
         this.reportedArtifacts = [];
 
-        if (!this.read_file()) {
-            for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
-                this.reportedArtifacts[i] = [i, false];
-            }
-        };
+        // if (!this.read_file()) {
+        //     for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
+        //         this.reportedArtifacts[i] = [i, false];
+        //     }
+        // };
 
         this.dist_threshhold = 1.0;
         console.log("artifact handler: " + name);
@@ -67,6 +72,91 @@ class Artifact {
         this.artifact_confidence[id] = this.artifact_tracker[id].querySelector("[id = 'confidence']");
         this.artifact_image[id] = this.artifact_tracker[id].querySelector("[id = image]");
     }
+
+    add_artifact(id) {
+        let robot_artifact_tracker = document.createElement("DIV");
+        robot_artifact_tracker.setAttribute("class", "row");
+        robot_artifact_tracker.setAttribute("artifact_id", id);
+        let align = '';
+        if (this.robot_name != 'Base') {
+            align = '<span class="col-sm-1">  </span>';
+        }
+        robot_artifact_tracker.innerHTML = align + '<span contenteditable="true" id="type" class="badge badge-secondary col-sm-2" style="text-align: center; min-height: 1px;" value="undefined"> undefined </span>';
+        if (this.robot_name == 'Base') {
+            // robot_artifact_tracker.innerHTML += '<span contenteditable="false" id="num_seen" class="badge badge-secondary col-sm-1" style="text-align: center; min-height: 1px;" value="0">0</span>' +
+            robot_artifact_tracker.innerHTML += '<span contenteditable="false" id="seen_by" class="badge badge-secondary col-sm-2" style="text-align: center; min-height: 1px;" value="undefined">&nbsp;</span>';
+        }
+
+        robot_artifact_tracker.innerHTML += '<span contenteditable="false" id="confidence" class="badge badge-secondary col-sm-1" style="text-align: center" value="0.00">0.00</span>' +
+            "<span contenteditable='true' id='position' class='badge badge-secondary col-sm-3' style='text-align: center' value='" + JSON.stringify({ x: 0.00, y: 0.00, z: 0.00 }) + "'>{x: 0.00 y: 0.00 z: 0.00}</span>";
+        // '<button class="col-sm-1">Yes</button>' +
+        // '<button class="col-sm-1">No</button>';
+
+        let robot_artifact_tracker_yes_container = document.createElement("DIV");
+        robot_artifact_tracker_yes_container.setAttribute("class", "badge badge-secondary col-sm-2");
+        robot_artifact_tracker_yes_container.setAttribute("id", this.robot_name + "_" + id);
+        let robot_artifact_tracker_yes = document.createElement("BUTTON");
+        robot_artifact_tracker_yes.setAttribute("id", "submit_" + this.robot_name + "_" + id);
+        robot_artifact_tracker_yes.innerText = "Submit";
+        var n = this.n;
+        var robot_name = this.robot_name;
+        robot_artifact_tracker_yes.onclick = function () {
+            if(connected_to_scoring_server){
+                robot_artifact_tracker_yes.innerText = "submitting...";
+                if (robot_name == 'Base') {
+                    global_tabManager.fusedArtifacts.open_edit_submit_modal(id);
+                } else {
+                    global_tabManager.global_vehicleArtifactsList[n].open_edit_submit_modal(id);
+                }
+            }
+            else {
+                alert('Cannot submit. You are not connected to the DARPA server.');
+            }
+        };
+        robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_yes);
+
+        let robot_artifact_tracker_reset = document.createElement("DIV");
+        robot_artifact_tracker_reset.onclick = function () {
+            if (robot_name == 'Base') {
+                let artifacts = global_tabManager.fusedArtifacts.artifactsList;
+                artifacts['dupe_' + id] = Object.assign({}, artifacts[id]);
+                artifacts['dupe_' + id].position = Object.assign({}, artifacts[id].position);
+                global_tabManager.fusedArtifacts.updateDisplay();
+            } else {
+                let artifacts = global_tabManager.global_vehicleArtifactsList[n].artifactsList;
+                artifacts['dupe_' + id] = Object.assign({}, artifacts[id]);
+                artifacts['dupe_' + id].position = Object.assign({}, artifacts[id].position);
+                global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
+            }
+        }
+        robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_reset);
+
+        let robot_artifact_image_container = document.createElement("DIV");
+        robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-2 popup");
+        robot_artifact_image_container.setAttribute("id", "image");
+        robot_artifact_image_container.innerText = "No Image";
+
+        robot_artifact_tracker.appendChild(robot_artifact_tracker_yes_container);
+        robot_artifact_tracker.appendChild(robot_artifact_image_container);
+        // robot_artifact_tracker.appendChild(robot_artifact_tracker_no);
+
+        return robot_artifact_tracker;
+    }
+
+    // open_edit_submit_modal(id){
+    //     $('#edit_x_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).x.toFixed(2));
+    //     $('#edit_y_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).y.toFixed(2));
+    //     $('#edit_z_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).z.toFixed(2));
+    //     $("#edit_type").val(this.artifact_type[id].innerText).change();
+
+    //     var my_this = this
+    //     $('#edit_submit').off('click').on('click', function () {
+    //         my_this.submit_artifact(id, my_this);
+    //     });
+
+    //     $('#myModal').modal({backdrop: 'static', keyboard: false});
+    //     $('#myModal').modal('show');
+    // }
 
     async submit_artifact(id, _this) {
         console.log("here I am");
@@ -200,5 +290,24 @@ class Artifact {
             });
 
         $('#myModal').modal('hide');
+    }
+
+    read_file() {
+        const csv = require('csv-parser');
+        // const fs = require('fs');
+        var count = 0;
+        fs.createReadStream(this.robot_name + '_reported.csv')
+            .pipe(csv())
+            .on('data', (row) => {
+                // console.log(row);
+                this.reportedArtifacts[count][0] = parseInt(row.id);
+                this.reportedArtifacts[count][1] = (row.Reported == "true");
+
+                count++;
+            })
+            .on('end', () => {
+                console.log('CSV file successfully processed');
+                console.log(this.reportedArtifacts);
+            });
     }
 }

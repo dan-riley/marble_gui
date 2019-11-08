@@ -1,6 +1,7 @@
 var ANALYZE_TOPICS_LIST_INTERVAL = 2000;
 
-function send_signal_to(robot_name, signal, value) {
+// This is for sending messages to the robots to start, stop, or go home
+function send_msg_to(robot_name, topic, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
         name: "/" + robot_name + "/" + signal,
@@ -11,6 +12,8 @@ function send_signal_to(robot_name, signal, value) {
     });
     Topic.publish(msg);
 }
+
+
 
 function send_string_to(robot_name, signal, text) {
     var Topic = new ROSLIB.Topic({
@@ -96,6 +99,7 @@ class TabManager {
 
         window.setInterval(this.get_TopicsFromROS, ANALYZE_TOPICS_LIST_INTERVAL);
     }
+
     remove_tab(name) {
         var content = document.getElementById("Robot_Pages").querySelector("[id='" + name + "']");
         content.parentNode.removeChild(content);

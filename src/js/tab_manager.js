@@ -3,7 +3,7 @@ var ANALYZE_TOPICS_LIST_INTERVAL = 2000;
 function send_signal_to(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: "/" + robot_name + "/" + signal,
+        name: `/${robot_name}/${signal}`,
         messageType: "std_msgs/Bool"
     });
     var msg = new ROSLIB.Message({
@@ -15,7 +15,7 @@ function send_signal_to(robot_name, signal, value) {
 function send_string_to(robot_name, signal, text) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: "/" + robot_name + "/" + signal,
+        name: `/${robot_name}/${signal}`,
         messageType: "std_msgs/String"
     });
     var msg = new ROSLIB.Message({
@@ -30,7 +30,7 @@ function create_pose_array(robot_name, poses) {
 
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: "/" + robot_name + "/posearray",
+        name: `/${robot_name}/posearray`,
         messageType: "geometry_msgs/PoseArray"
     })
     var msg = new ROSLIB.Message({
@@ -348,15 +348,15 @@ class TabManager {
             }
         });
 
-        setInterval(function () {
-            if (last_cloud_report_success != "never") {
-                var now = new Date();
-                $('#mapping_cloud_report_last_sent_secs_ago').text(
-                    Math.round(
-                        (now - last_cloud_report_success) / 1000
-                    ) + ' seconds ago');
-            }
-        }, 1000);
+        // setInterval(function () {
+        //     if (last_cloud_report_success != "never") {
+        //         var now = new Date();
+        //         $('#mapping_cloud_report_last_sent_secs_ago').text(
+        //             Math.round(
+        //                 (now - last_cloud_report_success) / 1000
+        //             ) + ' seconds ago');
+        //     }
+        // }, 1000);
 
         var last_grid_report_success = "never";
 
@@ -384,15 +384,15 @@ class TabManager {
             }
         });
 
-        setInterval(function () {
-            if (last_grid_report_success != "never") {
-                var now = new Date();
-                $('#mapping_grid_report_last_sent_secs_ago').text(
-                    Math.round(
-                        (now - last_grid_report_success) / 1000
-                    ) + ' seconds ago');
-            }
-        }, 1000);
+        // setInterval(function () {
+        //     if (last_grid_report_success != "never") {
+        //         var now = new Date();
+        //         $('#mapping_grid_report_last_sent_secs_ago').text(
+        //             Math.round(
+        //                 (now - last_grid_report_success) / 1000
+        //             ) + ' seconds ago');
+        //     }
+        // }, 1000);
 
         var last_telem_report_success = "never";
 
@@ -434,23 +434,23 @@ class TabManager {
             }
         });
 
-        setInterval(function () {
-            if (last_telem_report_success != "never") {
-                var now = new Date();
-                $('#telemetry_report_last_sent_secs_ago').text(
-                    Math.round(
-                        (now - last_telem_report_success) / 1000
-                    ) + ' seconds ago');
-            }
-        }, 1000);
+        // setInterval(function () {
+        //     if (last_telem_report_success != "never") {
+        //         var now = new Date();
+        //         $('#telemetry_report_last_sent_secs_ago').text(
+        //             Math.round(
+        //                 (now - last_telem_report_success) / 1000
+        //             ) + ' seconds ago');
+        //     }
+        // }, 1000);
 
         // Creating tab at top of screen for selecting robot view
         $('#Robot_Tabs').prepend(`
-            <li class="nav-item" id="` + this.robot_name[n] + `_nav_link" robot_name="` + this.robot_name[n] + `">
-                <a  class="nav-link" onclick="window.openPage('` + this.robot_name[n] + `', ` + n + `)" >
-                    ` + this.robot_name[n] + `
-                    <br><span id="connection_status_` + this.robot_name[n] + `"></span>
-                    <br><span id="task_status_` + this.robot_name[n] + `"></span>
+            <li class="nav-item" id="${this.robot_name[n]}_nav_link" robot_name="${this.robot_name[n]}">
+                <a  class="nav-link" onclick="window.openPage('${this.robot_name[n]}', ${n})" >
+                    ${this.robot_name[n]}
+                    <br><span id="connection_status_${this.robot_name[n]}"></span>
+                    <br><span id="task_status_${this.robot_name[n]}"></span>
                 </a>
             </li>`);
 
@@ -472,7 +472,7 @@ class TabManager {
             <dom-bind id="t">
                 <template is="dom-bind">
                     <ros-websocket auto id="websocket"ros="{{ros}}"url="ws://localhost:9090"></ros-websocket>
-                    <ros-rviz id="` + this.robot_name[n] + `_rviz" ros="{{ros}}"websocket-url="ws://localhost:9090"></ros-rviz>
+                    <ros-rviz id="${this.robot_name[n]}_rviz" ros="{{ros}}"websocket-url="ws://localhost:9090"></ros-rviz>
                 </template>
             </dom-bind>`.trim();
 
@@ -594,88 +594,88 @@ class TabManager {
         }
         this.Tab_OdomChart[n].update();
 
-        var top_card = document.createElement("DIV");
-        top_card.setAttribute("class", "card");
+    //     var top_card = document.createElement("DIV");
+    //     top_card.setAttribute("class", "card");
 
-        var top_card_header = document.createElement("DIV");
-        top_card_header.setAttribute("class", "card-header");
-        top_card_header.innerText = global_tabManager.robot_name[n];
+    //     var top_card_header = document.createElement("DIV");
+    //     top_card_header.setAttribute("class", "card-header");
+    //     top_card_header.innerText = global_tabManager.robot_name[n];
 
-        var top_card_body = document.createElement("DIV");
-        var robot_info = document.createElement("DIV");
-        top_card_body.setAttribute("class", "card-body");
-        top_card_body.setAttribute("id", global_tabManager.robot_name[n] + "_buttons");
-        robot_info.setAttribute("class", "card-body");
+    //     var top_card_body = document.createElement("DIV");
+    //     var robot_info = document.createElement("DIV");
+    //     top_card_body.setAttribute("class", "card-body");
+    //     top_card_body.setAttribute("id", global_tabManager.robot_name[n] + "_buttons");
+    //     robot_info.setAttribute("class", "card-body");
 
-        top_card.appendChild(top_card_header);
-        top_card.appendChild(top_card_body);
-        top_card.appendChild(robot_info);
+    //     top_card.appendChild(top_card_header);
+    //     top_card.appendChild(top_card_body);
+    //     top_card.appendChild(robot_info);
 
 
-        var battery_voltage = document.createElement("P");
-        battery_voltage.innerHTML = `Voltage: <span id="` + global_tabManager.robot_name[n] + `_voltage"></span>`;
-        var control_status = document.createElement("P");
-        control_status.innerHTML = `Status: <span id="` + global_tabManager.robot_name[n] + `_status"></span>`;
-        robot_info.appendChild(control_status);
-        robot_info.appendChild(battery_voltage);
+    //     var battery_voltage = document.createElement("P");
+    //     battery_voltage.innerHTML = `Voltage: <span id="` + global_tabManager.robot_name[n] + `_voltage"></span>`;
+    //     var control_status = document.createElement("P");
+    //     control_status.innerHTML = `Status: <span id="` + global_tabManager.robot_name[n] + `_status"></span>`;
+    //     robot_info.appendChild(control_status);
+    //     robot_info.appendChild(battery_voltage);
 
-        var radio_btn = document.createElement("BUTTON");
-        radio_btn.setAttribute("id", this.robot_name[n] + "_radio");
-        radio_btn.setAttribute("type", "button");
-        radio_btn.setAttribute("class", "btn btn-success btn-space");
-        radio_btn.innerText = "Radio Reset";
+    //     var radio_btn = document.createElement("BUTTON");
+    //     radio_btn.setAttribute("id", this.robot_name[n] + "_radio");
+    //     radio_btn.setAttribute("type", "button");
+    //     radio_btn.setAttribute("class", "btn btn-success btn-space");
+    //     radio_btn.innerText = "Radio Reset";
 
-        var estop_btn = document.createElement("BUTTON");
-        estop_btn.setAttribute("id", this.robot_name[n] + "_estop");
-        estop_btn.setAttribute("type", "button");
-        estop_btn.setAttribute("class", "btn btn-danger btn-space");
-        estop_btn.innerText = "Emergency Stop";
+    //     var estop_btn = document.createElement("BUTTON");
+    //     estop_btn.setAttribute("id", this.robot_name[n] + "_estop");
+    //     estop_btn.setAttribute("type", "button");
+    //     estop_btn.setAttribute("class", "btn btn-danger btn-space");
+    //     estop_btn.innerText = "Emergency Stop";
 
-	var estop_off_btn = document.createElement("BUTTON");
-        estop_off_btn.setAttribute("id", this.robot_name[n] + "_estop_off");
-        estop_off_btn.setAttribute("type", "button");
-        estop_off_btn.setAttribute("class", "btn btn-success btn-space");
-        estop_off_btn.innerText = "Emergency Stop Disabled";
+	//     var estop_off_btn = document.createElement("BUTTON");
+    //     estop_off_btn.setAttribute("id", this.robot_name[n] + "_estop_off");
+    //     estop_off_btn.setAttribute("type", "button");
+    //     estop_off_btn.setAttribute("class", "btn btn-success btn-space");
+    //     estop_off_btn.innerText = "Emergency Stop Disabled";
 
-	var stop_btn = document.createElement("BUTTON");
-        stop_btn.setAttribute("id", this.robot_name[n] + "_stop");
-        stop_btn.setAttribute("type", "button");
-        stop_btn.setAttribute("class", "btn btn-danger btn-space");
-        stop_btn.innerText = "Stop Vehicle";
+	//     var stop_btn = document.createElement("BUTTON");
+    //     stop_btn.setAttribute("id", this.robot_name[n] + "_stop");
+    //     stop_btn.setAttribute("type", "button");
+    //     stop_btn.setAttribute("class", "btn btn-danger btn-space");
+    //     stop_btn.innerText = "Stop Vehicle";
 
-        var startup_btn = document.createElement("BUTTON");
-        startup_btn.setAttribute("id", this.robot_name[n] + "_startup");
-        startup_btn.setAttribute("type", "button");
-        startup_btn.setAttribute("class", "btn btn-success btn-space");
-        startup_btn.innerText = "Start Mission";
+    //     var startup_btn = document.createElement("BUTTON");
+    //     startup_btn.setAttribute("id", this.robot_name[n] + "_startup");
+    //     startup_btn.setAttribute("type", "button");
+    //     startup_btn.setAttribute("class", "btn btn-success btn-space");
+    //     startup_btn.innerText = "Start Mission";
 
-	// estop_status  sw_state (1=stop -- the estop!, 0=go), radio_state (0=go/enabled)
+	// // estop_status  sw_state (1=stop -- the estop!, 0=go), radio_state (0=go/enabled)
 
-        var home_btn = document.createElement("BUTTON");
-        home_btn.setAttribute("id", this.robot_name[n] + "_home");
-        home_btn.setAttribute("type", "button");
-        home_btn.setAttribute("class", "btn btn-danger btn-space");
-        home_btn.innerText = "Return Home";
+    //     var home_btn = document.createElement("BUTTON");
+    //     home_btn.setAttribute("id", this.robot_name[n] + "_home");
+    //     home_btn.setAttribute("type", "button");
+    //     home_btn.setAttribute("class", "btn btn-danger btn-space");
+    //     home_btn.innerText = "Return Home";
 
-        var explore_btn = document.createElement("BUTTON");
-        explore_btn.setAttribute("id", this.robot_name[n] + "_explore");
-        explore_btn.setAttribute("type", "button");
-        explore_btn.setAttribute("class", "btn btn-success btn-space");
-        explore_btn.innerText = "Explore";
+    //     var explore_btn = document.createElement("BUTTON");
+    //     explore_btn.setAttribute("id", this.robot_name[n] + "_explore");
+    //     explore_btn.setAttribute("type", "button");
+    //     explore_btn.setAttribute("class", "btn btn-success btn-space");
+    //     explore_btn.innerText = "Explore";
 
-        top_card_body.appendChild(radio_btn);
-        top_card_body.appendChild(estop_btn);
-        top_card_body.appendChild(estop_off_btn);
-        top_card_body.appendChild(stop_btn);
-        top_card_body.appendChild(startup_btn);
-        top_card_body.appendChild(home_btn);
-        top_card_body.appendChild(explore_btn);
+    //     top_card_body.appendChild(radio_btn);
+    //     top_card_body.appendChild(estop_btn);
+    //     top_card_body.appendChild(estop_off_btn);
+    //     top_card_body.appendChild(stop_btn);
+    //     top_card_body.appendChild(startup_btn);
+    //     top_card_body.appendChild(home_btn);
+    //     top_card_body.appendChild(explore_btn);
 
-        chart_wrap.appendChild(chart);
+    //     chart_wrap.appendChild(chart);
 
-        tab_content.appendChild(top_card);
-        tab_content.appendChild(chart_wrap);
-        tab_content.appendChild(viewer_row);
+    //     tab_content.appendChild(top_card);
+    //     tab_content.appendChild(chart_wrap);
+    //     tab_content.appendChild(viewer_row);
 
         $('#Robot_Pages').prepend(tab_content);
 
@@ -714,10 +714,10 @@ class TabManager {
         var robot_artifact_header_inner = document.createElement("DIV");
         robot_artifact_header_inner.setAttribute("class", "panel panel-default");
         robot_artifact_header_inner.innerHTML = `
-                    <div class="panel-heading" role="tab" id="` + this.robot_name[n] + `_heading">
+                    <div class="panel-heading" role="tab" id="${this.robot_name[n]}_heading">
                         <b class="panel-title">
-                            <a class="" role="button" title="" data-toggle="collapse" href="#` + this.robot_name[n] + `_collapse" aria-expanded="true" aria-controls="collapse1">
-                            ` + this.robot_name[n] + `
+                            <a class="" role="button" title="" data-toggle="collapse" href="#${this.robot_name[n]}_collapse" aria-expanded="true" aria-controls="collapse1">
+                            ${this.robot_name[n]}
                             </a>
                         </b>
                     </div>`;

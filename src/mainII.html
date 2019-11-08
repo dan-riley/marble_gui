@@ -45,7 +45,7 @@
 
 <!-- <body onload="window.setTimeout(function(){window.setSpeed(1000);},1000);"> -->
 
-<body>
+<body onload="populateOpts()">
   <!-- <div class="container"> -->
   <!--! Tab bar at the top of web page that displays all vehicles and default tabs -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -195,14 +195,7 @@
                         </tr>
                     </thead>
                     <tbody id="submission_tbody">
-                        <!--
-                          <tr>
-                              <td>sam</td>
-                              <td>gillam</td>
-                              <td>gillamkid@gmail.com</td>
-                              <td>No points added</td>
-                          </tr>
-                        -->
+          
                     </tbody>
                 </table>
 
@@ -212,7 +205,7 @@
 
 
         <!-- Button to Open the Modal -->
-        <button type="button" class="btn btn-primary" id="NewReportButton" data-toggle="modal" data-target="#NewReportModal" onclick="populateOpts()">
+        <button type="button" class="btn btn-primary" id="NewReportButton" data-toggle="modal" data-target="#NewReportModal">
           New Report
         </button>
 
@@ -233,7 +226,8 @@
                     <!-- ITEM SELECTION (get from config file) -->
                     <select class="custom-select" id="artifactSelect">
 
-                    </select> <br>
+                    </select>
+                    <br>
                      
                     <div class="form-group">
                         <input type="text" class="form-control" id="xVal" placeholder="Enter X value"><br>
@@ -250,7 +244,7 @@
 
               <!-- Modal footer -->
               <div class="modal-footer">
-                <button id="edit_submit" type="button" class="btn btn-primary">Report</button>
+                <button id="edit_submit" type="button" class="btn btn-primary" onclick="reportArtifact()">Report</button>
               </div>
 
             </div>
