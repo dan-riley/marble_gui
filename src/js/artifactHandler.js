@@ -63,6 +63,7 @@ class Artifact {
     }
 
     add_artifact(id) {
+        // Add artifact to page
         let robot_artifact_tracker = document.createElement("DIV");
         robot_artifact_tracker.setAttribute("class", "row");
         robot_artifact_tracker.setAttribute("artifact_id", id);
@@ -559,14 +560,14 @@ async function submit_artifact(id, _this) {
             }
         }
     }
-    var position_string =  `${$('#edit_x_pos').val()}, '${$('#edit_y_pos').val()}, ${$('#edit_z_pos').val()}`;
+    var position_string =  `${$('#edit_x_pos').val()}, ${$('#edit_y_pos').val()}, ${$('#edit_z_pos').val()}`;
 
     $('#submission_tbody').append(`
     <tr>
         <td>${$('#edit_type').val()}</td>
-        <td>` + position_string + `</td>
-        <td>` + $('#edit_notes ').val() + `</td>
-        <td id="` + position_string + `">No result yet</td>
+        <td>${position_string}</td>
+        <td>${$('#edit_notes ').val()}</td>
+        <td id="${position_string}">No result yet</td>
     </tr>`);
 
     // var org_artifacts = _this.artifactsList[id].originals;
@@ -584,11 +585,10 @@ async function submit_artifact(id, _this) {
     $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
         .done(function (json) {
             // This is for testing a bad artifact and darpa responding with "0"
-            // if(data.type == "score 0"){
-            //     json.score_change = 0;
-            // }
+            if(data.type == "return 0"){
+                 json.score_change = 0;
+            }
             // This is where we get the darpa score back - specifically json.score_change
-            console.log("WOWAH!");
 
             // Write overall reported 
             
@@ -603,43 +603,52 @@ async function submit_artifact(id, _this) {
             }
             $("[id='" + position_string + "']").parent().addClass(color_class);
 
-            document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
+            // Put the fused artifact in the fused artifact tab
+            var fused_div = document.getElementById("fused_artifacts");
+            
+            // document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
 
-            if (json.score_change > 0) {
-                document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
-            }
+            // if (json.score_change > 0) {
+            //     document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
+            // }
 
-            if (robo_name == "Base") {
-                for (let id2 in org_artifacts) {
-                    let artifact = org_artifacts[id2];
-                    global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].submitted = true;
-                    global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].result = json.score_change;
-                    let robot_name = global_tabManager.global_vehicleArtifactsList[artifact.n].robot_name;
-                    if (json.score_change > 0) {
-                        document.getElementById("submit_" + robot_name + "_" + id2).disabled = true;
-                    }
+            // if (robo_name == "Base") {
+            //     for (let id2 in org_artifacts) {
+            //         let artifact = org_artifacts[id2];
+            //         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].submitted = true;
+            //         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].result = json.score_change;
+            //         let robot_name = global_tabManager.global_vehicleArtifactsList[artifact.n].robot_name;
+            //         if (json.score_change > 0) {
+            //             document.getElementById("submit_" + robot_name + "_" + id2).disabled = true;
+            //         }
 
-                    global_tabManager.global_vehicleArtifactsList[artifact.n].updateDisplay();
-                }
-            } else {
-                for (let id2 in global_tabManager.fusedArtifacts.artifactsList) {
-                    let fartifact = global_tabManager.fusedArtifacts.artifactsList[id2];
-                    for (let id3 in fartifact.originals) {
-                        if (id3 == id) {
-                            fartifact.submitted = true;
-                            fartifact.result = json.score_change;
-                            if (json.score_change > 0) {
-                                document.getElementById("submit_Base_" + id2).disabled = true;
-                            }
-                        }
-                    }
-                }
-                global_tabManager.fusedArtifacts.updateDisplay();
-            }
+            //         global_tabManager.global_vehicleArtifactsList[artifact.n].updateDisplay();
+            //     }
+            // } else {
+            //     for (let id2 in global_tabManager.fusedArtifacts.artifactsList) {
+            //         let fartifact = global_tabManager.fusedArtifacts.artifactsList[id2];
+            //         for (let id3 in fartifact.originals) {
+            //             if (id3 == id) {
+            //                 fartifact.submitted = true;
+            //                 fartifact.result = json.score_change;
+            //                 if (json.score_change > 0) {
+            //                     document.getElementById("submit_Base_" + id2).disabled = true;
+            //                 }
+            //             }
+            //         }
+            //     }
+            //     global_tabManager.fusedArtifacts.updateDisplay();
+            // }
             if(json.score_change > 0){
                 $('#' + position_string).html('Success');
+                log_submitted_artifacts(data.type)
             }
         });
 
     $('#NewReportModal').modal('hide');
+}
+
+// This logs artifacts that have been submitte dto darpa
+function log_submitted_artifacts(artifact){
+    fs.writeFile('DARPA_reported.txt', `${artifact}\n`)
 }

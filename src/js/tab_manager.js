@@ -453,7 +453,24 @@ class TabManager {
                     <br><span id="task_status_${this.robot_name[n]}"></span>
                 </a>
             </li>`);
-
+        
+        // This is for creatiung the control card for each robot on the sidebar
+        $('#controls_bar_inner').prepend(`
+        <li class="quick_control">
+        <h4>${this.robot_name[n]}</h4>
+        <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_start"
+            onclick="send_signal_to('${this.robot_name[n]}', 'control', 'start'"> 
+            Start 
+        </button><br>
+        <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop" onclick="send_signal_to('${this.robot_name[n]}', 'control', 'stop'">
+            Stop
+        </button><br>
+        <button type='button' class="button btn-warning btn-sm" id="${this.robot_name[n]}_home" onclick="send_signal_to('${this.robot_name[n]}', 'control', 'go_home'"> go
+            home
+        </button><br>
+    </li>
+        `)
+ 
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");
         tab_content.setAttribute("id", this.robot_name[n]);
