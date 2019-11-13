@@ -62,8 +62,10 @@ class Artifact {
         this.artifact_image[id] = this.artifact_tracker[id].querySelector("[id = image]");
     }
 
+    // Add artifact to page
     add_artifact(id) {
         // Add artifact to page
+        console.log("adding artifact")
         let robot_artifact_tracker = document.createElement("DIV");
         robot_artifact_tracker.setAttribute("class", "row");
         robot_artifact_tracker.setAttribute("artifact_id", id);
@@ -134,7 +136,9 @@ class Artifact {
     }
 
     updateDisplay() {
+        console.log("updating the display")
         var artifact_page = document.getElementById("Artifact_Page");
+        // Make this work - its looking for the wong thing
         var robot_artifacts = artifact_page.querySelector("[robot_name = '" + this.robot_name + "']");
         for (let id in this.artifactsList) {
             let artifact = this.artifactsList[id];
@@ -378,6 +382,7 @@ class Artifact {
     }
 
     set_artifacts(msg) {
+        // console.log("begining of setting artifact")
         let update = false;
         for (let i = 0; i < msg.length; i++) {
             // Remap the artifacts to the DARPA required names
@@ -434,8 +439,9 @@ class Artifact {
                 this.fuse_artifacts(id, false);
             }
         }
-
+        // console.log("set artifacts")
         if (update) {
+            console.log("update was true")
             this.save_file();
             this.updateDisplay();
         }
@@ -514,7 +520,6 @@ class Artifact {
 }
 
 async function submit_artifact(id, _this) {
-    console.log("here I am");
     // var robo_name = _this.get_robot_name();
 
     var data = {
@@ -652,3 +657,8 @@ async function submit_artifact(id, _this) {
 function log_submitted_artifacts(artifact){
     fs.writeFile('DARPA_reported.txt', `${artifact}\n`)
 }
+
+// function artifact_listener(msg){
+//     // If recovery files exist, use those
+
+// }

@@ -459,13 +459,17 @@ class TabManager {
         <li class="quick_control">
         <h4>${this.robot_name[n]}</h4>
         <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_start"
-            onclick="send_signal_to('${this.robot_name[n]}', 'control', 'start'"> 
+            onclick="send_signal_to('${this.robot_name[n]}', 'control', 'start')"> 
+            Start 
+        </button>
+        <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_radio"
+            onclick="send_signal_to('${this.robot_name[n]}', 'control', 'start')"> 
             Start 
         </button><br>
-        <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop" onclick="send_signal_to('${this.robot_name[n]}', 'control', 'stop'">
+        <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop" onclick="send_signal_to('${this.robot_name[n]}', 'control', 'stop')">
             Stop
         </button><br>
-        <button type='button' class="button btn-warning btn-sm" id="${this.robot_name[n]}_home" onclick="send_signal_to('${this.robot_name[n]}', 'control', 'go_home'"> go
+        <button type='button' class="button btn-warning btn-sm" id="${this.robot_name[n]}_home" onclick="send_signal_to('${this.robot_name[n]}', 'control', 'go_home')"> go
             home
         </button><br>
     </li>
@@ -611,30 +615,30 @@ class TabManager {
         }
         this.Tab_OdomChart[n].update();
 
-    //     var top_card = document.createElement("DIV");
-    //     top_card.setAttribute("class", "card");
+        var top_card = document.createElement("DIV");
+        top_card.setAttribute("class", "card");
 
-    //     var top_card_header = document.createElement("DIV");
-    //     top_card_header.setAttribute("class", "card-header");
-    //     top_card_header.innerText = global_tabManager.robot_name[n];
+        var top_card_header = document.createElement("DIV");
+        top_card_header.setAttribute("class", "card-header");
+        top_card_header.innerText = global_tabManager.robot_name[n];
 
-    //     var top_card_body = document.createElement("DIV");
-    //     var robot_info = document.createElement("DIV");
-    //     top_card_body.setAttribute("class", "card-body");
-    //     top_card_body.setAttribute("id", global_tabManager.robot_name[n] + "_buttons");
-    //     robot_info.setAttribute("class", "card-body");
+        // var top_card_body = document.createElement("DIV");
+        // var robot_info = document.createElement("DIV");
+        // top_card_body.setAttribute("class", "card-body");
+        // top_card_body.setAttribute("id", global_tabManager.robot_name[n] + "_buttons");
+        // robot_info.setAttribute("class", "card-body");
 
-    //     top_card.appendChild(top_card_header);
-    //     top_card.appendChild(top_card_body);
-    //     top_card.appendChild(robot_info);
+        top_card.appendChild(top_card_header);
+        // top_card.appendChild(top_card_body);
+        // top_card.appendChild(robot_info);
 
 
-    //     var battery_voltage = document.createElement("P");
-    //     battery_voltage.innerHTML = `Voltage: <span id="` + global_tabManager.robot_name[n] + `_voltage"></span>`;
-    //     var control_status = document.createElement("P");
-    //     control_status.innerHTML = `Status: <span id="` + global_tabManager.robot_name[n] + `_status"></span>`;
-    //     robot_info.appendChild(control_status);
-    //     robot_info.appendChild(battery_voltage);
+        var battery_voltage = document.createElement("P");
+        battery_voltage.innerHTML = `Voltage: <span id="` + global_tabManager.robot_name[n] + `_voltage"></span>`;
+        var control_status = document.createElement("P");
+        control_status.innerHTML = `Status: <span id="` + global_tabManager.robot_name[n] + `_status"></span>`;
+        // robot_info.appendChild(control_status);
+        // robot_info.appendChild(battery_voltage);
 
     //     var radio_btn = document.createElement("BUTTON");
     //     radio_btn.setAttribute("id", this.robot_name[n] + "_radio");
@@ -688,22 +692,22 @@ class TabManager {
     //     top_card_body.appendChild(home_btn);
     //     top_card_body.appendChild(explore_btn);
 
-    //     chart_wrap.appendChild(chart);
+        chart_wrap.appendChild(chart);
 
-    //     tab_content.appendChild(top_card);
-    //     tab_content.appendChild(chart_wrap);
-    //     tab_content.appendChild(viewer_row);
+        tab_content.appendChild(top_card);
+        tab_content.appendChild(chart_wrap);
+        tab_content.appendChild(viewer_row);
 
         $('#Robot_Pages').prepend(tab_content);
 
         // Need these here in jquery so the events can be cloned properly for the artifact page
-        $('#' + this.robot_name[n] + '_radio').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "radio_reset_cmd", true) });
-        $('#' + this.robot_name[n] + '_estop').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", true) });
-        $('#' + this.robot_name[n] + '_estop_off').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", false) });
-        $('#' + this.robot_name[n] + '_stop').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop", true) });
-        $('#' + this.robot_name[n] + '_startup').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop", false) });
-        $('#' + this.robot_name[n] + '_home').on('click', function () { send_string_to(global_tabManager.robot_name[n], "task", "Home") });
-        $('#' + this.robot_name[n] + '_explore').on('click', function () { send_string_to(global_tabManager.robot_name[n], "task", "Explore") });
+        // $('#' + this.robot_name[n] + '_radio').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "radio_reset_cmd", true) });
+        // $('#' + this.robot_name[n] + '_estop').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", true) });
+        // $('#' + this.robot_name[n] + '_estop_off').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", false) });
+        // $('#' + this.robot_name[n] + '_stop').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop", true) });
+        // $('#' + this.robot_name[n] + '_startup').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop", false) });
+        // $('#' + this.robot_name[n] + '_home').on('click', function () { send_string_to(global_tabManager.robot_name[n], "task", "Home") });
+        // $('#' + this.robot_name[n] + '_explore').on('click', function () { send_string_to(global_tabManager.robot_name[n], "task", "Explore") });
 
         create_viewer(this.robot_name[n]);
 
@@ -726,8 +730,8 @@ class TabManager {
 
         var robot_artifact_header = document.createElement("SPAN");
         robot_artifact_header.setAttribute("class", "badge badge-secondary col-sm-12");
-        robot_artifact_header.setAttribute("style", "height: 95px;")
-
+        robot_artifact_header.setAttribute("style", "font-size: 20px")
+        
         var robot_artifact_header_inner = document.createElement("DIV");
         robot_artifact_header_inner.setAttribute("class", "panel panel-default");
         robot_artifact_header_inner.innerHTML = `
@@ -757,7 +761,6 @@ class TabManager {
         robot_artifact_container.appendChild(robot_artifact_titles);
 
         // Artifact rows get created by the artifact handler now
-
         let artifact_tracker = document.getElementById("robot_artifact_tables");
         // Creates a DIV element that is placed either on the left or right side of the screen depending on how many robots there currently are
         if (n % 2 == 0) {
@@ -773,11 +776,12 @@ class TabManager {
         }
 
         // Buttons have to be added here or jquery doesn't see it in the DOM
-        $('#' + this.robot_name[n] + '_buttons').clone(true, true).appendTo('#' + this.robot_name[n] + '_buttons_container');
+        // $('#' + this.robot_name[n] + '_buttons').clone(true, true).appendTo('#' + this.robot_name[n] + '_buttons_container');
 
         // Sets up all objects for vehicle artifact manager
         this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n], n);
 
+        // Subscribes to artifact messages
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
             // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
             global_tabManager.global_vehicleArtifactsList[n].set_artifacts(msg.artifacts);

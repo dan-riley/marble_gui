@@ -18,10 +18,10 @@
   <script type="text/javascript" src="robotwebtools/roslib.min.js"></script>
   <script type="text/javascript" src="robotwebtools/ros3d.min.js"></script>
 
-  <script type="text/javascript" src="js/artifactHandlerII.js"></script>
+  <script type="text/javascript" src="js/artifactHandler.js"></script>
   <script type="text/javascript" src="js/darpaServerComm.js"></script>
   <script type="text/javascript" src="js/octomap_viewer.js"></script>
-  <script type="text/javascript" src="js/tab_managerII.js"></script>
+  <script type="text/javascript" src="js/tab_manager.js"></script>
   <script type="text/javascript" src="js/readData.js"></script>
   <script type="text/javascript" src="js/tabs.js"></script>
   <script type="text/javascript" src="js/fileCopy.js"></script>
@@ -45,7 +45,7 @@
 
 <!-- <body onload="window.setTimeout(function(){window.setSpeed(1000);},1000);"> -->
 
-<body onload="populateOpts()">
+<body>
   <!-- <div class="container"> -->
   <!--! Tab bar at the top of web page that displays all vehicles and default tabs -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -195,7 +195,14 @@
                         </tr>
                     </thead>
                     <tbody id="submission_tbody">
-          
+                        <!--
+                          <tr>
+                              <td>sam</td>
+                              <td>gillam</td>
+                              <td>gillamkid@gmail.com</td>
+                              <td>No points added</td>
+                          </tr>
+                        -->
                     </tbody>
                 </table>
 
@@ -205,12 +212,12 @@
 
 
         <!-- Button to Open the Modal -->
-        <button type="button" class="btn btn-primary" id="NewReportButton" data-toggle="modal" data-target="#NewReportModal">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" data-backdrop="static" data-keyboard="false">
           New Report
         </button>
 
-        <!-- New repot modal -->
-        <div class="modal fade" id="NewReportModal" role="dialog">
+        <!-- The Modal -->
+        <div class="modal" id="myModal">
           <div class="modal-dialog">
             <div class="modal-content">
 
@@ -222,29 +229,36 @@
 
               <!-- Modal body -->
               <div class="modal-body">
-                  <form id="NewReportForm">
-                    <!-- ITEM SELECTION (get from config file) -->
-                    <select class="custom-select" id="artifactSelect">
-
-                    </select>
-                    <br>
-                     
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="xVal" placeholder="Enter X value"><br>
-                        <input type="text" class="form-control" id="yVal" placeholder="Enter Y value"><br>
-                        <input type="text" class="form-control" id="zVal" placeholder="Enter Z value"><br>
-                    </div>
-                    <div class="form-group">
-                        <label for="notesTextArea">Notes</label>
-                        <textarea class="form-control" id="notesTextArea" rows="3"></textarea>
-                    </div>
-                  </form>    
-
+                  <div class="form-group">
+                    <select id="edit_type">
+                      <option>Fire Extinguisher</option>
+                      <option>Drill</option>
+                      <option>Backpack</option>
+                      <option>Cell Phone</option>
+                      <option>Survivor</option>
+                      <option>score 0</option> 
+                  </select> 
+                  </div>
+                  <div class="form-group form-inline">
+                      <label style="width: 30px;">X:</label>
+                      <input id="edit_x_pos" type="text" class="form-control" placeholder="position" ng-model="personalDetails.lname" required>   
+                  </div>
+                  <div class="form-group form-inline">
+                      <label style="width: 30px;">Y:</label>
+                      <input id="edit_y_pos" type="text" class="form-control" placeholder="position" ng-model="personalDetails.lname" required>   
+                  </div>
+                  <div class="form-group form-inline">
+                      <label style="width: 30px;">Z:</label>
+                      <input id="edit_z_pos" type="text" class="form-control" placeholder="position" ng-model="personalDetails.lname" required>   
+                  </div>
+                  <div class="form-group">
+                      <input id="edit_notes" type="text" class="form-control" placeholder="notes" ng-model="personalDetails.email" required>  
+                  </div>
               </div>
 
               <!-- Modal footer -->
               <div class="modal-footer">
-                <button id="edit_submit" type="button" class="btn btn-primary" onclick="reportArtifact()">Report</button>
+                <button id="edit_submit" type="button" class="btn btn-primary">Report</button>
               </div>
 
             </div>

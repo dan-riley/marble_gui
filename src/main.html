@@ -50,7 +50,7 @@
 
 <!-- <body onload="window.setTimeout(function(){window.setSpeed(1000);},1000);"> -->
 
-<body onload="populateOpts()">
+<body onload="populateOpts()" style="overflow: hidden;">
     <!-- <div class="container"> -->
     <!--! Tab bar at the top of web page that displays all vehicles and default tabs -->
     <div id="connections_bar">
@@ -90,189 +90,111 @@
     </div>
 
 
-    <div class="main">
+    <div class="main" style="overflow: scroll; height:1000px">
 
         <!--! Top bar on web page that displays all information reported back by DARPA when getting the score -->
-        <!-- <div id="Universal_Page" class="row"> -->
-        <!-- Score: <label style="background-color: white; padding: 2px;"> 10 </label> -->
-        <!-- <span class="badge badge-secondary col-sm-4" style="text-align: center">Time: <span
-                    id="header_time">nan</span></span>
+        <div id="Universal_Page" class="row">
+            <!-- Score: <label style="background-color: white; padding: 2px;"> 10 </label> -->
+            <span class="badge badge-secondary col-sm-4" style="text-align: center">Time: <span
+                id="header_time">nan</span></span>
             <span class="badge badge-secondary col-sm-4" style="text-align: center">Score: <span
-                    id="header_score">0</span></span>
+                id="header_score">0</span></span>
             <span class="badge badge-secondary col-sm-4" style="text-align: center">Remaining Artifacts: <span
-                    id="header_remaining_reports">nan</span></span>
-        </div> -->
-
-        <!-- fixed page location
-        scrollable content -->
-        <div id="fused_artifacts" class="row">
-                <div class="col-md-12 artifact_table">
-                        <h3>Fused Artifacts</h3>
-                        <table class="table table-bordered" style="background-color: white">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Seen By</th>
-                                    <th>Confidence</th>
-                                    <th>Position</th>
-                                    <th>DARPA</th>
-                                    <th>Image</th>
-                                </tr>
-                            </thead>
-                            <tbody id="fused_artifact_table">
-        
-                            </tbody>
-                        </table>
-                    </div>
+                id="header_remaining_reports">nan</span></span>
         </div>
-
-        <!-- fixed page location
-            scrollable content -->
-        <div id="all_artifacts" class="row">
-            <div class="col-md-12 artifact_table">
-                <h3>Raw Reported</h3>
-                <table class="table table-bordered" style="background-color: white">
-                    <thead>
-                        <tr>
-                            <th>Robot</th>
-                            <th>Type</th>
-                            <th>Confidence</th>
-                            <th>Position</th>
-                            <th>DARPA</th>
-                            <th>Image</th>
-                        </tr>
-                    </thead>
-                    <tbody id="raw_reported_table">
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- fixed page location
-            scrollable content -->
-        <div id="submitted" class="row">
-             <div class="col-md-12 artifact_table">
-                <h3>Submissions</h3>
-                <table class="table table-bordered" style="background-color: white">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Position</th>
-                            <th>Notes</th>
-                            <th>Response</th>
-                        </tr>
-                    </thead>
-                    <tbody id="submission_tbody">
-
-                    </tbody>
-                </table>
-
-            </div>
-        </div>
-
 
         <!--! DIV that contains all details within each tab, vehicle pages are added as subsections through javascript -->
         <div id="Robot_Pages">
 
 
             <div id="Listener" class="tabcontent">
-                <div class="card">
-                    <div class="card-body">
-                        <h2>Topic Listener</h2>
-                        <form>
-                            <div class="autocomplete" style="width:300px;">
-                                <input id="myInput" type="text" name="myTopics" placeholder="ex. /G01/artifact_record">
-                            </div>
-                            <button type="button" class="btn btn-success" id="begin_echo">Echo</button>
-                            <button type="button" class="btn btn-danger" id="stop_echo" style="display:none;">Stop
-                                Echo</button>
-                            <button type="button" class="btn btn-secondary" id="clear_console">Clear Console</button>
-                        </form>
-                        <div id="echo_console"></div>
+            <div class="card">
+                <div class="card-body">
+                <h2>Topic Listener</h2>
+                <form>
+                    <div class="autocomplete" style="width:300px;">
+                    <input id="myInput" type="text" name="myTopics" placeholder="ex. /G01/artifact_record">
                     </div>
+                    <button type="button" class="btn btn-success" id="begin_echo">Echo</button>
+                    <button type="button" class="btn btn-danger" id="stop_echo" style="display:none;">Stop Echo</button>
+                    <button type="button" class="btn btn-secondary" id="clear_console">Clear Console</button>
+                </form>
+                <div id="echo_console"></div>
                 </div>
+            </div>
             </div>
 
 
             <div id="DARPA" class="tabcontent">
-                <!-- add stuff here for DARPA server -->
-                <div class="card card-body" style="margin-bottom: 40px;">
-                    <h1>DARPA Reporting</h1>
-                    <p><i>Systems Teams must provide real-time 3D volumetric map updates to the DARPA Command Post at a
-                            minimum
-                            frequency of one update per 10 seconds.</i></p>
+            <!-- add stuff here for DARPA server -->
+            <div class="card card-body" style="margin-bottom: 40px;">
+                <h1>DARPA Reporting</h1>
+                <p><i>Systems Teams must provide real-time 3D volumetric map updates to the DARPA Command Post at a minimum
+                    frequency of one update per 10 seconds.</i></p>
 
-                    <div class="row">
-                        <div class="col-4">
-                            Last mapping report sent (PointCloud2):
-                            <div style="padding-left: 10px;">
-                                time sent: <span id="mapping_cloud_report_last_sent_raw">-</span>
-                                <br>
-                                time elapsed since last sent: <span
-                                    id="mapping_cloud_report_last_sent_secs_ago">-</span>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            Last mapping report sent (OccupancyGrid):
-                            <div style="padding-left: 10px;">
-                                time sent: <span id="mapping_grid_report_last_sent_raw">-</span>
-                                <br>
-                                time elapsed since last sent: <span id="mapping_grid_report_last_sent_secs_ago">-</span>
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            Last telemetry report sent (PoseArray): <span id="telemetry_report_last_sent">-</span>
-                            <div style="padding-left: 10px;">
-                                time sent: <span id="telemetry_report_last_sent_raw">-</span>
-                                <br>
-                                time elapsed since last sent: <span id="telemetry_report_last_sent_secs_ago">-</span>
-                            </div>
-                        </div>
-
+                <div class="row">
+                <div class="col-4">
+                    Last mapping report sent (PointCloud2):
+                    <div style="padding-left: 10px;">
+                    time sent: <span id="mapping_cloud_report_last_sent_raw">-</span>
+                    <br>
+                    time elapsed since last sent: <span id="mapping_cloud_report_last_sent_secs_ago">-</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    Last mapping report sent (OccupancyGrid):
+                    <div style="padding-left: 10px;">
+                    time sent: <span id="mapping_grid_report_last_sent_raw">-</span>
+                    <br>
+                    time elapsed since last sent: <span id="mapping_grid_report_last_sent_secs_ago">-</span>
                     </div>
                 </div>
 
-
-                <div class="card card-body">
-                    <h1>File Manager</h1>
-                    <form autocomplete="on">
-                        <!-- Source Directory: <input id='source_dir' type='text' placeholder='/home/' class='margin-bottom'> -->
-                        <br>User: <input id='user' type='text' placeholder='admin' class='margin-bottom'>
-                        <br>Host: <input id='host' type='text' placeholder='192.168.0.1' class='margin-bottom'>
-                        <br>Password: <input id='password' type='password' placeholder='test123' class='margin-bottom'>
-                        <br>Destination Directory: <input id='dest_dir' type='text' placeholder='/home/example.txt'
-                            class='margin-bottom'>
-                        <br><input id='TransferFile' type='button' value='Copy File' class='margin-bottom'>
-                        <br><label class="btn btn-default btn-file margin-bottom"
-                            style="background-color: white; cursor: pointer;">
-                            Browse Files<input type='file' id='_file' style="display: none;" multiple>
-                        </label>
-                    </form>
+                <div class="col-4">
+                    Last telemetry report sent (PoseArray): <span id="telemetry_report_last_sent">-</span>
+                    <div style="padding-left: 10px;">
+                    time sent: <span id="telemetry_report_last_sent_raw">-</span>
+                    <br>
+                    time elapsed since last sent: <span id="telemetry_report_last_sent_secs_ago">-</span>
+                    </div>
                 </div>
+
+                </div>
+            </div>
+
+
+            <div class="card card-body">
+                <h1>File Manager</h1>
+                <form autocomplete="on">
+                <!-- Source Directory: <input id='source_dir' type='text' placeholder='/home/' class='margin-bottom'> -->
+                <br>User: <input id='user' type='text' placeholder='admin' class='margin-bottom'>
+                <br>Host: <input id='host' type='text' placeholder='192.168.0.1' class='margin-bottom'>
+                <br>Password: <input id='password' type='password' placeholder='test123' class='margin-bottom'>
+                <br>Destination Directory: <input id='dest_dir' type='text' placeholder='/home/example.txt'
+                    class='margin-bottom'>
+                <br><input id='TransferFile' type='button' value='Copy File' class='margin-bottom'>
+                <br><label class="btn btn-default btn-file margin-bottom" style="background-color: white; cursor: pointer;">
+                    Browse Files<input type='file' id='_file' style="display: none;" multiple>
+                </label>
+                </form>
+            </div>
 
 
             </div>
             <div id="Artifact_Page" class="tabcontent">
                 <div class="col-sm-12" robot_name="Base">
                     <div class="row" artifact_id="header">
-                        <span class="badge badge-secondary col-sm-12" style="font-size: 20px"><b>Fused
-                                Artifacts</b></span>
+                        <span class="badge badge-secondary col-sm-12" style="font-size: 20px"><b>Fused Artifacts</b></span>
                     </div>
 
                     <div class="row" artifact_id="title">
-                        <span id="type" class="badge badge-secondary col-sm-2"
-                            style="text-align: center"><b>Type</b></span>
+                        <span id="type" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Type</b></span>
                         <!--
-                <span id="num_seen" class="badge badge-secondary col-sm-1" style="text-align: center"><b># Seen</b></span>
-                -->
-                        <span id="seen_by" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Seen
-                                By</b></span>
-                        <span id="confidence" class="badge badge-secondary col-sm-1"
-                            style="text-align: center"><b>Confidence</b></span>
-                        <span id="position" class="badge badge-secondary col-sm-3"
-                            style="text-align: center"><b>Position</b></span>
+                        <span id="num_seen" class="badge badge-secondary col-sm-1" style="text-align: center"><b># Seen</b></span>
+                        -->
+                        <span id="seen_by" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Seen By</b></span>
+                        <span id="confidence" class="badge badge-secondary col-sm-1" style="text-align: center"><b>Confidence</b></span>
+                        <span id="position" class="badge badge-secondary col-sm-3" style="text-align: center"><b>Position</b></span>
                         <span class="badge badge-secondary col-sm-2" style="text-align: center"><b>DARPA</b></span>
                         <span class="badge badge-secondary col-sm-2" style="text-align: center"><b>Image</b></span>
                     </div>
@@ -281,7 +203,7 @@
                 <div id="robot_artifact_tables"></div>
 
                 <div class="row">
-                    <!-- <div class="col-md-12 artifact_table">
+                    <div class="col-md-12 artifact_table">
                         <h3>Submissions</h3>
                         <table class="table table-bordered" style="background-color: white">
                             <thead>
@@ -293,73 +215,80 @@
                                 </tr>
                             </thead>
                             <tbody id="submission_tbody">
-
+                                <!--
+                                <tr>
+                                    <td>sam</td>
+                                    <td>gillam</td>
+                                    <td>gillamkid@gmail.com</td>
+                                    <td>No points added</td>
+                                </tr>
+                                -->
                             </tbody>
                         </table>
 
-                    </div> -->
-                </div>
-
-
-
-                <!-- Button to Open the Modal -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#NewReportModal"
-                    data-backdrop="static" data-keyboard="false">
-                    New Report
-                </button>
-
-                <!-- New Report Modal -->
-                <div class="modal" id="NewReportModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-
-                            <!-- Modal Header -->
-                            <div class="modal-header">
-                                <h4 class="modal-title">Artifact Submit</h4>
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            </div>
-
-                            <!-- Modal body -->
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <!-- This is for selecting the artifact type -->
-                                    <select class="custom-select" id="edit_type">
-
-                                    </select>
-                                </div>
-                                <div class="form-group form-inline">
-                                    <label style="width: 30px;">X:</label>
-                                    <input id="edit_x_pos" type="text" class="form-control" placeholder="position"
-                                        ng-model="personalDetails.lname" required>
-                                </div>
-                                <div class="form-group form-inline">
-                                    <label style="width: 30px;">Y:</label>
-                                    <input id="edit_y_pos" type="text" class="form-control" placeholder="position"
-                                        ng-model="personalDetails.lname" required>
-                                </div>
-                                <div class="form-group form-inline">
-                                    <label style="width: 30px;">Z:</label>
-                                    <input id="edit_z_pos" type="text" class="form-control" placeholder="position"
-                                        ng-model="personalDetails.lname" required>
-                                </div>
-                                <div class="form-group">
-                                    <input id="edit_notes" type="text" class="form-control" placeholder="notes"
-                                        ng-model="personalDetails.email" required>
-                                </div>
-                            </div>
-
-                            <!-- Modal footer -->
-                            <div class="modal-footer">
-                                <button id="edit_submit" type="button" class="btn btn-primary" onclick="submit_artifact()">Report</button>
-                            </div>
-
-                        </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
-        <!-- </div> -->
+
+
+                        <!-- Button to Open the Modal -->
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#NewReportModal"
+                            data-backdrop="static" data-keyboard="false">
+                            New Report
+                        </button>
+
+                        <!-- New Report Modal -->
+                        <div class="modal" id="NewReportModal">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Artifact Submit</h4>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <!-- Modal body -->
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <!-- This is for selecting the artifact type -->
+                                            <select class="custom-select" id="edit_type">
+
+                                            </select>
+                                        </div>
+                                        <div class="form-group form-inline">
+                                            <label style="width: 30px;">X:</label>
+                                            <input id="edit_x_pos" type="text" class="form-control" placeholder="position"
+                                                ng-model="personalDetails.lname" required>
+                                        </div>
+                                        <div class="form-group form-inline">
+                                            <label style="width: 30px;">Y:</label>
+                                            <input id="edit_y_pos" type="text" class="form-control" placeholder="position"
+                                                ng-model="personalDetails.lname" required>
+                                        </div>
+                                        <div class="form-group form-inline">
+                                            <label style="width: 30px;">Z:</label>
+                                            <input id="edit_z_pos" type="text" class="form-control" placeholder="position"
+                                                ng-model="personalDetails.lname" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <input id="edit_notes" type="text" class="form-control" placeholder="notes"
+                                                ng-model="personalDetails.email" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal footer -->
+                                    <div class="modal-footer">
+                                        <button id="edit_submit" type="button" class="btn btn-primary" onclick="submit_artifact()">Report</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- </div> -->
 
 
 </body>
