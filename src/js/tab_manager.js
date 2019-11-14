@@ -64,7 +64,7 @@ class TabManager {
         // Tab_CmdVelMsg;
 
         this.global_vehicleType = [];
-	this.tasks = [];
+        this.tasks = [];
         this.global_vehicleArtifactsList = [];
         this.prev_time = [];
         this.fusedArtifacts = new Artifact('Base', 0);
@@ -151,18 +151,18 @@ class TabManager {
                 status_dom.html('<font color="red">Disconnected</font>');
             }
 
-	    var task_dom = $('#task_status_' + _this.robot_name[i]);
-	    var task = global_tabManager.tasks[i];
-	    if (task == "Home") {
-	        task_dom.html('<font color="yellow">Going Home</font>');
-	    } else if (task == "Report") {
-	        task_dom.html('<font color="yellow">Reporting</font>');
-	    } else if (task == "Explore") {
-	        task_dom.html('<font color="green">Exploring</font>');
-	    } else {
-		if (task == undefined) task = '';
-	        task_dom.html('<font color="red">' + task + '</font>');
-	    }
+            var task_dom = $('#task_status_' + _this.robot_name[i]);
+            var task = global_tabManager.tasks[i];
+            if (task == "Home") {
+                task_dom.html('<font color="yellow">Going Home</font>');
+            } else if (task == "Report") {
+                task_dom.html('<font color="yellow">Reporting</font>');
+            } else if (task == "Explore") {
+                task_dom.html('<font color="green">Exploring</font>');
+            } else {
+                if (task == undefined) task = '';
+                task_dom.html('<font color="red">' + task + '</font>');
+            }
 
         }
 
@@ -317,11 +317,11 @@ class TabManager {
 
         var last_cloud_report_success = "never";
 
-	global_tabManager.Tab_TaskSub[n].subscribe(function (msg) {
+        global_tabManager.Tab_TaskSub[n].subscribe(function (msg) {
             // Save our current time to update connection status
             // The service call isn't reliable!
             global_tabManager.time_since_last_msg[n] = new Date();
-	    global_tabManager.tasks[n] = msg.data
+            global_tabManager.tasks[n] = msg.data
         });
 
         // Subscriber to point cloud topic for vehicle that publishes to darpa server
@@ -329,7 +329,7 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                if(connected_to_darpa){
+                if (connected_to_darpa) {
                     $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
                         .done(function (json, statusText, xhr) {
                             if (xhr.status == 200) {
@@ -365,7 +365,7 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                if(connected_to_darpa){
+                if (connected_to_darpa) {
                     $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
                         .done(function (json, statusText, xhr) {
                             if (xhr.status == 200) {
@@ -412,7 +412,7 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                if(connected_to_darpa){
+                if (connected_to_darpa) {
                     $.post(SERVER_ROOT + "/state/update/", JSON.stringify(msg))
                         .done(function (json, statusText, xhr) {
                             if (xhr.status == 200) {
@@ -453,28 +453,49 @@ class TabManager {
                     <br><span id="task_status_${this.robot_name[n]}"></span>
                 </a>
             </li>`);
-        
+
         // This is for creatiung the control card for each robot on the sidebar
         $('#controls_bar_inner').prepend(`
         <li class="quick_control">
-        <h4>${this.robot_name[n]}</h4>
-        <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_start"
-            onclick="send_signal_to('${this.robot_name[n]}', 'control', 'start')"> 
-            Start 
-        </button>
-        <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_radio"
-            onclick="send_signal_to('${this.robot_name[n]}', 'control', 'start')"> 
-            Start 
-        </button><br>
-        <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop" onclick="send_signal_to('${this.robot_name[n]}', 'control', 'stop')">
-            Stop
-        </button><br>
-        <button type='button' class="button btn-warning btn-sm" id="${this.robot_name[n]}_home" onclick="send_signal_to('${this.robot_name[n]}', 'control', 'go_home')"> go
-            home
-        </button><br>
-    </li>
+            <h4>${this.robot_name[n]}</h4>
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
+                onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)"> 
+                Start 
+            </button>
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop" 
+                onclick="send_signal_to('${this.robot_name[n]}', 'estop', true)">
+                Stop
+            </button>
+            <br>
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_explore" 
+                onclick="send_signal_to('${this.robot_name[n]}', 'task', 'Explore')"> 
+                Explore
+            </button>
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home" 
+                onclick="send_signal_to('${this.robot_name[n]}', 'task', 'Home')"> 
+                go home
+            </button>
+            <br>
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off" 
+                onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', flase)"> 
+                E-stop disabled
+            </button>
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_estop" 
+                onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', true)"> 
+                E-stop
+            </button>
+            <br>
+            <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_radio"
+                onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)"> 
+                Radio reset
+            </button>
+            <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
+                onclick="send_signal_to('${this.robot_name[n]}', 'control', 'teleop')"> 
+                teleop 
+            </button><br>
+        </li>
         `)
- 
+
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");
         tab_content.setAttribute("id", this.robot_name[n]);
@@ -640,57 +661,57 @@ class TabManager {
         // robot_info.appendChild(control_status);
         // robot_info.appendChild(battery_voltage);
 
-    //     var radio_btn = document.createElement("BUTTON");
-    //     radio_btn.setAttribute("id", this.robot_name[n] + "_radio");
-    //     radio_btn.setAttribute("type", "button");
-    //     radio_btn.setAttribute("class", "btn btn-success btn-space");
-    //     radio_btn.innerText = "Radio Reset";
+        //     var radio_btn = document.createElement("BUTTON");
+        //     radio_btn.setAttribute("id", this.robot_name[n] + "_radio");
+        //     radio_btn.setAttribute("type", "button");
+        //     radio_btn.setAttribute("class", "btn btn-success btn-space");
+        //     radio_btn.innerText = "Radio Reset";
 
-    //     var estop_btn = document.createElement("BUTTON");
-    //     estop_btn.setAttribute("id", this.robot_name[n] + "_estop");
-    //     estop_btn.setAttribute("type", "button");
-    //     estop_btn.setAttribute("class", "btn btn-danger btn-space");
-    //     estop_btn.innerText = "Emergency Stop";
+        //     var estop_btn = document.createElement("BUTTON");
+        //     estop_btn.setAttribute("id", this.robot_name[n] + "_estop");
+        //     estop_btn.setAttribute("type", "button");
+        //     estop_btn.setAttribute("class", "btn btn-danger btn-space");
+        //     estop_btn.innerText = "Emergency Stop";
 
-	//     var estop_off_btn = document.createElement("BUTTON");
-    //     estop_off_btn.setAttribute("id", this.robot_name[n] + "_estop_off");
-    //     estop_off_btn.setAttribute("type", "button");
-    //     estop_off_btn.setAttribute("class", "btn btn-success btn-space");
-    //     estop_off_btn.innerText = "Emergency Stop Disabled";
+        //     var estop_off_btn = document.createElement("BUTTON");
+        //     estop_off_btn.setAttribute("id", this.robot_name[n] + "_estop_off");
+        //     estop_off_btn.setAttribute("type", "button");
+        //     estop_off_btn.setAttribute("class", "btn btn-success btn-space");
+        //     estop_off_btn.innerText = "Emergency Stop Disabled";
 
-	//     var stop_btn = document.createElement("BUTTON");
-    //     stop_btn.setAttribute("id", this.robot_name[n] + "_stop");
-    //     stop_btn.setAttribute("type", "button");
-    //     stop_btn.setAttribute("class", "btn btn-danger btn-space");
-    //     stop_btn.innerText = "Stop Vehicle";
+        //     var stop_btn = document.createElement("BUTTON");
+        //     stop_btn.setAttribute("id", this.robot_name[n] + "_stop");
+        //     stop_btn.setAttribute("type", "button");
+        //     stop_btn.setAttribute("class", "btn btn-danger btn-space");
+        //     stop_btn.innerText = "Stop Vehicle";
 
-    //     var startup_btn = document.createElement("BUTTON");
-    //     startup_btn.setAttribute("id", this.robot_name[n] + "_startup");
-    //     startup_btn.setAttribute("type", "button");
-    //     startup_btn.setAttribute("class", "btn btn-success btn-space");
-    //     startup_btn.innerText = "Start Mission";
+        //     var startup_btn = document.createElement("BUTTON");
+        //     startup_btn.setAttribute("id", this.robot_name[n] + "_startup");
+        //     startup_btn.setAttribute("type", "button");
+        //     startup_btn.setAttribute("class", "btn btn-success btn-space");
+        //     startup_btn.innerText = "Start Mission";
 
-	// // estop_status  sw_state (1=stop -- the estop!, 0=go), radio_state (0=go/enabled)
+        // // estop_status  sw_state (1=stop -- the estop!, 0=go), radio_state (0=go/enabled)
 
-    //     var home_btn = document.createElement("BUTTON");
-    //     home_btn.setAttribute("id", this.robot_name[n] + "_home");
-    //     home_btn.setAttribute("type", "button");
-    //     home_btn.setAttribute("class", "btn btn-danger btn-space");
-    //     home_btn.innerText = "Return Home";
+        //     var home_btn = document.createElement("BUTTON");
+        //     home_btn.setAttribute("id", this.robot_name[n] + "_home");
+        //     home_btn.setAttribute("type", "button");
+        //     home_btn.setAttribute("class", "btn btn-danger btn-space");
+        //     home_btn.innerText = "Return Home";
 
-    //     var explore_btn = document.createElement("BUTTON");
-    //     explore_btn.setAttribute("id", this.robot_name[n] + "_explore");
-    //     explore_btn.setAttribute("type", "button");
-    //     explore_btn.setAttribute("class", "btn btn-success btn-space");
-    //     explore_btn.innerText = "Explore";
+        //     var explore_btn = document.createElement("BUTTON");
+        //     explore_btn.setAttribute("id", this.robot_name[n] + "_explore");
+        //     explore_btn.setAttribute("type", "button");
+        //     explore_btn.setAttribute("class", "btn btn-success btn-space");
+        //     explore_btn.innerText = "Explore";
 
-    //     top_card_body.appendChild(radio_btn);
-    //     top_card_body.appendChild(estop_btn);
-    //     top_card_body.appendChild(estop_off_btn);
-    //     top_card_body.appendChild(stop_btn);
-    //     top_card_body.appendChild(startup_btn);
-    //     top_card_body.appendChild(home_btn);
-    //     top_card_body.appendChild(explore_btn);
+        //     top_card_body.appendChild(radio_btn);
+        //     top_card_body.appendChild(estop_btn);
+        //     top_card_body.appendChild(estop_off_btn);
+        //     top_card_body.appendChild(stop_btn);
+        //     top_card_body.appendChild(startup_btn);
+        //     top_card_body.appendChild(home_btn);
+        //     top_card_body.appendChild(explore_btn);
 
         chart_wrap.appendChild(chart);
 
@@ -731,7 +752,7 @@ class TabManager {
         var robot_artifact_header = document.createElement("SPAN");
         robot_artifact_header.setAttribute("class", "badge badge-secondary col-sm-12");
         robot_artifact_header.setAttribute("style", "font-size: 20px")
-        
+
         var robot_artifact_header_inner = document.createElement("DIV");
         robot_artifact_header_inner.setAttribute("class", "panel panel-default");
         robot_artifact_header_inner.innerHTML = `
