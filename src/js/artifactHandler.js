@@ -2,24 +2,6 @@
  * Artifact class for handling, sending, and checking known artifacts
  */
 
-// How can this be made not a fixed length?
-var fs = require("fs");
-// you might wnat to change where the artifact file is
-// It works by putting each artifact on a new line
-var artifact_file = fs.readFileSync("js/artifacts.txt", "utf-8");
-var artifacts = artifact_file.split("\n")
-var ARTIFACT_ARR_LEN = artifacts.length
-function populateOpts(){
-    var modal_options = document.getElementById("edit_type");
-    for(var i = 0; i < artifacts.length; i++){
-        var artifact = artifacts[i];
-        var option = document.createElement("option");
-        option.text = artifact;
-        option.value = artifact;
-        modal_options.add(option);
-    }
-    console.log("made artifacts array")
-}
 
 class Artifact {
     constructor(name, n) {
@@ -29,6 +11,7 @@ class Artifact {
         this.artifactsList = [];
         this.artifactImages = [];
         this.reportedArtifacts = [];
+        this.savedArtifacts = recover_artifacts(name);
 
         if (!this.read_file()) {
             for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
@@ -44,7 +27,7 @@ class Artifact {
 
         this.artifact_tracker = [];
         this.artifact_position = [];
-	this.artifact_type = [];
+	    this.artifact_type = [];
         // this.artifact_num_seen = [];
         this.artifact_seen_by = [];
         this.artifact_confidence = [];
@@ -230,6 +213,16 @@ class Artifact {
 
             let color = this.color_artifacts(type);
             this.artifact_type[id].style.color = color;
+
+            if(this.savedArtifacts.includes(type) == false){
+                var position_string = `${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}`;
+
+                log_robot_artifacts(this.robot_name, type, position_string);
+                this.savedArtifacts.push(type)
+                console.log(`saved artifact ${type}`)
+            }
+            
+
         }
     }
 
@@ -441,8 +434,7 @@ class Artifact {
         }
         // console.log("set artifacts")
         if (update) {
-            console.log("update was true")
-            this.save_file();
+            //this.save_file();
             this.updateDisplay();
         }
     }
@@ -480,13 +472,13 @@ class Artifact {
         return this.artifactsList;
     }
 
-    save_file(data) {
-       fs.writeFileSync(`js/${this.robot_name}reported_artifacts.txt`, `${data}\n`, "utf-8");
+    // save_file(data) {
+    //    fs.writeFileSync(`js/${this.robot_name}_reported.txt`, `${data}\n`, "utf-8");
 
-    }
+    // }
 
     read_file() {
-        var robot_reported = `js/${this.robot_name}reported_artifacts.txt`;
+        var robot_reported = `js/${this.robot_name}_reported.txt`;
         if(fs.existsSync(robot_reported)){
             var reported_artifact_file = fs.readFileSync(robot_reported, "utf-8");
             this.reportedArtifacts = artifact_file.split("\n");
@@ -565,13 +557,16 @@ async function submit_artifact(id, _this) {
             }
         }
     }
+    // Variables used for logging a little later and for submission now
     var position_string =  `${$('#edit_x_pos').val()}, ${$('#edit_y_pos').val()}, ${$('#edit_z_pos').val()}`;
-
+    var notes = $('#edit_notes ').val();
+    var type = $('#edit_type').val();
+    
     $('#submission_tbody').append(`
     <tr>
-        <td>${$('#edit_type').val()}</td>
+        <td>${type}</td>
         <td>${position_string}</td>
-        <td>${$('#edit_notes ').val()}</td>
+        <td>${notes}</td>
         <td id="${position_string}">No result yet</td>
     </tr>`);
 
@@ -589,76 +584,71 @@ async function submit_artifact(id, _this) {
     // ==================================================
     $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
         .done(function (json) {
-            // This is for testing a bad artifact and darpa responding with "0"
-            if(data.type == "return 0"){
-                 json.score_change = 0;
-            }
-            // This is where we get the darpa score back - specifically json.score_change
-
-            // Write overall reported 
+            log_submitted_artifacts(type, position_string, notes, json.score_change);
+            update_submitted_table(json, position_string, data);
             
-
-            var submission_result = "+" + json.score_change + " points";
-            // Here down is mostly formatting
-            $("[id='" + position_string + "']").text(submission_result);
-
-            var color_class = 'table-danger';
-            if(json.score_change > 0){
-                color_class = 'table-success';
-            }
-            $("[id='" + position_string + "']").parent().addClass(color_class);
-
-            // Put the fused artifact in the fused artifact tab
-            var fused_div = document.getElementById("fused_artifacts");
-            
-            // document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
-
-            // if (json.score_change > 0) {
-            //     document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
-            // }
-
-            // if (robo_name == "Base") {
-            //     for (let id2 in org_artifacts) {
-            //         let artifact = org_artifacts[id2];
-            //         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].submitted = true;
-            //         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].result = json.score_change;
-            //         let robot_name = global_tabManager.global_vehicleArtifactsList[artifact.n].robot_name;
-            //         if (json.score_change > 0) {
-            //             document.getElementById("submit_" + robot_name + "_" + id2).disabled = true;
-            //         }
-
-            //         global_tabManager.global_vehicleArtifactsList[artifact.n].updateDisplay();
-            //     }
-            // } else {
-            //     for (let id2 in global_tabManager.fusedArtifacts.artifactsList) {
-            //         let fartifact = global_tabManager.fusedArtifacts.artifactsList[id2];
-            //         for (let id3 in fartifact.originals) {
-            //             if (id3 == id) {
-            //                 fartifact.submitted = true;
-            //                 fartifact.result = json.score_change;
-            //                 if (json.score_change > 0) {
-            //                     document.getElementById("submit_Base_" + id2).disabled = true;
-            //                 }
-            //             }
-            //         }
-            //     }
-            //     global_tabManager.fusedArtifacts.updateDisplay();
-            // }
-            if(json.score_change > 0){
-                $('#' + position_string).html('Success');
-                log_submitted_artifacts(data.type)
-            }
         });
 
     $('#NewReportModal').modal('hide');
 }
 
-// This logs artifacts that have been submitte dto darpa
-function log_submitted_artifacts(artifact){
-    fs.writeFile('DARPA_reported.txt', `${artifact}\n`)
+// Update the submitted table
+function update_submitted_table(json, position_string, data){
+    // This is for testing a bad artifact and darpa responding with "0"
+    if(data.type == "return 0"){
+        json.score_change = 0;
+   }
+   
+   // This is where we get the darpa score back - specifically json.score_change
+
+   // Write overall reported 
+   var submission_result = "+" + json.score_change + " points";
+   // Here down is mostly formatting
+   $("[id='" + position_string + "']").text(submission_result);
+
+   var color_class = 'table-danger';
+   if(json.score_change > 0){
+       color_class = 'table-success';
+   }
+   $("[id='" + position_string + "']").parent().addClass(color_class);
+
+   // Put the fused artifact in the fused artifact tab
+   var fused_div = document.getElementById("fused_artifacts");
+   
+   // document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
+
+   // if (json.score_change > 0) {
+   //     document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
+   // }
+
+   // if (robo_name == "Base") {
+   //     for (let id2 in org_artifacts) {
+   //         let artifact = org_artifacts[id2];
+   //         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].submitted = true;
+   //         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].result = json.score_change;
+   //         let robot_name = global_tabManager.global_vehicleArtifactsList[artifact.n].robot_name;
+   //         if (json.score_change > 0) {
+   //             document.getElementById("submit_" + robot_name + "_" + id2).disabled = true;
+   //         }
+
+   //         global_tabManager.global_vehicleArtifactsList[artifact.n].updateDisplay();
+   //     }
+   // } else {
+   //     for (let id2 in global_tabManager.fusedArtifacts.artifactsList) {
+   //         let fartifact = global_tabManager.fusedArtifacts.artifactsList[id2];
+   //         for (let id3 in fartifact.originals) {
+   //             if (id3 == id) {
+   //                 fartifact.submitted = true;
+   //                 fartifact.result = json.score_change;
+   //                 if (json.score_change > 0) {
+   //                     document.getElementById("submit_Base_" + id2).disabled = true;
+   //                 }
+   //             }
+   //         }
+   //     }
+   //     global_tabManager.fusedArtifacts.updateDisplay();
+   // }
+   if(json.score_change > 0){
+       $('#' + position_string).html('Success');
+   }
 }
-
-// function artifact_listener(msg){
-//     // If recovery files exist, use those
-
-// }

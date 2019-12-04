@@ -1,4 +1,5 @@
 var ANALYZE_TOPICS_LIST_INTERVAL = 2000;
+var teleop_robot = "base"
 
 function send_signal_to(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
@@ -41,6 +42,17 @@ function create_pose_array(robot_name, poses) {
         poses: poses
     })
     Topic.publish(msg);
+}
+
+// This changes what robot we want to teleop to
+function teleop_to(robot_name){
+    teleop_robot = robot_name;
+}
+
+// This needs to run all the time
+function teleop_route(){
+    // listen to /base/twist
+    // send to /teleop_robot/twist
 }
 
 class TabManager {
@@ -473,25 +485,25 @@ class TabManager {
             </button>
             <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home" 
                 onclick="send_signal_to('${this.robot_name[n]}', 'task', 'Home')"> 
-                go home
+                Go Home
             </button>
             <br>
             <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off" 
                 onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', flase)"> 
-                E-stop disabled
+                E-Stop Disabled
             </button>
             <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_estop" 
                 onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', true)"> 
-                E-stop
+                E-Stop
             </button>
             <br>
             <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_radio"
                 onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)"> 
-                Radio reset
+                Radio Reset
             </button>
             <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
-                onclick="send_signal_to('${this.robot_name[n]}', 'control', 'teleop')"> 
-                teleop 
+                onclick="teleop_to('${this.robot_name[n]}')"> 
+                Teleop 
             </button><br>
         </li>
         `)

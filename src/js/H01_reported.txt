@@ -1,0 +1,3 @@
+
+Backpack | 19.88, 1.66, -0.11
+Fire Extinguisher | 102.72, 2.74, -3.94
