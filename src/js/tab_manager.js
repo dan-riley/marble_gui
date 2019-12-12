@@ -47,12 +47,41 @@ function create_pose_array(robot_name, poses) {
 // This changes what robot we want to teleop to
 function teleop_to(robot_name){
     teleop_robot = robot_name;
+    console.log(teleop_robot)
 }
 
 // This needs to run all the time
 function teleop_route(){
+    console.log('rerouting teleop')
     // listen to /base/twist
     // send to /teleop_robot/twist
+    var teleop_listener = new ROSLIB.Topic({
+        ros: ros,
+        name: '/cmd_vel',
+        messageType: 'geometry_msgs/Twist'
+    });
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: `/${teleop_robot}/cmd_vel`,
+        messageType: "geometry_msgs/Twist"
+    })
+    // create a publisher
+    var last_robot = "base"
+    teleop_listener.subscribe(function (message){
+        if(teleop_robot != last_robot){
+            Topic.name = `/${teleop_robot}/cmd_vel`;
+            last_robot = teleop_robot;
+            console.log("changed target robot")
+        }
+        var msg = new ROSLIB.Message(message.data);
+        if(teleop_robot != 'base'){
+            Topic.publish(msg);
+            console
+        } 
+    });
+    
+    
+
 }
 
 class TabManager {

@@ -6,7 +6,8 @@
 
 
 function create_viewer(robot_name) {
-	// var rviz = document.getElementById(robot_name + '_rviz');
+	var rviz = document.getElementById(robot_name + 'markers');
+	
 
 
 	var grid = {
@@ -48,3 +49,4 @@ function create_viewer(robot_name) {
 
 	// rviz.set('config.sidebarOpened', false);
 }
+

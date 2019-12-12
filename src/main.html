@@ -33,6 +33,7 @@
     <script type="text/javascript" src="js/fileCopy.js"></script>
     <script type="text/javascript" src="js/battery.js"></script>
     <script type="text/javascript" src="js/renderjson.js"></script>
+    <script type="text/javascript" src="js/webviz.js"></script>
 
     <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
 
@@ -51,7 +52,8 @@
 
 <!-- <body onload="window.setTimeout(function(){window.setSpeed(1000);},1000);"> -->
 
-<body onload="populateOpts(), get_darpa_artifacts(), what_logs()" style="overflow: hidden;">
+<body onload="populateOpts(), teleop_route(), get_darpa_artifacts(), what_logs(), viewer_init()
+" style="overflow: hidden;">
     <!-- <div class="container"> -->
     <!--! Tab bar at the top of web page that displays all vehicles and default tabs -->
     <div id="connections_bar">
@@ -75,6 +77,9 @@
                     <li class="nav-item">
                         <a class="nav-link" onclick="window.openPage('Artifact_Page')"
                             id="Artifact_Page_nav_link">Artifacts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="window.openPage('Maps')" id="Maps_nav_link">Maps</a>
                     </li>
                 </ul>
             </div>
@@ -128,7 +133,7 @@
 
             <div id="DARPA" class="tabcontent">`
                 <!-- add stuff here for DARPA server -->
-                <!-- <div class="card card-body" style="margin-bottom: 40px;">
+                <div class="card card-body" style="margin-bottom: 40px;">
                     <h1>DARPA Reporting</h1>
                     <p><i>Systems Teams must provide real-time 3D volumetric map updates to the DARPA Command Post at a minimum
                         frequency of one update per 10 seconds.</i></p>
@@ -162,27 +167,25 @@
 
                     </div>
                 </div>
-            </div> -->
-
-
-            <!-- <div class="card card-body">
-                <h1>File Manager</h1>
-                <form autocomplete="on"> -->
-                <!-- Source Directory: <input id='source_dir' type='text' placeholder='/home/' class='margin-bottom'> -->
-                <!-- <br>User: <input id='user' type='text' placeholder='admin' class='margin-bottom'>
-                <br>Host: <input id='host' type='text' placeholder='192.168.0.1' class='margin-bottom'>
-                <br>Password: <input id='password' type='password' placeholder='test123' class='margin-bottom'>
-                <br>Destination Directory: <input id='dest_dir' type='text' placeholder='/home/example.txt'
-                    class='margin-bottom'>
-                <br><input id='TransferFile' type='button' value='Copy File' class='margin-bottom'>
-                <br><label class="btn btn-default btn-file margin-bottom" style="background-color: white; cursor: pointer;">
-                    Browse Files<input type='file' id='_file' style="display: none;" multiple>
-                </label>
-                </form>
-            </div> -->
             </div>
 
+            <!-- This is where the rviz map lives -->
+            <div id="Maps" class="tabcontent">
+                <h1>Map of deployment</h1>
+                <!-- <rviz id='rviz'>
 
+                </rviz> -->
+                <!-- <ros-websocket auto ros="{{ros}}" url="{{url}}"></ros-websocket>
+                <ros-rviz ros="{{ros}}" websocket-url="{{url}}"></ros-rviz> -->
+                <dom-bind id="t">
+                    <template is="dom-bind">
+                      <ros-websocket auto id="websocket" url="{{url}}" ros="{{ros}}"></ros-websocket>
+                      <ros-rviz id="rviz" ros="{{ros}}" websocket-url="{{url}}"></ros-rviz>
+                    </template>
+                  </dom-bind>
+            </div>
+
+            <!-- It is what it says, this is where the artifacts show up and where they are submitted thorugh -->
             <div id="Artifact_Page" class="tabcontent">
                 <div class="section_div">
                     <h3>Fused Artifacts</h3>
@@ -227,6 +230,7 @@
                                         <th>Response</th>
                                     </tr>
                                 </thead>
+                                <!-- Used for darpa artifact submission -->
                                 <tbody id="submission_tbody">
                                     <!--
                                     <tr>
@@ -337,6 +341,19 @@
             </div>
 
         </div>
+
+        <!-- <div id="Rviz_Viewer">
+            <div id="rviz">
+                <dom-bind>
+                    <template id='dom-bind'>
+                        <ros-websocket auto id="websocket" ros="{{ros}}" url="{{url}}"></ros-websocket>
+                        <ros-rviz ros="{{ros}}" websocket-url="{{url}}"></ros-rviz>
+                    </template>
+                </dom-bind>
+            </div>
+        </div> -->
+        <!-- This is where the vizualizer should go -->
+       
     </div>
 
 
