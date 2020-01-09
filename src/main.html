@@ -33,7 +33,7 @@
     <script type="text/javascript" src="js/fileCopy.js"></script>
     <script type="text/javascript" src="js/battery.js"></script>
     <script type="text/javascript" src="js/renderjson.js"></script>
-    <script type="text/javascript" src="js/webviz.js"></script>
+    <!-- <script type="text/javascript" src="js/webviz.js"></script> -->
 
     <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
 
@@ -50,9 +50,10 @@
 
 </head>
 
+
 <!-- <body onload="window.setTimeout(function(){window.setSpeed(1000);},1000);"> -->
 
-<body onload="populateOpts(), teleop_route(), get_darpa_artifacts(), what_logs(), viewer_init()
+<body onload="populateOpts(), teleop_route(), get_darpa_artifacts(), what_logs()
 " style="overflow: hidden;">
     <!-- <div class="container"> -->
     <!--! Tab bar at the top of web page that displays all vehicles and default tabs -->
@@ -78,9 +79,9 @@
                         <a class="nav-link" onclick="window.openPage('Artifact_Page')"
                             id="Artifact_Page_nav_link">Artifacts</a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" onclick="window.openPage('Maps')" id="Maps_nav_link">Maps</a>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </nav>
@@ -169,21 +170,12 @@
                 </div>
             </div>
 
-            <!-- This is where the rviz map lives -->
+            <!-- This is where the rviz map lives
             <div id="Maps" class="tabcontent">
                 <h1>Map of deployment</h1>
-                <!-- <rviz id='rviz'>
-
-                </rviz> -->
-                <!-- <ros-websocket auto ros="{{ros}}" url="{{url}}"></ros-websocket>
-                <ros-rviz ros="{{ros}}" websocket-url="{{url}}"></ros-rviz> -->
-                <dom-bind id="t">
-                    <template is="dom-bind">
-                      <ros-websocket auto id="websocket" url="{{url}}" ros="{{ros}}"></ros-websocket>
-                      <ros-rviz id="rviz" ros="{{ros}}" websocket-url="{{url}}"></ros-rviz>
-                    </template>
-                  </dom-bind>
-            </div>
+                <button class="btn btn-success" onclick="viewer_init(), this.disabled=true">Start viewer</button>
+                <div id="markers"></div>
+            </div> -->
 
             <!-- It is what it says, this is where the artifacts show up and where they are submitted thorugh -->
             <div id="Artifact_Page" class="tabcontent">

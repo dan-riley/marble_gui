@@ -46,13 +46,18 @@ function create_pose_array(robot_name, poses) {
 
 // This changes what robot we want to teleop to
 function teleop_to(robot_name){
-    teleop_robot = robot_name;
-    console.log(teleop_robot)
+    var tele_btn = document.getElementById(`${robot_name}_teleop`);
+    if(tele_btn.value == "Teleop"){
+        teleop_robot = robot_name;
+        tele_btn.value = "Disable Teleop";
+    }else{
+        teleop_robot = "Base";
+        tele_btn.value = "Teleop";
+    }
 }
 
 // This needs to run all the time
 function teleop_route(){
-    console.log('rerouting teleop')
     // listen to /base/twist
     // send to /teleop_robot/twist
     var teleop_listener = new ROSLIB.Topic({
@@ -80,6 +85,16 @@ function teleop_route(){
         } 
     });
     
+function mission_starter(){
+    var tele_btn = document.getElementById(`${robot_name}_teleop`);
+    if(tele_btn.value == "Teleop"){
+        teleop_robot = robot_name;
+        tele_btn.value = "Disable Teleop";
+    }else{
+        teleop_robot = "Base";
+        tele_btn.value = "Teleop";
+    }
+}
     
 
 }
@@ -530,10 +545,8 @@ class TabManager {
                 onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)"> 
                 Radio Reset
             </button>
-            <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
-                onclick="teleop_to('${this.robot_name[n]}')"> 
-                Teleop 
-            </button><br>
+            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
+                onclick="teleop_to('${this.robot_name[n]}')" value="Teleop"></input><br>
         </li>
         `)
 
