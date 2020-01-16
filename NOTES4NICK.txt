@@ -66,3 +66,8 @@ when an artifact gets fused, send a message to the marker server with the releve
 
 change the processFeedback function to boardcast the new pose of the marker when it changes to the right toppic for the js to listen and update 
 in the gui
+
+
+
+ip
+172.31.0.1/16 cidr 16

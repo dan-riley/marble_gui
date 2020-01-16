@@ -1,9 +1,10 @@
 var ANALYZE_TOPICS_LIST_INTERVAL = 2000;
+var teleop_robot = "base"
 
 function send_signal_to(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: "/" + robot_name + "/" + signal,
+        name: `/${robot_name}/${signal}`,
         messageType: "std_msgs/Bool"
     });
     var msg = new ROSLIB.Message({
@@ -15,7 +16,7 @@ function send_signal_to(robot_name, signal, value) {
 function send_string_to(robot_name, signal, text) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: "/" + robot_name + "/" + signal,
+        name: `/${robot_name}/${signal}`,
         messageType: "std_msgs/String"
     });
     var msg = new ROSLIB.Message({
@@ -30,7 +31,7 @@ function create_pose_array(robot_name, poses) {
 
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: "/" + robot_name + "/posearray",
+        name: `/${robot_name}/posearray`,
         messageType: "geometry_msgs/PoseArray"
     })
     var msg = new ROSLIB.Message({
@@ -41,6 +42,62 @@ function create_pose_array(robot_name, poses) {
         poses: poses
     })
     Topic.publish(msg);
+}
+
+// This changes what robot we want to teleop to
+function teleop_to(robot_name){
+    var tele_btn = document.getElementById(`${robot_name}_teleop`);
+    if(tele_btn.value == "Teleop"){
+        teleop_robot = robot_name;
+        tele_btn.value = "Disable Teleop";
+    }else{
+        teleop_robot = "Base";
+        tele_btn.value = "Teleop";
+    }
+}
+
+// This needs to run all the time
+function teleop_route(){
+    // listen to /base/twist
+    // send to /teleop_robot/twist
+    var teleop_listener = new ROSLIB.Topic({
+        ros: ros,
+        name: '/cmd_vel',
+        messageType: 'geometry_msgs/Twist'
+    });
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        // HEY YOU CHANGED THIS BEFORE THE TEST ON THE 15th
+        name: `/${teleop_robot}/joy_cmd_vel`,
+        messageType: "geometry_msgs/Twist"
+    })
+    // create a publisher
+    var last_robot = "base"
+    teleop_listener.subscribe(function (message){
+        if(teleop_robot != last_robot){
+            Topic.name = `/${teleop_robot}/cmd_vel`;
+            last_robot = teleop_robot;
+            console.log("changed target robot")
+        }
+        var msg = new ROSLIB.Message(message.data);
+        if(teleop_robot != 'base'){
+            Topic.publish(msg);
+            console
+        } 
+    });
+    
+function mission_starter(){
+    var tele_btn = document.getElementById(`${robot_name}_teleop`);
+    if(tele_btn.value == "Teleop"){
+        teleop_robot = robot_name;
+        tele_btn.value = "Disable Teleop";
+    }else{
+        teleop_robot = "Base";
+        tele_btn.value = "Teleop";
+    }
+}
+    
+
 }
 
 class TabManager {
@@ -64,7 +121,7 @@ class TabManager {
         // Tab_CmdVelMsg;
 
         this.global_vehicleType = [];
-	this.tasks = [];
+        this.tasks = [];
         this.global_vehicleArtifactsList = [];
         this.prev_time = [];
         this.fusedArtifacts = new Artifact('Base', 0);
@@ -151,18 +208,18 @@ class TabManager {
                 status_dom.html('<font color="red">Disconnected</font>');
             }
 
-	    var task_dom = $('#task_status_' + _this.robot_name[i]);
-	    var task = global_tabManager.tasks[i];
-	    if (task == "Home") {
-	        task_dom.html('<font color="yellow">Going Home</font>');
-	    } else if (task == "Report") {
-	        task_dom.html('<font color="yellow">Reporting</font>');
-	    } else if (task == "Explore") {
-	        task_dom.html('<font color="green">Exploring</font>');
-	    } else {
-		if (task == undefined) task = '';
-	        task_dom.html('<font color="red">' + task + '</font>');
-	    }
+            var task_dom = $('#task_status_' + _this.robot_name[i]);
+            var task = global_tabManager.tasks[i];
+            if (task == "Home") {
+                task_dom.html('<font color="yellow">Going Home</font>');
+            } else if (task == "Report") {
+                task_dom.html('<font color="yellow">Reporting</font>');
+            } else if (task == "Explore") {
+                task_dom.html('<font color="green">Exploring</font>');
+            } else {
+                if (task == undefined) task = '';
+                task_dom.html('<font color="red">' + task + '</font>');
+            }
 
         }
 
@@ -317,11 +374,11 @@ class TabManager {
 
         var last_cloud_report_success = "never";
 
-	global_tabManager.Tab_TaskSub[n].subscribe(function (msg) {
+        global_tabManager.Tab_TaskSub[n].subscribe(function (msg) {
             // Save our current time to update connection status
             // The service call isn't reliable!
             global_tabManager.time_since_last_msg[n] = new Date();
-	    global_tabManager.tasks[n] = msg.data
+            global_tabManager.tasks[n] = msg.data
         });
 
         // Subscriber to point cloud topic for vehicle that publishes to darpa server
@@ -329,7 +386,7 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                if(connected_to_darpa){
+                if (connected_to_darpa) {
                     $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
                         .done(function (json, statusText, xhr) {
                             if (xhr.status == 200) {
@@ -348,15 +405,15 @@ class TabManager {
             }
         });
 
-        setInterval(function () {
-            if (last_cloud_report_success != "never") {
-                var now = new Date();
-                $('#mapping_cloud_report_last_sent_secs_ago').text(
-                    Math.round(
-                        (now - last_cloud_report_success) / 1000
-                    ) + ' seconds ago');
-            }
-        }, 1000);
+        // setInterval(function () {
+        //     if (last_cloud_report_success != "never") {
+        //         var now = new Date();
+        //         $('#mapping_cloud_report_last_sent_secs_ago').text(
+        //             Math.round(
+        //                 (now - last_cloud_report_success) / 1000
+        //             ) + ' seconds ago');
+        //     }
+        // }, 1000);
 
         var last_grid_report_success = "never";
 
@@ -365,7 +422,7 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                if(connected_to_darpa){
+                if (connected_to_darpa) {
                     $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
                         .done(function (json, statusText, xhr) {
                             if (xhr.status == 200) {
@@ -384,15 +441,15 @@ class TabManager {
             }
         });
 
-        setInterval(function () {
-            if (last_grid_report_success != "never") {
-                var now = new Date();
-                $('#mapping_grid_report_last_sent_secs_ago').text(
-                    Math.round(
-                        (now - last_grid_report_success) / 1000
-                    ) + ' seconds ago');
-            }
-        }, 1000);
+        // setInterval(function () {
+        //     if (last_grid_report_success != "never") {
+        //         var now = new Date();
+        //         $('#mapping_grid_report_last_sent_secs_ago').text(
+        //             Math.round(
+        //                 (now - last_grid_report_success) / 1000
+        //             ) + ' seconds ago');
+        //     }
+        // }, 1000);
 
         var last_telem_report_success = "never";
 
@@ -412,7 +469,7 @@ class TabManager {
             var now = new Date();
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
-                if(connected_to_darpa){
+                if (connected_to_darpa) {
                     $.post(SERVER_ROOT + "/state/update/", JSON.stringify(msg))
                         .done(function (json, statusText, xhr) {
                             if (xhr.status == 200) {
@@ -434,25 +491,65 @@ class TabManager {
             }
         });
 
-        setInterval(function () {
-            if (last_telem_report_success != "never") {
-                var now = new Date();
-                $('#telemetry_report_last_sent_secs_ago').text(
-                    Math.round(
-                        (now - last_telem_report_success) / 1000
-                    ) + ' seconds ago');
-            }
-        }, 1000);
+        // setInterval(function () {
+        //     if (last_telem_report_success != "never") {
+        //         var now = new Date();
+        //         $('#telemetry_report_last_sent_secs_ago').text(
+        //             Math.round(
+        //                 (now - last_telem_report_success) / 1000
+        //             ) + ' seconds ago');
+        //     }
+        // }, 1000);
 
         // Creating tab at top of screen for selecting robot view
         $('#Robot_Tabs').prepend(`
-            <li class="nav-item" id="` + this.robot_name[n] + `_nav_link" robot_name="` + this.robot_name[n] + `">
-                <a  class="nav-link" onclick="window.openPage('` + this.robot_name[n] + `', ` + n + `)" >
-                    ` + this.robot_name[n] + `
-                    <br><span id="connection_status_` + this.robot_name[n] + `"></span>
-                    <br><span id="task_status_` + this.robot_name[n] + `"></span>
+            <li class="nav-item" id="${this.robot_name[n]}_nav_link" robot_name="${this.robot_name[n]}">
+                <a  class="nav-link" onclick="window.openPage('${this.robot_name[n]}', ${n})" >
+                    ${this.robot_name[n]}
+                    <br><span id="connection_status_${this.robot_name[n]}"></span>
+                    <br><span id="task_status_${this.robot_name[n]}"></span>
                 </a>
             </li>`);
+
+        // This is for creatiung the control card for each robot on the sidebar
+        $('#controls_bar_inner').prepend(`
+        <li class="quick_control">
+            <h4>${this.robot_name[n]}</h4>
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
+                onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)"> 
+                Start 
+            </button>
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop" 
+                onclick="send_signal_to('${this.robot_name[n]}', 'estop', true)">
+                Stop
+            </button>
+            <br>
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_explore" 
+                onclick="send_signal_to('${this.robot_name[n]}', 'task', 'Explore')"> 
+                Explore
+            </button>
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home" 
+                onclick="send_signal_to('${this.robot_name[n]}', 'task', 'Home')"> 
+                Go Home
+            </button>
+            <br>
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off" 
+                onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', flase)"> 
+                E-Stop Disabled
+            </button>
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_estop" 
+                onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', true)"> 
+                E-Stop
+            </button>
+            <br>
+            <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_radio"
+                onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)"> 
+                Radio Reset
+            </button>
+            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
+                onclick="teleop_to('${this.robot_name[n]}')" value="Teleop"></input><br>
+        </li>
+        `)
 
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");
@@ -472,7 +569,7 @@ class TabManager {
             <dom-bind id="t">
                 <template is="dom-bind">
                     <ros-websocket auto id="websocket"ros="{{ros}}"url="ws://localhost:9090"></ros-websocket>
-                    <ros-rviz id="` + this.robot_name[n] + `_rviz" ros="{{ros}}"websocket-url="ws://localhost:9090"></ros-rviz>
+                    <ros-rviz id="${this.robot_name[n]}_rviz" ros="{{ros}}"websocket-url="ws://localhost:9090"></ros-rviz>
                 </template>
             </dom-bind>`.trim();
 
@@ -601,75 +698,75 @@ class TabManager {
         top_card_header.setAttribute("class", "card-header");
         top_card_header.innerText = global_tabManager.robot_name[n];
 
-        var top_card_body = document.createElement("DIV");
-        var robot_info = document.createElement("DIV");
-        top_card_body.setAttribute("class", "card-body");
-        top_card_body.setAttribute("id", global_tabManager.robot_name[n] + "_buttons");
-        robot_info.setAttribute("class", "card-body");
+        // var top_card_body = document.createElement("DIV");
+        // var robot_info = document.createElement("DIV");
+        // top_card_body.setAttribute("class", "card-body");
+        // top_card_body.setAttribute("id", global_tabManager.robot_name[n] + "_buttons");
+        // robot_info.setAttribute("class", "card-body");
 
         top_card.appendChild(top_card_header);
-        top_card.appendChild(top_card_body);
-        top_card.appendChild(robot_info);
+        // top_card.appendChild(top_card_body);
+        // top_card.appendChild(robot_info);
 
 
         var battery_voltage = document.createElement("P");
         battery_voltage.innerHTML = `Voltage: <span id="` + global_tabManager.robot_name[n] + `_voltage"></span>`;
         var control_status = document.createElement("P");
         control_status.innerHTML = `Status: <span id="` + global_tabManager.robot_name[n] + `_status"></span>`;
-        robot_info.appendChild(control_status);
-        robot_info.appendChild(battery_voltage);
+        // robot_info.appendChild(control_status);
+        // robot_info.appendChild(battery_voltage);
 
-        var radio_btn = document.createElement("BUTTON");
-        radio_btn.setAttribute("id", this.robot_name[n] + "_radio");
-        radio_btn.setAttribute("type", "button");
-        radio_btn.setAttribute("class", "btn btn-success btn-space");
-        radio_btn.innerText = "Radio Reset";
+        //     var radio_btn = document.createElement("BUTTON");
+        //     radio_btn.setAttribute("id", this.robot_name[n] + "_radio");
+        //     radio_btn.setAttribute("type", "button");
+        //     radio_btn.setAttribute("class", "btn btn-success btn-space");
+        //     radio_btn.innerText = "Radio Reset";
 
-        var estop_btn = document.createElement("BUTTON");
-        estop_btn.setAttribute("id", this.robot_name[n] + "_estop");
-        estop_btn.setAttribute("type", "button");
-        estop_btn.setAttribute("class", "btn btn-danger btn-space");
-        estop_btn.innerText = "Emergency Stop";
+        //     var estop_btn = document.createElement("BUTTON");
+        //     estop_btn.setAttribute("id", this.robot_name[n] + "_estop");
+        //     estop_btn.setAttribute("type", "button");
+        //     estop_btn.setAttribute("class", "btn btn-danger btn-space");
+        //     estop_btn.innerText = "Emergency Stop";
 
-	var estop_off_btn = document.createElement("BUTTON");
-        estop_off_btn.setAttribute("id", this.robot_name[n] + "_estop_off");
-        estop_off_btn.setAttribute("type", "button");
-        estop_off_btn.setAttribute("class", "btn btn-success btn-space");
-        estop_off_btn.innerText = "Emergency Stop Disabled";
+        //     var estop_off_btn = document.createElement("BUTTON");
+        //     estop_off_btn.setAttribute("id", this.robot_name[n] + "_estop_off");
+        //     estop_off_btn.setAttribute("type", "button");
+        //     estop_off_btn.setAttribute("class", "btn btn-success btn-space");
+        //     estop_off_btn.innerText = "Emergency Stop Disabled";
 
-	var stop_btn = document.createElement("BUTTON");
-        stop_btn.setAttribute("id", this.robot_name[n] + "_stop");
-        stop_btn.setAttribute("type", "button");
-        stop_btn.setAttribute("class", "btn btn-danger btn-space");
-        stop_btn.innerText = "Stop Vehicle";
+        //     var stop_btn = document.createElement("BUTTON");
+        //     stop_btn.setAttribute("id", this.robot_name[n] + "_stop");
+        //     stop_btn.setAttribute("type", "button");
+        //     stop_btn.setAttribute("class", "btn btn-danger btn-space");
+        //     stop_btn.innerText = "Stop Vehicle";
 
-        var startup_btn = document.createElement("BUTTON");
-        startup_btn.setAttribute("id", this.robot_name[n] + "_startup");
-        startup_btn.setAttribute("type", "button");
-        startup_btn.setAttribute("class", "btn btn-success btn-space");
-        startup_btn.innerText = "Start Mission";
+        //     var startup_btn = document.createElement("BUTTON");
+        //     startup_btn.setAttribute("id", this.robot_name[n] + "_startup");
+        //     startup_btn.setAttribute("type", "button");
+        //     startup_btn.setAttribute("class", "btn btn-success btn-space");
+        //     startup_btn.innerText = "Start Mission";
 
-	// estop_status  sw_state (1=stop -- the estop!, 0=go), radio_state (0=go/enabled)
+        // // estop_status  sw_state (1=stop -- the estop!, 0=go), radio_state (0=go/enabled)
 
-        var home_btn = document.createElement("BUTTON");
-        home_btn.setAttribute("id", this.robot_name[n] + "_home");
-        home_btn.setAttribute("type", "button");
-        home_btn.setAttribute("class", "btn btn-danger btn-space");
-        home_btn.innerText = "Return Home";
+        //     var home_btn = document.createElement("BUTTON");
+        //     home_btn.setAttribute("id", this.robot_name[n] + "_home");
+        //     home_btn.setAttribute("type", "button");
+        //     home_btn.setAttribute("class", "btn btn-danger btn-space");
+        //     home_btn.innerText = "Return Home";
 
-        var explore_btn = document.createElement("BUTTON");
-        explore_btn.setAttribute("id", this.robot_name[n] + "_explore");
-        explore_btn.setAttribute("type", "button");
-        explore_btn.setAttribute("class", "btn btn-success btn-space");
-        explore_btn.innerText = "Explore";
+        //     var explore_btn = document.createElement("BUTTON");
+        //     explore_btn.setAttribute("id", this.robot_name[n] + "_explore");
+        //     explore_btn.setAttribute("type", "button");
+        //     explore_btn.setAttribute("class", "btn btn-success btn-space");
+        //     explore_btn.innerText = "Explore";
 
-        top_card_body.appendChild(radio_btn);
-        top_card_body.appendChild(estop_btn);
-        top_card_body.appendChild(estop_off_btn);
-        top_card_body.appendChild(stop_btn);
-        top_card_body.appendChild(startup_btn);
-        top_card_body.appendChild(home_btn);
-        top_card_body.appendChild(explore_btn);
+        //     top_card_body.appendChild(radio_btn);
+        //     top_card_body.appendChild(estop_btn);
+        //     top_card_body.appendChild(estop_off_btn);
+        //     top_card_body.appendChild(stop_btn);
+        //     top_card_body.appendChild(startup_btn);
+        //     top_card_body.appendChild(home_btn);
+        //     top_card_body.appendChild(explore_btn);
 
         chart_wrap.appendChild(chart);
 
@@ -680,15 +777,15 @@ class TabManager {
         $('#Robot_Pages').prepend(tab_content);
 
         // Need these here in jquery so the events can be cloned properly for the artifact page
-        $('#' + this.robot_name[n] + '_radio').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "radio_reset_cmd", true) });
-        $('#' + this.robot_name[n] + '_estop').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", true) });
-        $('#' + this.robot_name[n] + '_estop_off').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", false) });
-        $('#' + this.robot_name[n] + '_stop').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop", true) });
-        $('#' + this.robot_name[n] + '_startup').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop", false) });
-        $('#' + this.robot_name[n] + '_home').on('click', function () { send_string_to(global_tabManager.robot_name[n], "task", "Home") });
-        $('#' + this.robot_name[n] + '_explore').on('click', function () { send_string_to(global_tabManager.robot_name[n], "task", "Explore") });
+        // $('#' + this.robot_name[n] + '_radio').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "radio_reset_cmd", true) });
+        // $('#' + this.robot_name[n] + '_estop').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", true) });
+        // $('#' + this.robot_name[n] + '_estop_off').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop_cmd", false) });
+        // $('#' + this.robot_name[n] + '_stop').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop", true) });
+        // $('#' + this.robot_name[n] + '_startup').on('click', function () { send_signal_to(global_tabManager.robot_name[n], "estop", false) });
+        // $('#' + this.robot_name[n] + '_home').on('click', function () { send_string_to(global_tabManager.robot_name[n], "task", "Home") });
+        // $('#' + this.robot_name[n] + '_explore').on('click', function () { send_string_to(global_tabManager.robot_name[n], "task", "Explore") });
 
-        create_viewer(this.robot_name[n]);
+        // create_viewer(this.robot_name[n]);
 
         var robot_artifact_container = document.createElement("DIV");
         robot_artifact_container.setAttribute("class", "col-sm-12 artifact_table");
@@ -709,15 +806,15 @@ class TabManager {
 
         var robot_artifact_header = document.createElement("SPAN");
         robot_artifact_header.setAttribute("class", "badge badge-secondary col-sm-12");
-        robot_artifact_header.setAttribute("style", "height: 95px;")
+        robot_artifact_header.setAttribute("style", "font-size: 20px")
 
         var robot_artifact_header_inner = document.createElement("DIV");
         robot_artifact_header_inner.setAttribute("class", "panel panel-default");
         robot_artifact_header_inner.innerHTML = `
-                    <div class="panel-heading" role="tab" id="` + this.robot_name[n] + `_heading">
+                    <div class="panel-heading" role="tab" id="${this.robot_name[n]}_heading">
                         <b class="panel-title">
-                            <a class="" role="button" title="" data-toggle="collapse" href="#` + this.robot_name[n] + `_collapse" aria-expanded="true" aria-controls="collapse1">
-                            ` + this.robot_name[n] + `
+                            <a class="" role="button" title="" data-toggle="collapse" href="#${this.robot_name[n]}_collapse" aria-expanded="true" aria-controls="collapse1">
+                            ${this.robot_name[n]}
                             </a>
                         </b>
                     </div>`;
@@ -740,7 +837,6 @@ class TabManager {
         robot_artifact_container.appendChild(robot_artifact_titles);
 
         // Artifact rows get created by the artifact handler now
-
         let artifact_tracker = document.getElementById("robot_artifact_tables");
         // Creates a DIV element that is placed either on the left or right side of the screen depending on how many robots there currently are
         if (n % 2 == 0) {
@@ -756,11 +852,12 @@ class TabManager {
         }
 
         // Buttons have to be added here or jquery doesn't see it in the DOM
-        $('#' + this.robot_name[n] + '_buttons').clone(true, true).appendTo('#' + this.robot_name[n] + '_buttons_container');
+        // $('#' + this.robot_name[n] + '_buttons').clone(true, true).appendTo('#' + this.robot_name[n] + '_buttons_container');
 
         // Sets up all objects for vehicle artifact manager
         this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n], n);
 
+        // Subscribes to artifact messages
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
             // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
             global_tabManager.global_vehicleArtifactsList[n].set_artifacts(msg.artifacts);

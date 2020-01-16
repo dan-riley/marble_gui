@@ -14,7 +14,7 @@
   "author": "Blake McHale",
   "license": "ISC",
   "dependencies": {
-    "csv-parser": "^2.3.0",
+    "csv-parser": "^2.3.2",
     "csv-writer": "^1.5.0",
     "electron": "^4.2.8",
     "fs": "0.0.1-security",
@@ -22,6 +22,7 @@
     "net": "^1.0.2",
     "node-ssh": "^5.1.2",
     "path": "^0.12.7",
+    "polymer-cli": "^1.9.11",
     "tru": "^1.0.0"
   }
 }

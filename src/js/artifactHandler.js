@@ -2,8 +2,6 @@
  * Artifact class for handling, sending, and checking known artifacts
  */
 
-// Fixed array size determined by University of Colorado Denver, meant to reduce overall maintenance across network
-var ARTIFACT_ARR_LEN = 80;
 
 class Artifact {
     constructor(name, n) {
@@ -13,6 +11,7 @@ class Artifact {
         this.artifactsList = [];
         this.artifactImages = [];
         this.reportedArtifacts = [];
+        this.savedArtifacts = recover_artifacts(name);
 
         if (!this.read_file()) {
             for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
@@ -28,7 +27,7 @@ class Artifact {
 
         this.artifact_tracker = [];
         this.artifact_position = [];
-	this.artifact_type = [];
+	    this.artifact_type = [];
         // this.artifact_num_seen = [];
         this.artifact_seen_by = [];
         this.artifact_confidence = [];
@@ -46,7 +45,10 @@ class Artifact {
         this.artifact_image[id] = this.artifact_tracker[id].querySelector("[id = image]");
     }
 
+    // Add artifact to page
     add_artifact(id) {
+        // Add artifact to page
+        console.log("adding artifact")
         let robot_artifact_tracker = document.createElement("DIV");
         robot_artifact_tracker.setAttribute("class", "row");
         robot_artifact_tracker.setAttribute("artifact_id", id);
@@ -117,7 +119,9 @@ class Artifact {
     }
 
     updateDisplay() {
+        console.log("updating the display")
         var artifact_page = document.getElementById("Artifact_Page");
+        // Make this work - its looking for the wong thing
         var robot_artifacts = artifact_page.querySelector("[robot_name = '" + this.robot_name + "']");
         for (let id in this.artifactsList) {
             let artifact = this.artifactsList[id];
@@ -209,6 +213,16 @@ class Artifact {
 
             let color = this.color_artifacts(type);
             this.artifact_type[id].style.color = color;
+
+            if(this.savedArtifacts.includes(type) == false){
+                var position_string = `${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}`;
+
+                log_robot_artifacts(this.robot_name, type, position_string);
+                this.savedArtifacts.push(type)
+                console.log(`saved artifact ${type}`)
+            }
+            
+
         }
     }
 
@@ -361,6 +375,7 @@ class Artifact {
     }
 
     set_artifacts(msg) {
+        // console.log("begining of setting artifact")
         let update = false;
         for (let i = 0; i < msg.length; i++) {
             // Remap the artifacts to the DARPA required names
@@ -417,144 +432,37 @@ class Artifact {
                 this.fuse_artifacts(id, false);
             }
         }
-
+        // console.log("set artifacts")
         if (update) {
-            this.save_file();
+            //this.save_file();
             this.updateDisplay();
         }
     }
 
     open_edit_submit_modal(id){
+        console.log("inside the submit modal");
         $('#edit_x_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).x.toFixed(2));
         $('#edit_y_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).y.toFixed(2));
         $('#edit_z_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).z.toFixed(2));
         $("#edit_type").val(this.artifact_type[id].innerText).change();
 
-        var my_this = this
-        $('#edit_submit').off('click').on('click', function () {
-            my_this.submit_artifact(id, my_this);
+        // This is here for a reason as part of a scope change
+        var different_scope_this = this;
+        // This is called by the submit button on the modal
+        $('#edit_submit').click(function () {
+            console.log("submit button");
+            different_scope_this.submit_artifact(id, different_scope_this);
         });
 
-        $('#myModal').modal({backdrop: 'static', keyboard: false});
-        $('#myModal').modal('show');
+        $('#NewReportModal').modal({backdrop: 'static', keyboard: false});
+        $('#NewReportModal').modal('show');
     }
 
-    async submit_artifact(id, _this) {
-        var robo_name = _this.get_robot_name();
 
-        var data = {
-            "x": parseFloat($('#edit_x_pos').val()),
-            "y": parseFloat($('#edit_y_pos').val()),
-            "z": parseFloat($('#edit_z_pos').val()),
-            "type": $('#edit_type').val()
-        };
-
-        // Old code for finding the highest confidence.  We're doing this using
-        // base_artifact_fusion.  If this comes back, need to check code for new layout
-        var findBest = false;
-
-        if (findBest == true) {
-            var vehicle_Artifacts_length = this.artifactsList.length;
-            var other_location = new Array(vehicle_Artifacts_length);
-            var best_prob = parseFloat(this.artifact_confidence[row_id].getAttribute("value"));
-            for (let i = 0; i < vehicle_Artifacts_length; i++) {
-                if (vehicle_Artifacts[i].get_robot_name() == robo_name) {
-                    continue;
-                }
-                let other_artifactsList = vehicle_Artifacts[i].get_artifactsList();
-                let other_artifactsList_length = other_artifactsList.length;
-                for (let k = 0; k < other_artifactsList_length; k++) {
-                    if (other_artifactsList[k] == null) {
-                        break;
-                    }
-                    if (other_artifactsList[k].obj_class != this.artifactsList[row_id].obj_class) {
-                        continue;
-                    }
-                    let dist_x = other_artifactsList[k].position.x - data.x;
-                    let dist_y = other_artifactsList[k].position.y - data.y;
-
-                    if (other_artifactsList[k].obj_prob > best_prob && Math.hypot(dist_x, dist_y) < this.dist_threshhold) {
-                        console.log("Choosing higher chance object");
-                        data.x = other_artifactsList[k].position.x;
-                        data.y = other_artifactsList[k].position.y;
-                        data.z = other_artifactsList[k].position.z;
-                        other_location[i] = k;
-                    } else if (Math.hypot(dist_x, dist_y) < this.dist_threshhold) {
-                        other_location[i] = k;
-                    }
-                }
-            }
-        }
-        var position_string =  $('#edit_x_pos').val() + ', ' + $('#edit_y_pos').val() + ', ' + $('#edit_z_pos').val();
-
-        $('#submission_tbody').append(`
-        <tr>
-            <td>` + $('#edit_type').val() + `</td>
-            <td>` + position_string + `</td>
-            <td>` + $('#edit_notes ').val() + `</td>
-            <td id="` + position_string + `">No result yet</td>
-        </tr>`);
-
-        var org_artifacts = _this.artifactsList[id].originals;
-        console.log("submitting artifact to DARPA server. Waiting for response...");
-        let t = new Date();
-        t.setSeconds(t.getSeconds() - 1);
-        if (t <= scoringTimer) {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            scoringTimer = new Date();
-        }
-
-
-        $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
-            .done(function (json) {
-                var submission_result = "+" + json.score_change + " points";
-                $("[id='" + position_string + "']").text(submission_result);
-                var color_class = 'table-danger';
-                if(json.score_change > 0){
-                    color_class = 'table-success';
-                }
-                $("[id='" + position_string + "']").parent().addClass(color_class);
-
-                document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
-
-                if (json.score_change > 0) {
-                    document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
-                }
-
-                if (robo_name == "Base") {
-                    for (let id2 in org_artifacts) {
-                        let artifact = org_artifacts[id2];
-                        global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].submitted = true;
-                        global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].result = json.score_change;
-                        let robot_name = global_tabManager.global_vehicleArtifactsList[artifact.n].robot_name;
-                        if (json.score_change > 0) {
-                            document.getElementById("submit_" + robot_name + "_" + id2).disabled = true;
-                        }
-
-                        global_tabManager.global_vehicleArtifactsList[artifact.n].updateDisplay();
-                    }
-                } else {
-                    for (let id2 in global_tabManager.fusedArtifacts.artifactsList) {
-                        let fartifact = global_tabManager.fusedArtifacts.artifactsList[id2];
-                        for (let id3 in fartifact.originals) {
-                            if (id3 == id) {
-                                fartifact.submitted = true;
-                                fartifact.result = json.score_change;
-                                if (json.score_change > 0) {
-                                    document.getElementById("submit_Base_" + id2).disabled = true;
-                                }
-                            }
-                        }
-                    }
-                    global_tabManager.fusedArtifacts.updateDisplay();
-                }
-                if(json.score_change > 0){
-                    $('#' + position_string).html('Success');
-                }
-            });
-
-        $('#myModal').modal('hide');
-    }
+// ================================================================================================
+// THIS IS SUBMITTING AN ARTIFACT
+// ================================================================================================
+    
 
     get_robot_name() {
         return this.robot_name;
@@ -564,34 +472,23 @@ class Artifact {
         return this.artifactsList;
     }
 
-    save_file() {
-        const createCsvWriter = require('csv-writer').createArrayCsvWriter;
-        const csvWriter = createCsvWriter({
-            path: this.robot_name + '_reported.csv',
-            header: ['id', 'Reported']
-        });
-        csvWriter
-            .writeRecords(this.reportedArtifacts);//.then(() => console.log('The CSV file was written successfully'));
+    // save_file(data) {
+    //    fs.writeFileSync(`js/${this.robot_name}_reported.txt`, `${data}\n`, "utf-8");
 
-    }
+    // }
 
     read_file() {
-        const csv = require('csv-parser');
-        const fs = require('fs');
-        var count = 0;
-        fs.createReadStream(this.robot_name + '_reported.csv')
-            .pipe(csv())
-            .on('data', (row) => {
-                // console.log(row);
-                this.reportedArtifacts[count][0] = parseInt(row.id);
-                this.reportedArtifacts[count][1] = (row.Reported == "true");
-
-                count++;
-            })
-            .on('end', () => {
-                console.log('CSV file successfully processed');
-                console.log(this.reportedArtifacts);
-            });
+        var robot_reported = `js/${this.robot_name}_reported.txt`;
+        if(fs.existsSync(robot_reported)){
+            var reported_artifact_file = fs.readFileSync(robot_reported, "utf-8");
+            this.reportedArtifacts = artifact_file.split("\n");
+            
+            console.log("recovered artifacts");
+        }else{
+            fs.openSync(robot_reported, "w");
+            console.log("made a recovery file for " + this.robot_name);
+        }
+        
     }
 
     // Function for determining color id of artifacts in Artifact list
@@ -612,4 +509,146 @@ class Artifact {
         }
     }
 
+}
+
+async function submit_artifact(id, _this) {
+    // var robo_name = _this.get_robot_name();
+
+    var data = {
+        "x": parseFloat($('#edit_x_pos').val()),
+        "y": parseFloat($('#edit_y_pos').val()),
+        "z": parseFloat($('#edit_z_pos').val()),
+        "type": $('#edit_type').val()
+    };
+
+    // Old code for finding the highest confidence.  We're doing this using
+    // base_artifact_fusion.  If this comes back, need to check code for new layout
+    var findBest = false;
+
+    if (findBest == true) {
+        var vehicle_Artifacts_length = this.artifactsList.length;
+        var other_location = new Array(vehicle_Artifacts_length);
+        var best_prob = parseFloat(this.artifact_confidence[row_id].getAttribute("value"));
+        for (let i = 0; i < vehicle_Artifacts_length; i++) {
+            if (vehicle_Artifacts[i].get_robot_name() == robo_name) {
+                continue;
+            }
+            let other_artifactsList = vehicle_Artifacts[i].get_artifactsList();
+            let other_artifactsList_length = other_artifactsList.length;
+            for (let k = 0; k < other_artifactsList_length; k++) {
+                if (other_artifactsList[k] == null) {
+                    break;
+                }
+                if (other_artifactsList[k].obj_class != this.artifactsList[row_id].obj_class) {
+                    continue;
+                }
+                let dist_x = other_artifactsList[k].position.x - data.x;
+                let dist_y = other_artifactsList[k].position.y - data.y;
+
+                if (other_artifactsList[k].obj_prob > best_prob && Math.hypot(dist_x, dist_y) < this.dist_threshhold) {
+                    console.log("Choosing higher chance object");
+                    data.x = other_artifactsList[k].position.x;
+                    data.y = other_artifactsList[k].position.y;
+                    data.z = other_artifactsList[k].position.z;
+                    other_location[i] = k;
+                } else if (Math.hypot(dist_x, dist_y) < this.dist_threshhold) {
+                    other_location[i] = k;
+                }
+            }
+        }
+    }
+    // Variables used for logging a little later and for submission now
+    var position_string =  `${$('#edit_x_pos').val()}, ${$('#edit_y_pos').val()}, ${$('#edit_z_pos').val()}`;
+    var notes = $('#edit_notes ').val();
+    var type = $('#edit_type').val();
+    
+    $('#submission_tbody').append(`
+    <tr>
+        <td>${type}</td>
+        <td>${position_string}</td>
+        <td>${notes}</td>
+        <td id="${position_string}">No result yet</td>
+    </tr>`);
+
+    // var org_artifacts = _this.artifactsList[id].originals;
+    console.log("submitting artifact to DARPA server. Waiting for response...");
+    let t = new Date();
+    t.setSeconds(t.getSeconds() - 1);
+    if (t <= scoringTimer) {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        scoringTimer = new Date();
+    }
+
+    // ==================================================
+    // DARPA SCORING STUFF
+    // ==================================================
+    $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
+        .done(function (json) {
+            log_submitted_artifacts(type, position_string, notes, json.score_change);
+            update_submitted_table(json, position_string, data);
+            
+        });
+
+    $('#NewReportModal').modal('hide');
+}
+
+// Update the submitted table
+function update_submitted_table(json, position_string, data){
+    // This is for testing a bad artifact and darpa responding with "0"
+    if(data.type == "return 0"){
+        json.score_change = 0;
+   }
+   
+   // This is where we get the darpa score back - specifically json.score_change
+
+   // Write overall reported 
+   var submission_result = "+" + json.score_change + " points";
+   // Here down is mostly formatting
+   $("[id='" + position_string + "']").text(submission_result);
+
+   var color_class = 'table-danger';
+   if(json.score_change > 0){
+       color_class = 'table-success';
+   }
+   $("[id='" + position_string + "']").parent().addClass(color_class);
+
+   // Put the fused artifact in the fused artifact tab
+   var fused_div = document.getElementById("fused_artifacts");
+   
+   // document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
+
+   // if (json.score_change > 0) {
+   //     document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
+   // }
+
+   // if (robo_name == "Base") {
+   //     for (let id2 in org_artifacts) {
+   //         let artifact = org_artifacts[id2];
+   //         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].submitted = true;
+   //         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].result = json.score_change;
+   //         let robot_name = global_tabManager.global_vehicleArtifactsList[artifact.n].robot_name;
+   //         if (json.score_change > 0) {
+   //             document.getElementById("submit_" + robot_name + "_" + id2).disabled = true;
+   //         }
+
+   //         global_tabManager.global_vehicleArtifactsList[artifact.n].updateDisplay();
+   //     }
+   // } else {
+   //     for (let id2 in global_tabManager.fusedArtifacts.artifactsList) {
+   //         let fartifact = global_tabManager.fusedArtifacts.artifactsList[id2];
+   //         for (let id3 in fartifact.originals) {
+   //             if (id3 == id) {
+   //                 fartifact.submitted = true;
+   //                 fartifact.result = json.score_change;
+   //                 if (json.score_change > 0) {
+   //                     document.getElementById("submit_Base_" + id2).disabled = true;
+   //                 }
+   //             }
+   //         }
+   //     }
+   //     global_tabManager.fusedArtifacts.updateDisplay();
+   // }
+   if(json.score_change > 0){
+       $('#' + position_string).html('Success');
+   }
 }
