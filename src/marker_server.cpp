@@ -506,8 +506,7 @@ void markerMakerCallback(const std_msgs::String::ConstPtr& msg){
   server->applyChanges();
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv){
   ros::init(argc, argv, "basic_controls");
   ros::init(argc, argv, "listener");
   ros::NodeHandle n;

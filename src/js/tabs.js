@@ -115,20 +115,20 @@ window.openPage = function (pageName, k=-1 ){
     // Hide all elements with class="tabcontent" by default */
     var tabcontent;
 
-        // Attempts at unsubscribing from all topics when the tab is switched
+    // Attempts at unsubscribing from all topics when the tab is switched
     // Meant to reduce load of data being sent to the gui
-    try {
-        var OdomSubLength = global_tabManager.get_Tab_OdomSub().length;
-        for (let i = 0; i < OdomSubLength; i++) {
-            global_tabManager.Tab_OdomSub[i].unsubscribe();
-            // Tab_CmdVelSub[i].unsubscribe();
-            global_tabManager.Tab_BatterySub[i].unsubscribe();
-            global_tabManager.Tab_ControlSub[i].unsubscribe();
-            console.log("Unsubscribing... ")
-        }
-    } catch {
+    // try {
+    //     var OdomSubLength = global_tabManager.get_Tab_OdomSub().length;
+    //     for (let i = 0; i < OdomSubLength; i++) {
+    //         global_tabManager.Tab_OdomSub[i].unsubscribe();
+    //         // Tab_CmdVelSub[i].unsubscribe();
+    //         global_tabManager.Tab_BatterySub[i].unsubscribe();
+    //         global_tabManager.Tab_ControlSub[i].unsubscribe();
+    //         console.log("Unsubscribing... ")
+    //     }
+    // } catch {
 
-    }
+    // }
     
     if (k >= 0) {
 

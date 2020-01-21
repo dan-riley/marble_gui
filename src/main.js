@@ -57,6 +57,6 @@ app.on('activate', function () {
 
 
 function DDR(){
-  // not operational yet
+  // not operational yet. based off a joke of "what can't be used as a teleop controller?"
   document.body.style.backgroundImage = 'url("../images/DDR_STEVE.gif")'
 }

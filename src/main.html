@@ -82,6 +82,9 @@
                     <!-- <li class="nav-item">
                         <a class="nav-link" onclick="window.openPage('Maps')" id="Maps_nav_link">Maps</a>
                     </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="window.openPage('Beacons')" id="Beacon_nav_link">Beacons</a>
+                    </li>
                 </ul>
             </div>
         </nav>
@@ -170,12 +173,13 @@
                 </div>
             </div>
 
-            <!-- This is where the rviz map lives
-            <div id="Maps" class="tabcontent">
-                <h1>Map of deployment</h1>
-                <button class="btn btn-success" onclick="viewer_init(), this.disabled=true">Start viewer</button>
-                <div id="markers"></div>
-            </div> -->
+            <!-- This is where the rviz map lives -->
+            <div id="Beacons" class="tabcontent">
+                <h1>Beacons</h1>
+                <div id="Beacon_Cards">
+
+                </div>
+            </div>
 
             <!-- It is what it says, this is where the artifacts show up and where they are submitted thorugh -->
             <div id="Artifact_Page" class="tabcontent">

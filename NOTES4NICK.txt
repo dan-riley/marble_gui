@@ -71,3 +71,9 @@ in the gui
 
 ip
 172.31.0.1/16 cidr 16
+
+octomap rviz plugin
+
+
+edit multi agent launch for basestation
+update: has been updated and made new file for bases

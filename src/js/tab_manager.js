@@ -162,11 +162,12 @@ class TabManager {
         tab = null;
     }
 
-    //\brief Function for searching topics list for robot namespaces and adding those robots to the current robot name
+    // brief Function for searching topics list for robot namespaces and adding those robots to the current robot name
     // list if they are not there already
     search_robots() {
         var _this = global_tabManager;
-        var patt = /\d\d/;
+        // This is where robots and beacons are filtered
+        var patt = /^((?!B).)\d\d/;
         for (let i = 0; i < topicsList.length; i++) {
             let name = topicsList[i].split('/')[1];
             var handled_names = [];
@@ -228,10 +229,19 @@ class TabManager {
         }
     }
 
-    // Function for adding additional vehicle tabs to gui, it will add whenever a vehicle with ROS topic ending in odometry is found
+
+    // Function for adding additional vehicle tabs to gui and beacons to the beacon page
     add_tab() {
         let n = this.i;
-        console.log("Tab: " + this.robot_name[n]);
+        var robot = this.robot_name[n];
+
+        // Make decision about where this device will go in the gui
+        if(robot.includes("B") || robot.includes("S")){
+
+        }else{
+
+        }
+        console.log("Tab: " + robot);
 
         let input_str;
 
@@ -252,125 +262,14 @@ class TabManager {
             return;
         }
 
-        let TaskTopic = {
-            topic: "/" + this.robot_name[n] + "/task_update",
-            messageType: "std_msgs/String"
-        };
-        let OdomTopic = {
-            topic: "/" + this.robot_name[n] + "/odometry",
-            messageType: "nav_msgs/Odometry"
-        };
-        let CmdVelTopic = "/" + this.robot_name[n] + "/cmd_vel";
-        let CmdPosTopic = {
-            topic: "/" + this.robot_name[n] + "/current_goal",
-            messageType: "geometry_msgs/PoseStamped"
-        };
-        let BatteryTopic = {
-            topic: "/" + this.robot_name[n] + "/battery_status",
-            messageType: "std_msgs/Float32"
-        };
-        let ControlTopic = {
-            topic: "/" + this.robot_name[n] + "/control_status",
-            messageType: "std_msgs/UInt8"
-        };
-        let ArtifactTopic = {
-            // topic: "/artifact_record",  // For use when artifact detection is on ground station
-            // topic: "/" + this.robot_name[n] + "/artifact_record",
-            topic: "/" + this.robot_name[n] + "/artifact_array/relay",
-            messageType: "marble_artifact_detection_msgs/ArtifactArray"
-        };
-        let ArtifactImgTopic = {
-            // topic: "/artifact_record",  // For use to save images on ground station
-            // topic: "/" + this.robot_name[n] + "/located_artifact_img",
-            topic: "/" + this.robot_name[n] + "/artifact_image_to_base",
-            // topic: "/disabled3",
-            messageType: "marble_artifact_detection_msgs/ArtifactImg"
-        };
-        let VehicleStatusTopic = {
-            topic: "/" + this.robot_name[n] + "/status", //TODO: change to vehicle_status
-            messageType: "marble_common_msgs/VehicleStatus"
-        }
-        let PointCloudTopic = {
-            topic: "/disabled1",
-            // topic: "/merged_map",
-            // topic: "/octomap_point_cloud_occupied",
-            messageType: "sensor_msgs/PointCloud2"
-        };
-
-        this.Tab_TaskSub[n] = new ROSLIB.Topic({
-            ros: ros,
-            name: TaskTopic.topic,
-            messageType: TaskTopic.messageType
-        });
-        this.Tab_OdomSub[n] = new ROSLIB.Topic({
-            ros: ros,
-            name: OdomTopic.topic,
-            messageType: OdomTopic.messageType
-        });
-        // this.Tab_OdometrySub[n] = new ROSLIB.Topic({
-        //     ros: ros,
-        //     name: OdomTopic.topic,
-        //     messageType: OdomTopic.messageType
-        // });
-        this.Tab_BatterySub[n] = new ROSLIB.Topic({
-            ros: ros,
-            name: BatteryTopic.topic,
-            messageType: BatteryTopic.messageType
-        });
-        this.Tab_ControlSub[n] = new ROSLIB.Topic({
-            ros: ros,
-            name: ControlTopic.topic,
-            messageType: ControlTopic.messageType
-        });
-        this.Tab_ArtifactSub[n] = new ROSLIB.Topic({
-            ros: ros,
-            name: ArtifactTopic.topic,
-            messageType: ArtifactTopic.messageType
-        });
-        this.Tab_ArtifactImgSub[n] = new ROSLIB.Topic({
-            ros: ros,
-            name: ArtifactImgTopic.topic,
-            messageType: ArtifactImgTopic.messageType
-        });
-        this.Tab_VehicleStatusSub[n] = new ROSLIB.Topic({
-            ros: ros,
-            name: VehicleStatusTopic.topic,
-            messageType: VehicleStatusTopic.messageType
-        });
-        this.Tab_PointCloudSub[n] = new ROSLIB.Topic({
-            ros: ros,
-            name: PointCloudTopic.topic,
-            messageType: PointCloudTopic.messageType
-        });
-        this.Tab_PoseArraySub[n] = new ROSLIB.Topic({
-            ros: ros,
-            name: "/disabled2",
-            // name: "/merged_poses",
-            messageType: "geometry_msgs/PoseArray"
-        });
-        this.Tab_OccupancyGridSub[n] = new ROSLIB.Topic({
-            ros: ros,
-            name: "/" + this.robot_name[n] + "/map",
-            messageType: "nav_msgs/OccupancyGrid"
-        });
+        // This function (found below) gets up all the listeners for this robot
+        this.listen_to_robot_topics(n, robot)
 
         var date = new Date();
         var now_time = date.getTime() / 1000;
         global_tabManager.prev_time[n] = now_time;
 
-        function darpa_msg_from_ros_msg(msg, type) {
-            var now = new Date();
-            var now_time = now.getTime() / 1000;
-            let objJsonB64 = Buffer.from(msg.data).toString("base64");
-            msg.header.stamp = now_time;
-            msg.data = objJsonB64;
-            msg.header.frame_id = "darpa";
-            var data = {
-                type: type,
-                msg: msg
-            };
-            return JSON.stringify(data)
-        }
+        // function darpa_msg_from_ros_msg
 
         var last_cloud_report_success = "never";
 
@@ -387,7 +286,7 @@ class TabManager {
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
                 if (connected_to_darpa) {
-                    $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "PointCloud2"))
+                    $.post(SERVER_ROOT + "/map/update/", this.darpa_msg_from_ros_msg(msg, "PointCloud2"))
                         .done(function (json, statusText, xhr) {
                             if (xhr.status == 200) {
                                 last_cloud_report_success = new Date();
@@ -423,7 +322,7 @@ class TabManager {
             var now_time = now.getTime() / 1000;
             if (now_time - global_tabManager.prev_time[n] >= 0.05 || global_tabManager.prev_time[n] == null) {
                 if (connected_to_darpa) {
-                    $.post(SERVER_ROOT + "/map/update/", darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
+                    $.post(SERVER_ROOT + "/map/update/", this.darpa_msg_from_ros_msg(msg, "OccupancyGrid"))
                         .done(function (json, statusText, xhr) {
                             if (xhr.status == 200) {
                                 last_grid_report_success = new Date();
@@ -878,9 +777,153 @@ class TabManager {
             global_tabManager.Tab_ControlSub[n].publish(msg.control_status);
         });
     }
+
+    
+    // This is used by "add_tab" above
+    listen_to_robot_topics(n, robot){
+        let TaskTopic = {
+            topic: "/" + robot + "/task_update",
+            messageType: "std_msgs/String"
+        };
+        let OdomTopic = {
+            topic: "/" + robot + "/odometry",
+            messageType: "nav_msgs/Odometry"
+        };
+        let CmdVelTopic = "/" + robot + "/cmd_vel";
+        let CmdPosTopic = {
+            topic: "/" + robot + "/current_goal",
+            messageType: "geometry_msgs/PoseStamped"
+        };
+        let BatteryTopic = {
+            topic: "/" + robot + "/battery_status",
+            messageType: "std_msgs/Float32"
+        };
+        let ControlTopic = {
+            topic: "/" + robot + "/control_status",
+            messageType: "std_msgs/UInt8"
+        };
+        let ArtifactTopic = {
+            // topic: "/artifact_record",  // For use when artifact detection is on ground station
+            // topic: "/" + this.robot_name[n] + "/artifact_record",
+            topic: "/" + robot + "/artifact_array/relay",
+            messageType: "marble_artifact_detection_msgs/ArtifactArray"
+        };
+        let ArtifactImgTopic = {
+            // topic: "/artifact_record",  // For use to save images on ground station
+            // topic: "/" + this.robot_name[n] + "/located_artifact_img",
+            topic: "/" + robot + "/artifact_image_to_base",
+            // topic: "/disabled3",
+            messageType: "marble_artifact_detection_msgs/ArtifactImg"
+        };
+        let VehicleStatusTopic = {
+            topic: "/" + robot + "/status", //TODO: change to vehicle_status
+            messageType: "marble_common_msgs/VehicleStatus"
+        }
+        let PointCloudTopic = {
+            topic: "/disabled1",
+            // topic: "/merged_map",
+            // topic: "/octomap_point_cloud_occupied",
+            messageType: "sensor_msgs/PointCloud2"
+        };
+
+        this.Tab_TaskSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: TaskTopic.topic,
+            messageType: TaskTopic.messageType
+        });
+        this.Tab_OdomSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: OdomTopic.topic,
+            messageType: OdomTopic.messageType
+        });
+        // this.Tab_OdometrySub[n] = new ROSLIB.Topic({
+        //     ros: ros,
+        //     name: OdomTopic.topic,
+        //     messageType: OdomTopic.messageType
+        // });
+        this.Tab_BatterySub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: BatteryTopic.topic,
+            messageType: BatteryTopic.messageType
+        });
+        this.Tab_ControlSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: ControlTopic.topic,
+            messageType: ControlTopic.messageType
+        });
+        this.Tab_ArtifactSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: ArtifactTopic.topic,
+            messageType: ArtifactTopic.messageType
+        });
+        this.Tab_ArtifactImgSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: ArtifactImgTopic.topic,
+            messageType: ArtifactImgTopic.messageType
+        });
+        this.Tab_VehicleStatusSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: VehicleStatusTopic.topic,
+            messageType: VehicleStatusTopic.messageType
+        });
+        this.Tab_PointCloudSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: PointCloudTopic.topic,
+            messageType: PointCloudTopic.messageType
+        });
+        this.Tab_PoseArraySub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: "/disabled2",
+            // name: "/merged_poses",
+            messageType: "geometry_msgs/PoseArray"
+        });
+        this.Tab_OccupancyGridSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: "/" + robot + "/map",
+            messageType: "nav_msgs/OccupancyGrid"
+        });
+    }
+
+
+    // This is used by "add_tab" above
+    darpa_msg_from_ros_msg(msg, type) {
+        var now = new Date();
+        var now_time = now.getTime() / 1000;
+        let objJsonB64 = Buffer.from(msg.data).toString("base64");
+        msg.header.stamp = now_time;
+        msg.data = objJsonB64;
+        msg.header.frame_id = "darpa";
+        var data = {
+            type: type,
+            msg: msg
+        };
+        return JSON.stringify(data)
+    }
+
+
+    add_beacon(beacon_name){
+        // Listen for activation, may be atena up msg
+        // Creates a card for each beacon
+        var beaconcard = 
+        `<div class="card" id="${beacon_name}_card" beacon="${beacon_name}">
+                ${this.robot_name[n]}
+                <br><span id="connection_status_${beacon_name}"></span>
+                <br><span id="task_status_${beacon_name}"></span>
+            </div>`;
+
+        // Add card to beacons page
+        g = document.createElement('div');
+        g.id = beacon_name + "_container";
+        document.body.appendChild(g);
+        document.getElementById(g.id).innerHTML = beaconcard;
+    }
+
+
     get_vehicleArtifactsList(n) {
         return this.global_vehicleArtifactsList[n];
     }
+
+    
     get_Tab_OdomSub() {
         return this.Tab_OdomSub;
     }

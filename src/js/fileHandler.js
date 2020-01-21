@@ -27,7 +27,7 @@ function what_logs(){
     }  
 }
 
-// This logs artifacts that have been submitte dto darpa
+// This logs artifacts that have been submitted to darpa
 function log_submitted_artifacts(artifact, position, notes, score){
     var submitted_data  = `\n${artifact} |${position}| ${notes} | ${score}`;
     console.log(submitted_data)
