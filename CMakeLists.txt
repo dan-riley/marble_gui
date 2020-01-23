@@ -17,30 +17,27 @@ find_package(catkin REQUIRED
     
     visualization_msgs
     interactive_markers
+    message_generation
 )
 
 find_package(OpenCV REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+add_message_files(
+  FILES
+  artifact.msg
+)
 
+generate_messages(
+  DEPENDENCIES
+    roscpp
+    std_msgs
+    geometry_msgs
+    sensor_msgs
+    marble_artifact_detection_msgs
 
-#generate_messages(
-#  DEPENDENCIES
-#    roscpp
-#    std_msgs
-#    geometry_msgs
-#    sensor_msgs
-#    marble_artifact_detection_msgs
-    
-#)
-
-
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -57,6 +54,7 @@ catkin_package(
   roscpp 
   visualization_msgs 
   tf
+  message_runtime
 )
 
 ###########

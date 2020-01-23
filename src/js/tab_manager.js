@@ -1,5 +1,8 @@
 var ANALYZE_TOPICS_LIST_INTERVAL = 2000;
 var teleop_robot = "base"
+ros = new ROSLIB.Ros({
+    url: "ws://localhost:9090"
+});
 
 function send_signal_to(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
@@ -340,15 +343,6 @@ class TabManager {
             }
         });
 
-        // setInterval(function () {
-        //     if (last_grid_report_success != "never") {
-        //         var now = new Date();
-        //         $('#mapping_grid_report_last_sent_secs_ago').text(
-        //             Math.round(
-        //                 (now - last_grid_report_success) / 1000
-        //             ) + ' seconds ago');
-        //     }
-        // }, 1000);
 
         var last_telem_report_success = "never";
 
@@ -390,15 +384,7 @@ class TabManager {
             }
         });
 
-        // setInterval(function () {
-        //     if (last_telem_report_success != "never") {
-        //         var now = new Date();
-        //         $('#telemetry_report_last_sent_secs_ago').text(
-        //             Math.round(
-        //                 (now - last_telem_report_success) / 1000
-        //             ) + ' seconds ago');
-        //     }
-        // }, 1000);
+        
 
         // Creating tab at top of screen for selecting robot view
         $('#Robot_Tabs').prepend(`
@@ -459,20 +445,6 @@ class TabManager {
         var sub = document.createElement("DIV");
         sub.setAttribute("class", "info");
 
-        // Set unique ID so octomap_viewer can reference it for 3D visualization
-        var viewer_row = document.createElement("DIV");
-        viewer_row.setAttribute("class", "card")
-        var viewer = document.createElement("DIV");
-        viewer.setAttribute("class", "octomap_viewer");
-        viewer.innerHTML = `
-            <dom-bind id="t">
-                <template is="dom-bind">
-                    <ros-websocket auto id="websocket"ros="{{ros}}"url="ws://localhost:9090"></ros-websocket>
-                    <ros-rviz id="${this.robot_name[n]}_rviz" ros="{{ros}}"websocket-url="ws://localhost:9090"></ros-rviz>
-                </template>
-            </dom-bind>`.trim();
-
-        viewer_row.appendChild(viewer);
 
         /* Chart needs a dedicated DIV wrapper for ONLY the chart */
         var chart_wrap = document.createElement("DIV");
@@ -671,7 +643,7 @@ class TabManager {
 
         tab_content.appendChild(top_card);
         tab_content.appendChild(chart_wrap);
-        tab_content.appendChild(viewer_row);
+        // tab_content.appendChild(viewer_row);
 
         $('#Robot_Pages').prepend(tab_content);
 
