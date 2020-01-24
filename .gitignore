@@ -2,3 +2,5 @@
 src/node_modules/
 *.pyc
 src/bower_components
+src/js/*.txt
+tags
