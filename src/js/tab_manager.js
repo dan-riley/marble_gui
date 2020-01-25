@@ -14,12 +14,34 @@ function send_signal_to(robot_name, signal, value) {
         data: value
     });
     Topic.publish(msg);
+
+    // Also publish to multi-agent so it can relay it
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: `/Base/neighbors/${robot_name}/${signal}`,
+        messageType: "std_msgs/Bool"
+    });
+    var msg = new ROSLIB.Message({
+        data: value
+    });
+    Topic.publish(msg);
 }
 
 function send_string_to(robot_name, signal, text) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
         name: `/${robot_name}/${signal}`,
+        messageType: "std_msgs/String"
+    });
+    var msg = new ROSLIB.Message({
+        data: text
+    });
+    Topic.publish(msg);
+
+    // Also publish to multi-agent so it can relay it
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: `/Base/neighbors/${robot_name}/${signal}`,
         messageType: "std_msgs/String"
     });
     var msg = new ROSLIB.Message({
@@ -223,6 +245,8 @@ class TabManager {
         global_tabManager.Tab_TaskSub[n].subscribe(function (msg) {
             // Save our current time to update connection status
             // The service call isn't reliable!
+            // TODO need to change this again since we're not talking directly to the robot
+            // Maybe use artifact image?
             global_tabManager.time_since_last_msg[n] = new Date();
             global_tabManager.tasks[n] = msg.data
         });
@@ -242,34 +266,34 @@ class TabManager {
         <li class="quick_control">
             <h4>${this.robot_name[n]}</h4>
             <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
-                onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)"> 
-                Start 
+                onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)">
+                Start
             </button>
-            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop" 
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop"
                 onclick="send_signal_to('${this.robot_name[n]}', 'estop', true)">
                 Stop
             </button>
             <br>
-            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_explore" 
-                onclick="send_signal_to('${this.robot_name[n]}', 'task', 'Explore')"> 
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_explore"
+                onclick="send_string_to('${this.robot_name[n]}', 'task', 'Explore')">
                 Explore
             </button>
-            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home" 
-                onclick="send_signal_to('${this.robot_name[n]}', 'task', 'Home')"> 
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home"
+                onclick="send_string_to('${this.robot_name[n]}', 'task', 'Home')">
                 Go Home
             </button>
             <br>
-            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off" 
-                onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', flase)"> 
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off"
+                onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', false)">
                 E-Stop Disabled
             </button>
-            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_estop" 
-                onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', true)"> 
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_estop"
+                onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', true)">
                 E-Stop
             </button>
             <br>
             <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_radio"
-                onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)"> 
+                onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)">
                 Radio Reset
             </button>
             <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
@@ -388,6 +412,8 @@ class TabManager {
     listen_to_robot_topics(n, robot){
         let TaskTopic = {
             topic: "/" + robot + "/task_update",
+            // topic: "/Base/neighbors/" + robot + "/status",
+            // topic: "/Anchor/neighbors/" + robot + "/status",
             messageType: "std_msgs/String"
         };
         let ArtifactTopic = {
@@ -395,6 +421,10 @@ class TabManager {
             // topic: "/" + this.robot_name[n] + "/artifact_record",
             topic: "/" + robot + "/artifact_array/relay",
             // topic: "/Anchor/neighbors/" + robot + "/artifacts",
+<<<<<<< HEAD
+=======
+            // topic: "/Base/neighbors/" + robot + "/artifacts",
+>>>>>>> f50df15de2aac848f91747dfc293c99aa9af3922
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
         let ArtifactImgTopic = {
