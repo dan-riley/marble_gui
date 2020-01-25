@@ -16,7 +16,8 @@ body{
   .tabcontent {
     display: none;
     padding: 20px 20px;
-    max-width: 1200px;
+    max-width: 95%;
+    height: 100%;
     margin: auto;
   }
   #Robot_Pages {
@@ -27,21 +28,6 @@ body{
     padding: 20px;
     font-size: 30px;
     justify-content: center;
-  }
-  
-  /* Individual forms and charts inside generic tab page */
-  .cmdVel_form {
-    /* position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    justify-content: space-around; */
-  
-  }
-
-  .octomap_viewer {
-    height: 800px;
-    width: 100%;
   }
 
   #Robot_Pages #File .margin-bottom {

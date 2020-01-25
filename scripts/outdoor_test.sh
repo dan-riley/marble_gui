@@ -28,4 +28,4 @@ gnome-terminal -e 'sh -c "roslaunch marble_gui marble_gui.launch; exec bash"' &
 # change to be base mode
 gnome-terminal -e 'sh -c "roslaunch octomap_merger octomap_merger.launch; exec bash"' &
 
-exit 1
+# MAKE SURE DARPA TEST SERVER IS TURNED OFF FOR REAL LAUNCH

@@ -24,11 +24,13 @@ function what_logs(){
         if(files[f].includes("_reported.txt")){
             existing_logs.push(files[f].split("_")[0]);
         }
-    }  
+    }
+    console.log(existing_logs)  
 }
 
 // This logs artifacts that have been submitted to darpa
 function log_submitted_artifacts(artifact, position, notes, score){
+    console.log("saving a submitted artifact")
     var submitted_data  = `\n${artifact} |${position}| ${notes} | ${score}`;
     console.log(submitted_data)
     fs.appendFile('js/DARPA_reported.txt', submitted_data, function (err) {
@@ -52,7 +54,11 @@ function log_robot_artifacts(robot_name, artifact, position){
 function get_darpa_artifacts(){
     var darpa_file_name = "js/DARPA_reported.txt"
     // open or make DARPA_reported
-    if(existing_logs.indexOf('DARPA') < 0){
+
+    var found = existing_logs.find(function(darpa) { 
+        return darpa == "DARPA"; 
+    });
+    if(found){
         fs.open(darpa_file_name, 'w', function (err, file) {
             if (err) throw err;
             console.log('Saved!');

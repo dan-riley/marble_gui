@@ -69,9 +69,6 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto" id="Robot_Tabs">
                     <li class="nav-item">
-                        <a class="nav-link" onclick="window.openPage('Listener')" id="Listener_nav_link">Listener</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" onclick="window.openPage('DARPA')" id="DARPA_nav_link">DARPA<br><span
                                 id="connection_status_DARPA"></span></a>
                     </li>
@@ -79,9 +76,6 @@
                         <a class="nav-link" onclick="window.openPage('Artifact_Page')"
                             id="Artifact_Page_nav_link">Artifacts</a>
                     </li>
-                    <!-- <li class="nav-item">
-                        <a class="nav-link" onclick="window.openPage('Maps')" id="Maps_nav_link">Maps</a>
-                    </li> -->
                     <li class="nav-item">
                         <a class="nav-link" onclick="window.openPage('Beacons')" id="Beacon_nav_link">Beacons</a>
                     </li>
@@ -115,24 +109,6 @@
 
         <!--! DIV that contains all details within each tab, vehicle pages are added as subsections through javascript -->
         <div id="Robot_Pages" >
-
-            <div id="Listener" class="tabcontent">
-                <div class="card">
-                    <div class="card-body">
-                        <h2>Topic Listener</h2>
-                        <form>
-                            <div class="autocomplete" style="width:300px;">
-                                <input id="myInput" type="text" name="myTopics" placeholder="ex. /G01/artifact_record">
-                            </div>
-                            <button type="button" class="btn btn-success" id="begin_echo">Echo</button>
-                            <button type="button" class="btn btn-danger" id="stop_echo" style="display:none;">Stop Echo</button>
-                            <button type="button" class="btn btn-secondary" id="clear_console">Clear Console</button>
-                        </form>
-                        <div id="echo_console">
-                        </div>
-                    </div>
-                </div>
-            </div>
 
 
             <div id="DARPA" class="tabcontent">`
@@ -185,7 +161,7 @@
             <div id="Artifact_Page" class="tabcontent">
                 <div class="section_div">
                     <h3>Fused Artifacts</h3>
-                    <div class="col-sm-12, sub_section_div" robot_name="Base">
+                    <div class="col-sm-12, fused_div" robot_name="Base">
                         <!-- <div class="row" artifact_id="header">
                             <span class="badge badge-secondary col-sm-12" style="font-size: 20px"><b>Fused Artifacts</b></span>
                         </div> -->
@@ -207,7 +183,7 @@
                 <!-- WHERE THE ROBOT ARTIFACTS GO -->
                 <div class="section_div">
                     <h3>Raw Robot Artifacts</h3>
-                    <div id="robot_artifact_tables" class="sub_section_div">
+                    <div id="robot_artifact_tables" class="raw_div">
                     
                     </div>
                 </div>
@@ -215,7 +191,7 @@
                 <!-- WHERE THE SUBMISSIONS LIVE -->
                 <div class="section_div">
                     <h3>Submissions</h3>
-                    <div class="sub_section_div" >
+                    <div class="submitted_div" >
                         <div class="col-md-12 artifact_table">
                             <table class="table table-bordered" style="background-color: white">
                                 <thead>

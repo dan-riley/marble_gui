@@ -261,6 +261,8 @@ class Artifact {
         let new_ids = [];
         let remove_ids = [];
 
+        // Publish raw artifact
+
         // Compare to all of the other artifacts in the fuse array
         for (let id2 in fusedArtifacts) {
             // If the id's are the same then it's the same artifact
@@ -365,6 +367,7 @@ class Artifact {
 
             fusedArtifacts[id].robots = [];
             fusedArtifacts[id].robots[this.robot_name] = this.robot_name;
+            // SEND FUSED ARTIFACT MESSAGE TO SERVER
         }
 
         global_tabManager.fusedArtifacts.updateDisplay();
@@ -379,6 +382,7 @@ class Artifact {
         let update = false;
         for (let i = 0; i < msg.length; i++) {
             // Remap the artifacts to the DARPA required names
+            // SHOULD BE CHANGED BY MIKE ON A ROBOT LEVEL SO TRANSLATION DOESN'T NEED TO HAPPEN
             let obj_class = msg[i].obj_class;
             switch(msg[i].obj_class) {
                 case "person":
@@ -401,6 +405,7 @@ class Artifact {
             // Set a unique id.  Position never changes, but index can
             // Only update the list if it's a new artifact
             let id = msg[i].position.x + '-' + msg[i].position.y + '-' + msg[i].position.z;
+
             if ((this.artifactsList[id] == undefined) && (msg[i].position.x > 0)) {
                 update = true;
                 this.artifactsList[id] = {}

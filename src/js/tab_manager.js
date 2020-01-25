@@ -393,8 +393,8 @@ class TabManager {
         let ArtifactTopic = {
             // topic: "/artifact_record",  // For use when artifact detection is on ground station
             // topic: "/" + this.robot_name[n] + "/artifact_record",
-            // topic: "/" + robot + "/artifact_array/relay",
-            topic: "/Anchor/neighbors/" + robot + "/artifacts",
+            topic: "/" + robot + "/artifact_array/relay",
+            // topic: "/Anchor/neighbors/" + robot + "/artifacts",
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
         let ArtifactImgTopic = {

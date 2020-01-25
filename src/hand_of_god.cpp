@@ -7,6 +7,7 @@
 #include <tf/tf.h>
 
 #include "std_msgs/String.h"
+#include "marble_gui/artifact.h"
 
 #include <string>
 #include <math.h>
@@ -18,17 +19,11 @@ using namespace std;
 // Important kind of setup stuff
 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 interactive_markers::MenuHandler menu_handler;
+ros::Publisher pub;
 
-struct artifact{
-	string name;
-	float x_pos;
-	float y_pos;
-	float z_pos;
-};
 
-// This is the vector of artifacts in play right now
-vector<artifact> artifact_list;
-vector<string> rendered_artifact_names;
+// This is the vector of artifact names in play right now
+vector<string> artifact_names;
 
 // This makes the visible shape of the artifact in rviz
 Marker makeArtifact(InteractiveMarker &msg){
@@ -75,35 +70,43 @@ void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr
 	switch (feedback->event_type)
 	{
 	case visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK:
-		ROS_INFO_STREAM(s.str() << ": button click" << mouse_point_ss.str() << ".");
+		// ROS_INFO_STREAM(s.str() << ": button click" << mouse_point_ss.str() << ".");
 		break;
 
 	case visualization_msgs::InteractiveMarkerFeedback::MENU_SELECT:
-		ROS_INFO_STREAM(s.str() << ": menu item " << feedback->menu_entry_id << " clicked" << mouse_point_ss.str() << ".");
+		// ROS_INFO_STREAM(s.str() << ": menu item " << feedback->menu_entry_id << " clicked" << mouse_point_ss.str() << ".");
 		break;
 // IMPORTANT!! BROADCAST THIS FOR THE GUI
-	case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:
-		ROS_INFO_STREAM(s.str() << ": pose changed"
-								<< "\nposition = "
-								<< feedback->pose.position.x
-								<< ", " << feedback->pose.position.y
-								<< ", " << feedback->pose.position.z
-								<< "\norientation = "
-								<< feedback->pose.orientation.w
-								<< ", " << feedback->pose.orientation.x
-								<< ", " << feedback->pose.orientation.y
-								<< ", " << feedback->pose.orientation.z
-								<< "\nframe: " << feedback->header.frame_id
-								<< " time: " << feedback->header.stamp.sec << "sec, "
-								<< feedback->header.stamp.nsec << " nsec");
+	case visualization_msgs::InteractiveMarkerFeedback::POSE_UPDATE:{
+		// ROS_INFO_STREAM(s.str() << ": pose changed"
+		// 						<< "\nposition = "
+		// 						<< feedback->pose.position.x
+		// 						<< ", " << feedback->pose.position.y
+		// 						<< ", " << feedback->pose.position.z
+		// 						<< "\norientation = "
+		// 						<< feedback->pose.orientation.w
+		// 						<< ", " << feedback->pose.orientation.x
+		// 						<< ", " << feedback->pose.orientation.y
+		// 						<< ", " << feedback->pose.orientation.z
+		// 						<< "\nframe: " << feedback->header.frame_id
+		// 						<< " time: " << feedback->header.stamp.sec << "sec, "
+		// 						<< feedback->header.stamp.nsec << " nsec");
+		marble_gui::artifact updated_artifact;
+		updated_artifact.x = feedback->pose.position.x;
+		updated_artifact.y = feedback->pose.position.y;
+		updated_artifact.z = feedback->pose.position.z;
+		updated_artifact.artifact_name = feedback->marker_name;
+		updated_artifact.sender = 0;
+		pub.publish(updated_artifact);
 		break;
+	}
 
 	case visualization_msgs::InteractiveMarkerFeedback::MOUSE_DOWN:
-		ROS_INFO_STREAM(s.str() << ": mouse down" << mouse_point_ss.str() << ".");
+		// ROS_INFO_STREAM(s.str() << ": mouse down" << mouse_point_ss.str() << ".");
 		break;
 
 	case visualization_msgs::InteractiveMarkerFeedback::MOUSE_UP:
-		ROS_INFO_STREAM(s.str() << ": mouse up" << mouse_point_ss.str() << ".");
+		// ROS_INFO_STREAM(s.str() << ": mouse up" << mouse_point_ss.str() << ".");
 		break;
 	}
 
@@ -185,34 +188,28 @@ void make6DofMarker(bool fixed, unsigned int interaction_mode, const tf::Vector3
 // It creates new markers and updates existing ones when necessary
 void markerCallback(const marble_gui::artifact& art){
 
-	// If a new artifact comes in from the gui
-  	if(!rendered_artifact_names.contains(art.artifact_name) && art.sender ==  1){
+	// Note: this could be more efficient however this is more explicit and easier to read
+	// This is to see if the marker already exists in rviz. currently unused
+	bool exists = binary_search(artifact_names.begin(), artifact_names.end(), art.artifact_name);
+
+	
+  	if(art.sender ==  1){
+		tf::Vector3 position;
+		// CHECK TO MAKE SURE TEHESE ARE IN THE RIGHT PLACES
+		position = tf::Vector3(art.x, art.y, art.z);
+		// UPDATE THE EXISTING MARKER
+		if(server.setPose(art.artifact_name, position)){
+			cout << "successfully updated marker " + art.artifact_name << endl;
+		}else{
+			make6DofMarker(false, visualization_msgs::InteractiveMarkerControl::MOVE_3D, position, true, art.artifact_name);
+			artifact_names.push_back(art.artifact_name);
+		}
 		// Make marker
 		tf::Vector3 position;
 		// CHECK TO MAKE SURE TEHESE ARE IN THE RIGHT PLACES
 		position = tf::Vector3(art.x, art.y, art.z);
-		make6DofMarker(false, visualization_msgs::InteractiveMarkerControl::MOVE_3D, position, true, art.artifact_name);
-		server->applyChanges();
-		new_artifact artifact;
-		new_artifact.name = art.artifact_name;
-		new_artifact.x = art.x;
-		new_artifact.y = art.y;
-		new_artifact.z = art.z;
-		artifact_list.push_back(new_artifact);
-		rendered_artifact_names.push_back(art.artifact_name);
+		
   	}
-
-	// Update an existing artifact
-	if(rendered_artifact_names.contains(art.artifact_name) && art.sender ==  1){
-		tf::Vector3 position;
-		// CHECK TO MAKE SURE TEHESE ARE IN THE RIGHT PLACES
-		position = tf::Vector3(art.x, art.y, art.z);
-		// might need this so its here tf::pointTFToMsg(position, int_marker.pose.position);
-		server.setPose(art.artifact_name) = position;
-		server.applyChanges();
-	}
-
-
 }
 
 int main(int argc, char **argv)
@@ -222,7 +219,7 @@ int main(int argc, char **argv)
 	ros::NodeHandle n;
 
 	// create a timer to update the published transforms
-	ros::Timer frame_timer = n.createTimer(ros::Duration(0.01), frameCallback);
+	// ros::Timer frame_timer = n.createTimer(ros::Duration(0.01), frameCallback);
 
 	server.reset(new interactive_markers::InteractiveMarkerServer("basic_controls", "", false));
 
@@ -230,6 +227,7 @@ int main(int argc, char **argv)
 
 	// subscribe to fused artifacts
 	ros::Subscriber sub = n.subscribe("fused_artifacts", 1000, markerCallback);
+	pub = n.advertise<marble_gui::artifact>("moved_artifact", 5);
 
 	server->applyChanges();
 
