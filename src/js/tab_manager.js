@@ -421,10 +421,8 @@ class TabManager {
             // topic: "/" + this.robot_name[n] + "/artifact_record",
             topic: "/" + robot + "/artifact_array/relay",
             // topic: "/Anchor/neighbors/" + robot + "/artifacts",
-<<<<<<< HEAD
-=======
             // topic: "/Base/neighbors/" + robot + "/artifacts",
->>>>>>> f50df15de2aac848f91747dfc293c99aa9af3922
+
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
         let ArtifactImgTopic = {
