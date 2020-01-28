@@ -408,9 +408,9 @@ class TabManager {
     // This is used by "add_tab" above
     listen_to_robot_topics(n, robot){
         let TaskTopic = {
-            // topic: "/" + robot + "/task_update",
+            topic: "/" + robot + "/task_update",
             // topic: "/Base/neighbors/" + robot + "/status",
-            topic: "/Anchor/neighbors/" + robot + "/status",
+            // topic: "/Anchor/neighbors/" + robot + "/status",
             messageType: "std_msgs/String"
         };
         let CommTopic = {
@@ -421,8 +421,8 @@ class TabManager {
         let ArtifactTopic = {
             // topic: "/artifact_record",  // For use when artifact detection is on ground station
             // topic: "/" + this.robot_name[n] + "/artifact_record",
-            // topic: "/" + robot + "/artifact_array/relay",
-            topic: "/Anchor/neighbors/" + robot + "/artifacts",
+            topic: "/" + robot + "/artifact_array/relay",
+            // topic: "/Anchor/neighbors/" + robot + "/artifacts",
             // topic: "/Base/neighbors/" + robot + "/artifacts",
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
