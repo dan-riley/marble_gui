@@ -233,7 +233,7 @@ class Artifact {
     // Use this to save the image received from ROS
     save_image(msg) {
         this.artifactImages[msg.image_id] = msg.artifact_img.data;
-        this.save_file();
+        // this.save_file();
         this.updateDisplay();
     }
 

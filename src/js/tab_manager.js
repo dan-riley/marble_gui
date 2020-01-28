@@ -18,7 +18,8 @@ function send_signal_to(robot_name, signal, value) {
     // Also publish to multi-agent so it can relay it
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: `/Base/neighbors/${robot_name}/${signal}`,
+        name: `/Anchor/neighbors/${robot_name}/${signal}`,
+        // name: `/Base/neighbors/${robot_name}/${signal}`,
         messageType: "std_msgs/Bool"
     });
     var msg = new ROSLIB.Message({
@@ -41,7 +42,8 @@ function send_string_to(robot_name, signal, text) {
     // Also publish to multi-agent so it can relay it
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: `/Base/neighbors/${robot_name}/${signal}`,
+        name: `/Anchor/neighbors/${robot_name}/${signal}`,
+        // name: `/Base/neighbors/${robot_name}/${signal}`,
         messageType: "std_msgs/String"
     });
     var msg = new ROSLIB.Message({
@@ -97,6 +99,7 @@ class TabManager {
     constructor() {
         // Permanent subscribers for all vehicle tabs
         this.Tab_TaskSub = [];
+        this.Tab_CommSub = [];
         this.Tab_ArtifactSub = [];
         this.Tab_ArtifactImgSub = [];
         this.Tab_CmdVelSub = [];
@@ -104,13 +107,12 @@ class TabManager {
         this.global_vehicleType = [];
         this.tasks = [];
         this.global_vehicleArtifactsList = [];
-        this.prev_time = [];
         this.fusedArtifacts = new Artifact('Base', 0);
 
         this.poses = [];
         this.rows = 0;
         this.robot_name = [];
-        this.time_since_last_msg = [];
+        this.incomm = [];
         this.tabs_robot_name = [];
         this.x = 0;
         this.tabs = document.getElementById("Robot_Tabs");
@@ -172,7 +174,7 @@ class TabManager {
         let now = new Date();
         for (let i = 0; i < curr_robot_length; i++) {
             var status_dom = $('#connection_status_' + _this.robot_name[i]);
-            if (now - _this.time_since_last_msg[i] < ANALYZE_TOPICS_LIST_INTERVAL + 1000) {
+            if (_this.incomm[i]) {
                 status_dom.html('<font color="green">Connected</font>');
             }
             else {
@@ -234,21 +236,16 @@ class TabManager {
         // This function (found below) gets up all the listeners for this robot
         this.listen_to_robot_topics(n, robot)
 
-        var date = new Date();
-        var now_time = date.getTime() / 1000;
-        global_tabManager.prev_time[n] = now_time;
-
-        // function darpa_msg_from_ros_msg
-
         var last_cloud_report_success = "never";
 
         global_tabManager.Tab_TaskSub[n].subscribe(function (msg) {
+            global_tabManager.tasks[n] = msg.data
+        });
+
+        global_tabManager.Tab_CommSub[n].subscribe(function (msg) {
             // Save our current time to update connection status
             // The service call isn't reliable!
-            // TODO need to change this again since we're not talking directly to the robot
-            // Maybe use artifact image?
-            global_tabManager.time_since_last_msg[n] = new Date();
-            global_tabManager.tasks[n] = msg.data
+            global_tabManager.incomm[n] = msg.data;
         });
 
         // Creating tab at top of screen for selecting robot view
@@ -411,16 +408,21 @@ class TabManager {
     // This is used by "add_tab" above
     listen_to_robot_topics(n, robot){
         let TaskTopic = {
-            topic: "/" + robot + "/task_update",
+            // topic: "/" + robot + "/task_update",
             // topic: "/Base/neighbors/" + robot + "/status",
-            // topic: "/Anchor/neighbors/" + robot + "/status",
+            topic: "/Anchor/neighbors/" + robot + "/status",
             messageType: "std_msgs/String"
+        };
+        let CommTopic = {
+            // topic: "/Base/neighbors/" + robot + "/incomm",
+            topic: "/Anchor/neighbors/" + robot + "/incomm",
+            messageType: "std_msgs/Bool"
         };
         let ArtifactTopic = {
             // topic: "/artifact_record",  // For use when artifact detection is on ground station
             // topic: "/" + this.robot_name[n] + "/artifact_record",
-            topic: "/" + robot + "/artifact_array/relay",
-            // topic: "/Anchor/neighbors/" + robot + "/artifacts",
+            // topic: "/" + robot + "/artifact_array/relay",
+            topic: "/Anchor/neighbors/" + robot + "/artifacts",
             // topic: "/Base/neighbors/" + robot + "/artifacts",
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
@@ -435,6 +437,11 @@ class TabManager {
             ros: ros,
             name: TaskTopic.topic,
             messageType: TaskTopic.messageType
+        });
+        this.Tab_CommSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: CommTopic.topic,
+            messageType: CommTopic.messageType
         });
         this.Tab_ArtifactSub[n] = new ROSLIB.Topic({
             ros: ros,
