@@ -4,6 +4,30 @@ ros = new ROSLIB.Ros({
     url: "ws://localhost:9090"
 });
 
+function send_ma_task(robot_name, signal, value) {
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        // name: `/Anchor/neighbors/${robot_name}/guiTaskName`,
+        name: `/Base/neighbors/${robot_name}/guiTaskName`,
+        messageType: "std_msgs/String"
+    });
+    var msg = new ROSLIB.Message({
+        data: signal
+    });
+    Topic.publish(msg);
+
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        // name: `/Anchor/neighbors/${robot_name}/guiTaskValue`,
+        name: `/Base/neighbors/${robot_name}/guiTaskValue`,
+        messageType: "std_msgs/String"
+    });
+    var msg = new ROSLIB.Message({
+        data: value
+    });
+    Topic.publish(msg);
+}
+
 function send_signal_to(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
@@ -16,16 +40,7 @@ function send_signal_to(robot_name, signal, value) {
     Topic.publish(msg);
 
     // Also publish to multi-agent so it can relay it
-    var Topic = new ROSLIB.Topic({
-        ros: ros,
-        name: `/Anchor/neighbors/${robot_name}/${signal}`,
-        // name: `/Base/neighbors/${robot_name}/${signal}`,
-        messageType: "std_msgs/Bool"
-    });
-    var msg = new ROSLIB.Message({
-        data: value
-    });
-    Topic.publish(msg);
+    send_ma_task(robot_name, signal, (value ? 'True': 'False'));
 }
 
 function send_string_to(robot_name, signal, text) {
@@ -40,16 +55,7 @@ function send_string_to(robot_name, signal, text) {
     Topic.publish(msg);
 
     // Also publish to multi-agent so it can relay it
-    var Topic = new ROSLIB.Topic({
-        ros: ros,
-        name: `/Anchor/neighbors/${robot_name}/${signal}`,
-        // name: `/Base/neighbors/${robot_name}/${signal}`,
-        messageType: "std_msgs/String"
-    });
-    var msg = new ROSLIB.Message({
-        data: text
-    });
-    Topic.publish(msg);
+    send_ma_task(robot_name, signal, text);
 }
 
 // This changes what robot we want to teleop to
@@ -457,22 +463,22 @@ class TabManager {
     // This is used by "add_tab" above
     listen_to_robot_topics(n, robot){
         let TaskTopic = {
-            topic: "/" + robot + "/task_update",
-            // topic: "/Base/neighbors/" + robot + "/status",
+            // topic: "/" + robot + "/task_update",
+            topic: "/Base/neighbors/" + robot + "/status",
             // topic: "/Anchor/neighbors/" + robot + "/status",
             messageType: "std_msgs/String"
         };
         let CommTopic = {
-            // topic: "/Base/neighbors/" + robot + "/incomm",
-            topic: "/Anchor/neighbors/" + robot + "/incomm",
+            topic: "/Base/neighbors/" + robot + "/incomm",
+            // topic: "/Anchor/neighbors/" + robot + "/incomm",
             messageType: "std_msgs/Bool"
         };
         let ArtifactTopic = {
             // topic: "/artifact_record",  // For use when artifact detection is on ground station
             // topic: "/" + this.robot_name[n] + "/artifact_record",
-            topic: "/" + robot + "/artifact_array/relay",
+            // topic: "/" + robot + "/artifact_array/relay",
             // topic: "/Anchor/neighbors/" + robot + "/artifacts",
-            // topic: "/Base/neighbors/" + robot + "/artifacts",
+            topic: "/Base/neighbors/" + robot + "/artifacts",
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
         let ArtifactImgTopic = {
