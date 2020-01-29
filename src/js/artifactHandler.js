@@ -249,6 +249,8 @@ class Artifact {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
+
+    // THIS FUSES ARTIFACTS AND SEND THE FUSED ARTIFACT TO THE MARKER SERVER
     fuse_artifacts(id, useFusedArtifact) {
         let artifact;
         let fusedArtifacts = global_tabManager.fusedArtifacts.artifactsList;
@@ -261,7 +263,6 @@ class Artifact {
         let new_ids = [];
         let remove_ids = [];
 
-        // Publish raw artifact
 
         // Compare to all of the other artifacts in the fuse array
         for (let id2 in fusedArtifacts) {
@@ -367,7 +368,6 @@ class Artifact {
 
             fusedArtifacts[id].robots = [];
             fusedArtifacts[id].robots[this.robot_name] = this.robot_name;
-            // SEND FUSED ARTIFACT MESSAGE TO SERVER
         }
 
         global_tabManager.fusedArtifacts.updateDisplay();

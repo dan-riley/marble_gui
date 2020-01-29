@@ -17,27 +17,26 @@ find_package(catkin REQUIRED
     
     visualization_msgs
     interactive_markers
-    message_generation
+    # message_generation
 )
 
 find_package(OpenCV REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-add_message_files(
-  FILES
-  artifact.msg
-)
+# add_message_files(
+#   FILES
+#   artifact.msg
+# )
 
-generate_messages(
-  DEPENDENCIES
-    roscpp
-    std_msgs
-    geometry_msgs
-    sensor_msgs
-    marble_artifact_detection_msgs
-
-)
+# generate_messages(
+#   DEPENDENCIES
+#     roscpp
+#     std_msgs
+#     geometry_msgs
+#     sensor_msgs
+#     marble_artifact_detection_msgs
+# )
 
 ###################################
 ## catkin specific configuration ##
@@ -64,7 +63,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -74,20 +73,11 @@ include_directories(
 #### build the interactive markers ###########
 ##############################################
 
-add_executable(marker_server src/marker_server.cpp)
-target_link_libraries(marker_server
-   ${catkin_LIBRARIES}
-)
+add_executable(marker_dev_mk1 src/marker_dev_mk1.cpp)
+target_link_libraries(marker_dev_mk1 markers ${catkin_LIBRARIES})
 
-add_executable(demo_mkr_srv src/demo_mkr_srv.cpp)
-target_link_libraries(demo_mkr_srv
-   ${catkin_LIBRARIES}
-)
-
-add_executable(make_mkr src/marker_maker.cpp)
-target_link_libraries(make_mkr
-   ${catkin_LIBRARIES}
-)
+add_library(markers src/markers.cpp)
+target_link_libraries(markers ${catkin_LIBRARIES})
 
 
 
@@ -97,16 +87,20 @@ target_link_libraries(make_mkr
 #############
 
 
+
 ##############################################
 #### install the interactive markers #########
 ##############################################
 
-install(TARGETS
-  marker_server
-  demo_mkr_srv
-  make_mkr
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# install(TARGETS
+#   marker_dev_mk1
+#   markers
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  PATTERN ".svn" EXCLUDE
+)

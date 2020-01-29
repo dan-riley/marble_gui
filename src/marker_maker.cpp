@@ -1,3 +1,5 @@
+// THIS WAS JUST TO TEST SOME BASIC CONCEPTS OF THE MARKERS
+
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 

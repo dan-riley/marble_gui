@@ -335,7 +335,7 @@ button {
 .submitted_div{
   overflow-y: scroll;
   min-height: 100px;
-  height: 11vh;
+  height: 10vh;
   overflow-x: hidden;
   resize: vertical;
 

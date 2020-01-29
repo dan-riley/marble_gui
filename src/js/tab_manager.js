@@ -55,14 +55,33 @@ function send_string_to(robot_name, signal, text) {
 // This changes what robot we want to teleop to
 function teleop_to(robot_name){
     var tele_btn = document.getElementById(`${robot_name}_teleop`);
+    var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
     if(tele_btn.value == "Teleop"){
         teleop_robot = robot_name;
         tele_btn.value = "Disable Teleop";
+        robot_ctrl_card.style.backgroundColor = "#FF4C26";
     }else{
         teleop_robot = "Base";
         tele_btn.value = "Teleop";
+        robot_ctrl_card.style.backgroundColor = "darkgrey";
     }
 }
+
+
+function director(robot_name){
+    var tele_btn = document.getElementById(`${robot_name}_teleop`);
+    var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
+    if(tele_btn.value == "Teleop"){
+        teleop_robot = robot_name;
+        tele_btn.value = "Disable Teleop";
+        robot_ctrl_card.style.backgroundColor = "#FF4C26";
+    }else{
+        teleop_robot = "Base";
+        tele_btn.value = "Teleop";
+        robot_ctrl_card.style.backgroundColor = "darkgrey";
+    }
+}
+
 
 // This needs to run all the time
 function teleop_route(){
@@ -84,6 +103,36 @@ function teleop_route(){
     teleop_listener.subscribe(function (message){
         if(teleop_robot != last_robot){
             Topic.name = `/${teleop_robot}/cmd_vel`;
+            last_robot = teleop_robot;
+            console.log("changed target robot")
+        }
+        var msg = new ROSLIB.Message(message.data);
+        if(teleop_robot != 'base'){
+            Topic.publish(msg);
+            console
+        }
+    });
+}
+
+
+// This sends the goal pose from RVIZ to the correct robot
+function go_to_pose(){
+    var pose_listener = new ROSLIB.Topic({
+        ros: ros,
+        name: '/robot_to_goal',
+        messageType: 'geometry_msgs/Pose'
+    });
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
+        name: `/${teleop_robot}/goal`,
+        messageType: "geometry_msgs/Pose"
+    })
+    // create a publisher
+    var last_robot = "base"
+    pose_listener.subscribe(function (message){
+        if(teleop_robot != last_robot){
+            Topic.name = `/${teleop_robot}/goal_pose`;
             last_robot = teleop_robot;
             console.log("changed target robot")
         }
@@ -260,7 +309,7 @@ class TabManager {
 
         // This is for creatiung the control card for each robot on the sidebar
         $('#controls_bar_inner').prepend(`
-        <li class="quick_control">
+        <li id="${this.robot_name[n]}_control_card" class="quick_control">
             <h4>${this.robot_name[n]}</h4>
             <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
                 onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)">
