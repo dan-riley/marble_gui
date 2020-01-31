@@ -356,6 +356,11 @@ class TabManager {
                 Go Home
             </button>
             <br>
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_deploy"
+                onclick="send_string_to('${this.robot_name[n]}', 'task', 'Deploy')">
+                Deploy Beacon
+            </button>
+            <br>
             <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off"
                 onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', false)">
                 E-Stop Disabled
