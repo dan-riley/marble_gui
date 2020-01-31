@@ -73,7 +73,7 @@ function teleop_to(robot_name){
     }
 }
 
-
+// This is ro indicate a robot is goint to a point specified by the operator
 function director(robot_name){
     var tele_btn = document.getElementById(`${robot_name}_teleop`);
     var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
@@ -133,7 +133,7 @@ function go_to_pose(){
         // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
         name: `/${teleop_robot}/goal`,
         messageType: "geometry_msgs/Pose"
-    })
+    });
     // create a publisher
     var last_robot = "base"
     pose_listener.subscribe(function (message){
@@ -148,6 +148,27 @@ function go_to_pose(){
             console
         }
     });
+}
+
+
+// This sends a fused artifact to the marker server
+function send_fused_update(artifact, id){
+    var fused_pub = new ROSLIB.Topic({
+        ros: ros,
+        // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
+        name: `/gui/fused_artifact`,
+        // Probably change this to a custom message
+        messageType: "marble_gui/ArtifactTransport"
+    });
+
+    // Use the pose to make life easy. just neglect the orientation stuff
+    var pose = new ROSLIB.Message({
+        artifact_name: artifact.object_class,
+        artifact_id: id,
+        position: artifact.position
+      });
+      console.log(pose)
+    fused_pub.publish(pose)
 }
 
 class TabManager {

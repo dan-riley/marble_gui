@@ -373,6 +373,8 @@ class Artifact {
         global_tabManager.fusedArtifacts.updateDisplay();
         for (let n in global_tabManager.global_vehicleArtifactsList) {
             global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
+            // Try publishing fused artifacts here to marker server
+            send_fused_update(fusedArtifacts[id], id);
         }
         return fuse;
     }

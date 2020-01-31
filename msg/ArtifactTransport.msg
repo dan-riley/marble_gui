@@ -1,0 +1,3 @@
+string artifact_name
+string artifact_id
+Point position
