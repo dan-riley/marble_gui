@@ -1,4 +1,10 @@
 var fs = require("fs");
+
+// Robots that are allowed to be displayed in the GUI
+// Leave the file blank to display any that match
+var robots_file = fs.readFileSync("js/robots.txt", "utf-8");
+var robots_disp = robots_file.split("\n");
+
 // you might wnat to change where the artifact file is
 // It works by putting each artifact on a new line
 var artifact_file = fs.readFileSync("js/artifacts.txt", "utf-8");
