@@ -20,13 +20,16 @@ using namespace std;
 /*
     This is a 3 dof marker used mostly for artifacts
 */
-InteractiveMarker make3dofMarker(geometry_msgs::Pose &pos, string &artifact_name);
+InteractiveMarker make3dofMarker(geometry_msgs::Pose &pos, const string &artifact_name, const string &id, string world_frame);
 
 
 /*
     This is a 6 dof marker used for goal positions
 */
-InteractiveMarker make6dofMarker(geometry_msgs::Pose &pos, string &artifact_name);
+InteractiveMarker make6dofMarker(geometry_msgs::Pose &pos, const string &artifact_name, string world_frame);
+
+
+string* getIdFromName(string glob);
 
 
 InteractiveMarkerControl& makeArtifactControl(InteractiveMarker &msg, int dof);

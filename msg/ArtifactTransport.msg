@@ -1,3 +1,4 @@
-string artifact_name
-string artifact_id
+string object_class
+string id
+string origin
 Point position

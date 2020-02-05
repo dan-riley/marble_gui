@@ -7,6 +7,7 @@
     </node>
     <node name="marker_dev_mk1" pkg="marble_gui" type="marker_dev_mk1" output="screen">
     </node>
+    <param name="frame" type="string" value="world"/>
     <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen" args="$(find marble_gui)/src">
     </node>
 </launch>

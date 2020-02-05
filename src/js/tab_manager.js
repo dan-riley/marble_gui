@@ -153,22 +153,43 @@ function go_to_pose(){
 
 // This sends a fused artifact to the marker server
 function send_fused_update(artifact, id){
-    var fused_pub = new ROSLIB.Topic({
-        ros: ros,
-        // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
-        name: `/gui/fused_artifact`,
-        // Probably change this to a custom message
-        messageType: "marble_gui/ArtifactTransport"
-    });
+    // Important to catch these null artifacts
+    if(artifact != undefined){
+        console.log("sending fused artifact to server: " + artifact)
+        var fused_pub = new ROSLIB.Topic({
+            ros: ros,
+            // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
+            name: `/gui/fused_artifact`,
+            // Probably change this to a custom message
+            messageType: "marble_gui/ArtifactTransport"
+        });
+        // console.log(artifact)
+        // Use the pose to make life easy. just neglect the orientation stuff
+        var pose = new ROSLIB.Message({
+            object_class: artifact.obj_class,
+            id: id,
+            position: artifact.position,
+            origin: "gui"
+        });
+        //   console.log(pose)
+        fused_pub.publish(pose)
+    }
+}
 
-    // Use the pose to make life easy. just neglect the orientation stuff
-    var pose = new ROSLIB.Message({
-        artifact_name: artifact.object_class,
-        artifact_id: id,
-        position: artifact.position
+
+// This will listen to and process the updates from the marker server to update the gui
+function listen_to_markers(){
+    var listener = new ROSLIB.Topic({
+        ros : ros,
+        name : '/mkr_srv_talkback',
+        messageType : 'marble_gui/ArtifactTransport'
       });
-      console.log(pose)
-    fused_pub.publish(pose)
+    
+      listener.subscribe(function(message) {
+        // Kick this over to update fused artifacts
+        
+        // listener.unsubscribe();
+      });
 }
 
 class TabManager {
@@ -282,12 +303,6 @@ class TabManager {
         let n = this.i;
         var robot = this.robot_name[n];
 
-        // Make decision about where this device will go in the gui
-        if(robot.includes("B") || robot.includes("S")){
-
-        }else{
-
-        }
         console.log("Tab: " + robot);
 
         let input_str;
@@ -502,9 +517,9 @@ class TabManager {
         let ArtifactTopic = {
             // topic: "/artifact_record",  // For use when artifact detection is on ground station
             // topic: "/" + this.robot_name[n] + "/artifact_record",
-            // topic: "/" + robot + "/artifact_array/relay",
+            topic: "/" + robot + "/artifact_array/relay",
             // topic: "/Anchor/neighbors/" + robot + "/artifacts",
-            topic: "/Base/neighbors/" + robot + "/artifacts",
+            // topic: "/Base/neighbors/" + robot + "/artifacts",
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
         let ArtifactImgTopic = {

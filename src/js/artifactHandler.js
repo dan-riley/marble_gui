@@ -373,7 +373,7 @@ class Artifact {
         global_tabManager.fusedArtifacts.updateDisplay();
         for (let n in global_tabManager.global_vehicleArtifactsList) {
             global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
-            // Try publishing fused artifacts here to marker server
+            // Try publishing fused artifacts here to marker server ArtifactTransport
             send_fused_update(fusedArtifacts[id], id);
         }
         return fuse;
@@ -406,7 +406,12 @@ class Artifact {
 
             // Set a unique id.  Position never changes, but index can
             // Only update the list if it's a new artifact
-            let id = msg[i].position.x + '-' + msg[i].position.y + '-' + msg[i].position.z;
+            let x = Math.round((msg[i].position.x + Number.EPSILON) * 100) / 100
+            let y = Math.round((msg[i].position.y + Number.EPSILON) * 100) / 100
+            let z = Math.round((msg[i].position.z + Number.EPSILON) * 100) / 100
+            let id = x + '-' + y + '-' + z;
+            // The old way to do IDs
+            // let id = msg[i].position.x + '-' + msg[i].position.y + '-' + msg[i].position.z;
 
             if ((this.artifactsList[id] == undefined) && (msg[i].position.x > 0)) {
                 update = true;
@@ -442,7 +447,7 @@ class Artifact {
         // console.log("set artifacts")
         if (update) {
             //this.save_file();
-            this.updateDisplay();
+            this.updateDisplay();            
         }
     }
 

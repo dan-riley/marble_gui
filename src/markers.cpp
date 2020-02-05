@@ -17,20 +17,21 @@
 using namespace visualization_msgs;
 using namespace std;
 
+
 /*
     This is a 3 dof marker used mostly for artifacts
     THIS IS USED IN THE MAIN MARKER SERVER CODE
 */
-InteractiveMarker make3dofMarker(geometry_msgs::Pose &pos, string &artifact_name){
+InteractiveMarker make3dofMarker(geometry_msgs::Pose &pos, const string &artifact_name, const string &id, string world_frame){
     // Instatiate marker
 	InteractiveMarker int_marker;
 	// May have to change this for octomap
-	int_marker.header.frame_id = "base_link";
+	int_marker.header.frame_id = world_frame;
 
 	int_marker.scale = 1;
 
-	int_marker.name = artifact_name;
-	int_marker.description = artifact_name;
+	int_marker.name = artifact_name + "||" + id;
+	int_marker.description = id;
 
 	// insert a box
 	makeArtifactControl(int_marker, 3);
@@ -42,10 +43,10 @@ InteractiveMarker make3dofMarker(geometry_msgs::Pose &pos, string &artifact_name
 	return int_marker;
 }
 
-InteractiveMarker make6dofMarker(geometry_msgs::Pose &pos, string &artifact_name){
+InteractiveMarker make6dofMarker(geometry_msgs::Pose &pos, const string &artifact_name, string world_frame){
     InteractiveMarker int_marker;
     // You'll want to change this
-    int_marker.header.frame_id = "base_link";
+    int_marker.header.frame_id = world_frame;
     int_marker.scale = 1;
 
     int_marker.name = artifact_name;
