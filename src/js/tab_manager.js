@@ -247,23 +247,35 @@ class TabManager {
     // list if they are not there already
     search_robots() {
         var _this = global_tabManager;
-        // This is where robots and beacons are filtered
-        var patt = /^((?!B).)\d{1,2}(?!_)/;
 
-      for (let i = 0; i < topicsList.length; i++) {
-            let name = topicsList[i].split('/')[1];
-            var handled_names = [];
+        if (robots_disp.length == 1) {
+            // This is where robots and beacons are filtered
+            var patt = /^((?!B).)\d{1,2}(?!_)/;
 
-            if (handled_names.indexOf(name) == -1) {
-                if (patt.test(name) && (name != 'S01')) {
-                    if (_this.robot_name.indexOf(name) == -1) {
-                        _this.robot_name.push(name);
-                        _this.tabs_robot_name.push(name);
-                        _this.x++;
+            for (let i = 0; i < topicsList.length; i++) {
+                let name = topicsList[i].split('/')[1];
+                var handled_names = [];
+
+                if (handled_names.indexOf(name) == -1) {
+                    if (patt.test(name) && (name != 'S01')) {
+                        if (_this.robot_name.indexOf(name) == -1) {
+                            _this.robot_name.push(name);
+                            _this.tabs_robot_name.push(name);
+                            _this.x++;
+                        }
                     }
+                    handled_names.push(name);
                 }
-                handled_names.push(name);
             }
+        } else {
+          for (let i = 0; i < robots_disp.length - 1; i++) {
+              name = robots_disp[i];
+              if (_this.robot_name.indexOf(name) == -1) {
+                _this.robot_name.push(name);
+                _this.tabs_robot_name.push(name);
+                _this.x++;
+              }
+          }
         }
 
         let curr_robot_length = _this.robot_name.length; // Length of entire robots seen over all time after function
