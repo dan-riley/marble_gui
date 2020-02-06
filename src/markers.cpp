@@ -31,6 +31,7 @@ InteractiveMarker make3dofMarker(geometry_msgs::Pose &pos, const string &artifac
 	int_marker.scale = 1;
 
 	int_marker.name = artifact_name + "||" + id;
+    cout << "making 3 dof marker: " << int_marker.name << endl; 
 	int_marker.description = id;
 
 	// insert a box

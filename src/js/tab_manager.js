@@ -58,6 +58,7 @@ function send_string_to(robot_name, signal, text) {
     send_ma_task(robot_name, signal, text);
 }
 
+
 // This changes what robot we want to teleop to
 function teleop_to(robot_name){
     var tele_btn = document.getElementById(`${robot_name}_teleop`);
@@ -72,6 +73,7 @@ function teleop_to(robot_name){
         robot_ctrl_card.style.backgroundColor = "darkgrey";
     }
 }
+
 
 // This is ro indicate a robot is goint to a point specified by the operator
 function director(robot_name){
@@ -125,20 +127,20 @@ function teleop_route(){
 function go_to_pose(){
     var pose_listener = new ROSLIB.Topic({
         ros: ros,
-        name: '/robot_to_goal',
+        name: '/gui_god/feedback',
         messageType: 'geometry_msgs/Pose'
     });
     var Topic = new ROSLIB.Topic({
         ros: ros,
         // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
-        name: `/${teleop_robot}/goal`,
+        name: `Base/neighbors/${teleop_robot}/guiGoalPoint`,
         messageType: "geometry_msgs/Pose"
     });
     // create a publisher
     var last_robot = "base"
     pose_listener.subscribe(function (message){
         if(teleop_robot != last_robot){
-            Topic.name = `/${teleop_robot}/goal_pose`;
+            // Topic.name = `/${teleop_robot}/goal_pose`;
             last_robot = teleop_robot;
             console.log("changed target robot")
         }

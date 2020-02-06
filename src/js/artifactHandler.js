@@ -320,7 +320,12 @@ class Artifact {
                     newArtifact.position.y = y / length;
                     newArtifact.position.z = z / length;
                     newArtifact.obj_prob = obj_prob / length;
-                    let newid = newArtifact.position.x + '-' + newArtifact.position.y + '-' + newArtifact.position.z;
+                    let new_x = Math.round((newArtifact.position.x + Number.EPSILON) * 100) / 100
+                    let new_y = Math.round((newArtifact.position.y + Number.EPSILON) * 100) / 100
+                    let new_z = Math.round((newArtifact.position.z + Number.EPSILON) * 100) / 100
+                    let newid = new_x + '-' + new_y + '-' + new_z;
+                    // old way
+                    // let newid = newArtifact.position.x + '-' + newArtifact.position.y + '-' + newArtifact.position.z;
 
                     fusedArtifacts[newid] = newArtifact;
                     fusedArtifacts[newid].id = newid;
@@ -379,6 +384,18 @@ class Artifact {
         return fuse;
     }
 
+    update_fused_artifact(msg){
+        let id = msg.id;
+        fusedArtifacts[id].position = msg.position;
+        fusedArtifacts[id].vehicle_reporter = "GUI";
+        console.log(this.fuse_artifacts[id]);
+        // The display needs to be updated
+        this.updateDisplay();
+        // This is a potential solution
+        //  global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
+
+    }
+
     set_artifacts(msg) {
         // console.log("begining of setting artifact")
         let update = false;
@@ -406,10 +423,10 @@ class Artifact {
 
             // Set a unique id.  Position never changes, but index can
             // Only update the list if it's a new artifact
-            let x = Math.round((msg[i].position.x + Number.EPSILON) * 100) / 100
-            let y = Math.round((msg[i].position.y + Number.EPSILON) * 100) / 100
-            let z = Math.round((msg[i].position.z + Number.EPSILON) * 100) / 100
-            let id = x + '-' + y + '-' + z;
+            var id_x = Math.round((msg[i].position.x + Number.EPSILON) * 100) / 100
+            var id_y = Math.round((msg[i].position.y + Number.EPSILON) * 100) / 100
+            var id_z = Math.round((msg[i].position.z + Number.EPSILON) * 100) / 100
+            let id = id_x + '-' + id_y + '-' + id_z;
             // The old way to do IDs
             // let id = msg[i].position.x + '-' + msg[i].position.y + '-' + msg[i].position.z;
 

@@ -52,6 +52,7 @@ void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr
             updated_artifact.id = identifiers[1];
             updated_artifact.origin = "mkr_srvr";
             pub.publish(updated_artifact);
+            cout << "you moved " << identifiers[0] << endl;
         }
 		
 	}
