@@ -24,7 +24,8 @@ using namespace std;
 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 // boost::shared_ptr<ros::NodeHandle> n;
 interactive_markers::MenuHandler menu_handler;
-ros::Publisher pub, goal_pub;
+ros::Publisher pub;
+ros::Publisher goal_pub;
 string world_frame;
 
 
@@ -40,10 +41,17 @@ void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr
 
 	if(feedback->event_type == InteractiveMarkerFeedback::POSE_UPDATE){
         if(feedback->marker_name == "GOAL"){
-            goal_pub.publish(feedback->pose);
+            geometry_msgs::Pose pos;
+            pos.position = feedback->pose.position;
+            pos.orientation = feedback->pose.orientation;
+            goal_pub.publish(pos);
+            // cout << "updating goal: " << pos << endl;
+            ros::spinOnce();
         }else{
+            cout << feedback->marker_name << endl;
             // [artifact name] [artifact id]
             string* identifiers = getIdFromName(feedback->marker_name);
+            cout << identifiers << endl;
             marble_gui::ArtifactTransport updated_artifact;
             updated_artifact.position.x = feedback->pose.position.x;
             updated_artifact.position.y = feedback->pose.position.y;
@@ -52,7 +60,8 @@ void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr
             updated_artifact.id = identifiers[1];
             updated_artifact.origin = "mkr_srvr";
             pub.publish(updated_artifact);
-            cout << "you moved " << identifiers[0] << endl;
+            delete[] identifiers;
+            // cout << "you moved " << identifiers[0] << endl;
         }
 		
 	}
@@ -71,7 +80,7 @@ string* getIdFromName(string glob){
     // string to char array 
     strcpy(char_array, glob.c_str()); 
     // [artifact name] [artifact id]
-    string components [2];
+    string* components = new string[2];
     
     char *token = strtok(char_array, "||"); 
     
@@ -137,7 +146,7 @@ void markerCallback(const marble_gui::ArtifactTransport &art){
         // Check to see if we already have this artifact
         if(check_for_artifact(full_name)){
             server->setPose(full_name, pos);
-            cout << "successfully updated marker " + art.object_class << endl;
+            cout << "successfully updated marker " + full_name << endl;
         }else{
             cout << "making a new marker for " + art.object_class << endl;
             makeMarker(3, pos, art.object_class, art.id);
@@ -166,6 +175,7 @@ int main(int argc, char **argv){
 	ros::init(argc, argv, "int_mkr_srv");
 	// ros::init(argc, argv, "listener");
     ros::NodeHandle n;
+
 	if(!n.getParam("frame", world_frame)){
         cout << "something wrong with your frame parameter" << endl;
         return 1;
@@ -181,7 +191,7 @@ int main(int argc, char **argv){
 
 	// subscribe to fused artifacts
 	ros::Subscriber sub = n.subscribe("/gui/fused_artifact", 10, markerCallback);
-	pub = n.advertise<marble_artifact_detection_msgs::Artifact>("mkr_srv_talkback", 5);
+	pub = n.advertise<marble_gui::ArtifactTransport>("mkr_srv_talkback", 5);
     goal_pub = n.advertise<geometry_msgs::Pose>("robot_to_goal", 10);
     
     

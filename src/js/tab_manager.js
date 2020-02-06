@@ -75,20 +75,20 @@ function teleop_to(robot_name){
 }
 
 
-// This is ro indicate a robot is goint to a point specified by the operator
-function director(robot_name){
-    var tele_btn = document.getElementById(`${robot_name}_teleop`);
-    var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
-    if(tele_btn.value == "Teleop"){
-        teleop_robot = robot_name;
-        tele_btn.value = "Disable Teleop";
-        robot_ctrl_card.style.backgroundColor = "#FF4C26";
-    }else{
-        teleop_robot = "Base";
-        tele_btn.value = "Teleop";
-        robot_ctrl_card.style.backgroundColor = "darkgrey";
-    }
-}
+// // This is ro indicate a robot is goint to a point specified by the operator
+// function director(robot_name){
+//     var tele_btn = document.getElementById(`${robot_name}_teleop`);
+//     var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
+//     if(tele_btn.value == "Teleop"){
+//         teleop_robot = robot_name;
+//         tele_btn.value = "Disable Teleop";
+//         robot_ctrl_card.style.backgroundColor = "#FF4C26";
+//     }else{
+//         teleop_robot = "Base";
+//         tele_btn.value = "Teleop";
+//         robot_ctrl_card.style.backgroundColor = "darkgrey";
+//     }
+// }
 
 
 // This needs to run all the time
@@ -125,9 +125,10 @@ function teleop_route(){
 
 // This sends the goal pose from RVIZ to the correct robot
 function go_to_pose(){
+    // console.log("what is going on =================================");
     var pose_listener = new ROSLIB.Topic({
         ros: ros,
-        name: '/gui_god/feedback',
+        name: '/robot_to_goal',
         messageType: 'geometry_msgs/Pose'
     });
     var Topic = new ROSLIB.Topic({
@@ -138,16 +139,17 @@ function go_to_pose(){
     });
     // create a publisher
     var last_robot = "base"
+    // console.log("hey something happened ===========================================");
     pose_listener.subscribe(function (message){
         if(teleop_robot != last_robot){
-            // Topic.name = `/${teleop_robot}/goal_pose`;
+            Topic.name = `Base/neighbors/${teleop_robot}/guiGoalPoint`;
             last_robot = teleop_robot;
-            console.log("changed target robot")
+            // console.log("changed target robot")
         }
         var msg = new ROSLIB.Message(message.data);
         if(teleop_robot != 'base'){
             Topic.publish(msg);
-            console
+            // console.log(msg);
         }
     });
 }
@@ -189,7 +191,7 @@ function listen_to_markers(){
     
       listener.subscribe(function(message) {
         // Kick this over to update fused artifacts
-        
+        update_fused_artifact(message);
         // listener.unsubscribe();
       });
 }

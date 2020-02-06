@@ -1,3 +1,16 @@
+function update_fused_artifact(msg){
+    let id = msg.id;
+    fusedArtifacts[id].position = msg.position;
+    fusedArtifacts[id].vehicle_reporter = "GUI";
+    console.log(this.fuse_artifacts[id]);
+    // The display needs to be updated
+    updateDisplay();
+    // This is a potential solution
+    //  global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
+
+}
+
+
 /**
  * Artifact class for handling, sending, and checking known artifacts
  */
@@ -384,17 +397,7 @@ class Artifact {
         return fuse;
     }
 
-    update_fused_artifact(msg){
-        let id = msg.id;
-        fusedArtifacts[id].position = msg.position;
-        fusedArtifacts[id].vehicle_reporter = "GUI";
-        console.log(this.fuse_artifacts[id]);
-        // The display needs to be updated
-        this.updateDisplay();
-        // This is a potential solution
-        //  global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
-
-    }
+    
 
     set_artifacts(msg) {
         // console.log("begining of setting artifact")
