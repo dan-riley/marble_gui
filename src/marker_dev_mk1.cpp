@@ -27,6 +27,7 @@ interactive_markers::MenuHandler menu_handler;
 ros::Publisher pub;
 ros::Publisher goal_pub;
 string world_frame;
+geometry_msgs::Pose robot_goal;
 
 
 // This is the vector of artifact names in play right now
@@ -41,12 +42,12 @@ void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr
 
 	if(feedback->event_type == InteractiveMarkerFeedback::POSE_UPDATE){
         if(feedback->marker_name == "GOAL"){
-            geometry_msgs::Pose pos;
-            pos.position = feedback->pose.position;
-            pos.orientation = feedback->pose.orientation;
-            goal_pub.publish(pos);
+            // geometry_msgs::Pose pos;
+            robot_goal.position = feedback->pose.position;
+            robot_goal.orientation = feedback->pose.orientation;
+            // goal_pub.publish(pos);
             // cout << "updating goal: " << pos << endl;
-            ros::spinOnce();
+            // ros::spinOnce();
         }else{
             cout << feedback->marker_name << endl;
             // [artifact name] [artifact id]
@@ -168,6 +169,16 @@ void initGoal(){
     makeMarker(6, pos, name, name);
     server->applyChanges();
     // cout << "applied changes to server" << endl;
+    publishGoal();
+}
+
+void publishGoal(){
+    ros::Rate r(10); // 10 hz
+    while(ros::ok){
+        goal_pub.publish(robot_goal);
+        ros::spinOnce();
+        r.sleep();
+    }
 }
 
 
@@ -198,6 +209,7 @@ int main(int argc, char **argv){
 	server->applyChanges();
 
     initGoal();
+
 
 	ros::spin();
 

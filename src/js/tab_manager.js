@@ -1,5 +1,6 @@
 var ANALYZE_TOPICS_LIST_INTERVAL = 2000;
 var teleop_robot = "base"
+var goal_pose = new ROSLIB.Message();
 ros = new ROSLIB.Ros({
     url: "ws://localhost:9090"
 });
@@ -124,34 +125,29 @@ function teleop_route(){
 
 
 // This sends the goal pose from RVIZ to the correct robot
-function go_to_pose(){
-    // console.log("what is going on =================================");
+function listen_to_pose(){
     var pose_listener = new ROSLIB.Topic({
         ros: ros,
         name: '/robot_to_goal',
         messageType: 'geometry_msgs/Pose'
     });
+   
+    pose_listener.subscribe(function (message){
+        goal_pose = message
+    });
+}
+
+function publish_goal(robot){
     var Topic = new ROSLIB.Topic({
         ros: ros,
         // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
-        name: `Base/neighbors/${teleop_robot}/guiGoalPoint`,
+        name: `Base/neighbors/${robot}/guiGoalPoint`,
         messageType: "geometry_msgs/Pose"
     });
-    // create a publisher
-    var last_robot = "base"
-    // console.log("hey something happened ===========================================");
-    pose_listener.subscribe(function (message){
-        if(teleop_robot != last_robot){
-            Topic.name = `Base/neighbors/${teleop_robot}/guiGoalPoint`;
-            last_robot = teleop_robot;
-            // console.log("changed target robot")
-        }
-        var msg = new ROSLIB.Message(message.data);
-        if(teleop_robot != 'base'){
-            Topic.publish(msg);
-            // console.log(msg);
-        }
-    });
+    Topic.name = `Base/neighbors/${robot}/guiGoalPoint`;
+    if(robot != 'base'){
+        Topic.publish(goal_pose);
+    }
 }
 
 
@@ -407,6 +403,8 @@ class TabManager {
             </button>
             <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
                 onclick="teleop_to('${this.robot_name[n]}')" value="Teleop"></input><br>
+            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
+                onclick="publish_goal('${this.robot_name[n]}')" value="Goal"></input><br>
         </li>
         `)
 

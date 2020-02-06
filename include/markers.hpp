@@ -42,3 +42,5 @@ Marker makeGoal(InteractiveMarker &msg);
 
 
 void makeControls(InteractiveMarker &marker, bool rotate);
+
+void publishGoal();
