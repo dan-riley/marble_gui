@@ -181,6 +181,8 @@ void publishGoal(){
     }
 }
 
+// void goalToRobot(msg) soon!
+
 
 int main(int argc, char **argv){
 	ros::init(argc, argv, "int_mkr_srv");

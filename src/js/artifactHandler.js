@@ -1,12 +1,8 @@
 function update_fused_artifact(msg){
     let id = msg.id;
+    let fusedArtifacts = global_tabManager.fusedArtifacts.artifactsList;
     fusedArtifacts[id].position = msg.position;
-    fusedArtifacts[id].vehicle_reporter = "GUI";
-    console.log(this.fuse_artifacts[id]);
-    // The display needs to be updated
-    updateDisplay();
-    // This is a potential solution
-    //  global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
+    global_tabManager.fusedArtifacts.updateDisplay();
 
 }
 
@@ -483,7 +479,7 @@ class Artifact {
         // This is called by the submit button on the modal
         $('#edit_submit').click(function () {
             console.log("submit button");
-            different_scope_this.submit_artifact(id, different_scope_this);
+            submit_artifact(id, different_scope_this);
         });
 
         $('#NewReportModal').modal({backdrop: 'static', keyboard: false});
