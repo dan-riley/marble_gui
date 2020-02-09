@@ -301,6 +301,8 @@ class TabManager {
                 task_dom.html('<font color="yellow">Reporting</font>');
             } else if (task == "Deploy") {
                 task_dom.html('<font color="yellow">Deploying Beacon</font>');
+            } else if (task == "Stop") {
+                task_dom.html('<font color="red">Stopped</font>');
             } else if (task == "Explore") {
                 task_dom.html('<font color="green">Exploring</font>');
             } else if (task == "guiCommand") {
@@ -377,7 +379,7 @@ class TabManager {
                 Start
             </button>
             <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop"
-                onclick="send_signal_to('${this.robot_name[n]}', 'estop', true)">
+                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Stop')">
                 Stop
             </button>
             <br>
