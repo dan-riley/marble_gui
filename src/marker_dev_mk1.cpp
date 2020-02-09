@@ -178,7 +178,7 @@ void initGoal(){
 }
 
 void publishGoal(){
-    ros::Rate r(10); // 10 hz
+    ros::Rate r(1); // 1 hz
     while(ros::ok){
         goal_pub.publish(robot_goal);
         ros::spinOnce();
@@ -186,7 +186,9 @@ void publishGoal(){
     }
 }
 
-// void goalToRobot(msg) soon!
+void goalToRobotCallback(geometry_msgs::Pose msg){
+    server->setPose("GOAL", msg);
+}
 
 
 int main(int argc, char **argv){
@@ -209,6 +211,7 @@ int main(int argc, char **argv){
 
 	// subscribe to fused artifacts
 	ros::Subscriber sub = n.subscribe("/gui/fused_artifact", 10, markerCallback);
+    ros::Subscriber goal_sub = n.subscribe("/gui/goal_to_robot", 10, goalToRobotCallback);
 	pub = n.advertise<marble_gui::ArtifactTransport>("mkr_srv_talkback", 5);
     goal_pub = n.advertise<geometry_msgs::Pose>("robot_to_goal", 10);
     

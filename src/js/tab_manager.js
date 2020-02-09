@@ -76,22 +76,6 @@ function teleop_to(robot_name){
 }
 
 
-// // This is ro indicate a robot is goint to a point specified by the operator
-// function director(robot_name){
-//     var tele_btn = document.getElementById(`${robot_name}_teleop`);
-//     var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
-//     if(tele_btn.value == "Teleop"){
-//         teleop_robot = robot_name;
-//         tele_btn.value = "Disable Teleop";
-//         robot_ctrl_card.style.backgroundColor = "#FF4C26";
-//     }else{
-//         teleop_robot = "Base";
-//         tele_btn.value = "Teleop";
-//         robot_ctrl_card.style.backgroundColor = "darkgrey";
-//     }
-// }
-
-
 // This needs to run all the time
 function teleop_route(){
     // listen to /base/twist
@@ -123,77 +107,6 @@ function teleop_route(){
     });
 }
 
-
-// This sends the goal pose from RVIZ to the correct robot
-function listen_to_pose(){
-    var pose_listener = new ROSLIB.Topic({
-        ros: ros,
-        name: '/robot_to_goal',
-        messageType: 'geometry_msgs/Pose'
-    });
-   
-    pose_listener.subscribe(function (message){
-        goal_pose = message
-    });
-}
-
-function publish_goal(robot){
-    var Topic = new ROSLIB.Topic({
-        ros: ros,
-        // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
-        name: `Base/neighbors/${robot}/guiGoalPoint`,
-        messageType: "geometry_msgs/Pose"
-    });
-    Topic.name = `Base/neighbors/${robot}/guiGoalPoint`;
-    if(robot != 'base'){
-        Topic.publish(goal_pose);
-    }
-}
-
-// This sends a fused artifact to the marker server
-function send_fused_update(artifact, id, old_id) {
-    // Important to catch these null artifacts
-    if (artifact != undefined) {
-        if (old_id)
-            console.log("Updating fused artifact " + old_id + " with " + id)
-        else
-            console.log("Sending new fused artifact to server: " + id)
-
-        var fused_pub = new ROSLIB.Topic({
-            ros: ros,
-            // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
-            name: `/gui/fused_artifact`,
-            // Probably change this to a custom message
-            messageType: "marble_gui/ArtifactTransport"
-        });
-        // console.log(artifact)
-        // Use the pose to make life easy. just neglect the orientation stuff
-        var pose = new ROSLIB.Message({
-            object_class: artifact.obj_class,
-            id: id,
-            old_id: old_id,
-            position: artifact.position,
-            origin: "gui"
-        });
-        //   console.log(pose)
-        fused_pub.publish(pose)
-    }
-}
-
-// This will listen to and process the updates from the marker server to update the gui
-function listen_to_markers(){
-    var listener = new ROSLIB.Topic({
-        ros : ros,
-        name : '/mkr_srv_talkback',
-        messageType : 'marble_gui/ArtifactTransport'
-      });
-    
-      listener.subscribe(function(message) {
-        // Kick this over to update fused artifacts
-        update_fused_artifact(message);
-        // listener.unsubscribe();
-      });
-}
 
 class TabManager {
     constructor() {
