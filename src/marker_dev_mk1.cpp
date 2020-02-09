@@ -49,10 +49,10 @@ void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr
             // cout << "updating goal: " << pos << endl;
             // ros::spinOnce();
         }else{
-            cout << feedback->marker_name << endl;
+            // cout << feedback->marker_name << endl;
             // [artifact name] [artifact id]
             string* identifiers = getIdFromName(feedback->marker_name);
-            cout << identifiers << endl;
+            // cout << identifiers << endl;
             marble_gui::ArtifactTransport updated_artifact;
             updated_artifact.position.x = feedback->pose.position.x;
             updated_artifact.position.y = feedback->pose.position.y;
@@ -103,11 +103,11 @@ void makeMarker(int dof, geometry_msgs::Pose &pos, const string &artifact_name, 
     InteractiveMarker int_marker;  
     if(dof == 3){
         cout << "making 3dof marker" << endl;
-        int_marker = make3dofMarker(pos, artifact_name, id, world_frame);
+        int_marker = make3dofMarker(artifact_name, id, world_frame);
     }
     if(dof == 6){
         cout << "CHOOSE 6 DOF" << endl;
-        int_marker = make6dofMarker(pos, artifact_name, world_frame);
+        int_marker = make6dofMarker(artifact_name, world_frame);
     }
     // Error case 
     if(dof != 3 && dof != 6){
@@ -117,7 +117,7 @@ void makeMarker(int dof, geometry_msgs::Pose &pos, const string &artifact_name, 
 	
 	server->insert(int_marker);
 	server->setCallback(int_marker.name, &processFeedback);
-	
+    server->setPose(int_marker.name, pos);
 }
 
 bool check_for_artifact(string &name){
@@ -144,10 +144,15 @@ void markerCallback(const marble_gui::ArtifactTransport &art){
         pos.position.y = art.position.y;
         pos.position.z = art.position.z;
         string full_name = art.object_class + "||" + art.id;
+        string old_name = art.object_class + "||" + art.old_id;
         // Check to see if we already have this artifact
         if(check_for_artifact(full_name)){
             server->setPose(full_name, pos);
             cout << "successfully updated marker " + full_name << endl;
+        } else if (!art.old_id.empty() && check_for_artifact(old_name)) {
+            server->erase(old_name);
+            makeMarker(3, pos, art.object_class, art.id);
+            cout << "moved marker " + old_name + " to " + full_name << endl;
         }else{
             cout << "making a new marker for " + art.object_class << endl;
             makeMarker(3, pos, art.object_class, art.id);

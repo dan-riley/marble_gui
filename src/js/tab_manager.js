@@ -150,12 +150,15 @@ function publish_goal(robot){
     }
 }
 
-
 // This sends a fused artifact to the marker server
-function send_fused_update(artifact, id){
+function send_fused_update(artifact, id, old_id) {
     // Important to catch these null artifacts
-    if(artifact != undefined){
-        console.log("sending fused artifact to server: " + artifact)
+    if (artifact != undefined) {
+        if (old_id)
+            console.log("Updating fused artifact " + old_id + " with " + id)
+        else
+            console.log("Sending new fused artifact to server: " + id)
+
         var fused_pub = new ROSLIB.Topic({
             ros: ros,
             // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
@@ -168,6 +171,7 @@ function send_fused_update(artifact, id){
         var pose = new ROSLIB.Message({
             object_class: artifact.obj_class,
             id: id,
+            old_id: old_id,
             position: artifact.position,
             origin: "gui"
         });
@@ -175,7 +179,6 @@ function send_fused_update(artifact, id){
         fused_pub.publish(pose)
     }
 }
-
 
 // This will listen to and process the updates from the marker server to update the gui
 function listen_to_markers(){
@@ -296,8 +299,12 @@ class TabManager {
                 task_dom.html('<font color="yellow">Going Home</font>');
             } else if (task == "Report") {
                 task_dom.html('<font color="yellow">Reporting</font>');
+            } else if (task == "Deploy") {
+                task_dom.html('<font color="yellow">Deploying Beacon</font>');
             } else if (task == "Explore") {
                 task_dom.html('<font color="green">Exploring</font>');
+            } else if (task == "guiCommand") {
+                task_dom.html('<font color="green">GUI Goal</font>');
             } else {
                 if (task == undefined) task = '';
                 task_dom.html('<font color="red">' + task + '</font>');
@@ -375,16 +382,16 @@ class TabManager {
             </button>
             <br>
             <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_explore"
-                onclick="send_string_to('${this.robot_name[n]}', 'task', 'Explore')">
+                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Explore')">
                 Explore
             </button>
             <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home"
-                onclick="send_string_to('${this.robot_name[n]}', 'task', 'Home')">
+                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Home')">
                 Go Home
             </button>
             <br>
             <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_deploy"
-                onclick="send_string_to('${this.robot_name[n]}', 'task', 'Deploy')">
+                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')">
                 Deploy Beacon
             </button>
             <br>
@@ -531,9 +538,9 @@ class TabManager {
         let ArtifactTopic = {
             // topic: "/artifact_record",  // For use when artifact detection is on ground station
             // topic: "/" + this.robot_name[n] + "/artifact_record",
-            topic: "/" + robot + "/artifact_array/relay",
+            // topic: "/" + robot + "/artifact_array/relay",
             // topic: "/Anchor/neighbors/" + robot + "/artifacts",
-            // topic: "/Base/neighbors/" + robot + "/artifacts",
+            topic: "/Base/neighbors/" + robot + "/artifacts",
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
         let ArtifactImgTopic = {
