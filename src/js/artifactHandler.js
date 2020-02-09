@@ -3,7 +3,6 @@ function update_fused_artifact(msg){
     let fusedArtifacts = global_tabManager.fusedArtifacts.artifactsList;
     fusedArtifacts[id].position = msg.position;
     global_tabManager.fusedArtifacts.updateDisplay();
-
 }
 
 
@@ -230,8 +229,6 @@ class Artifact {
                 this.savedArtifacts.push(type)
                 console.log(`saved artifact ${type}`)
             }
-            
-
         }
     }
 
@@ -345,6 +342,9 @@ class Artifact {
                     }
                     new_ids.push(newid);
                     remove_ids.push(id2);
+
+                    // Move the marker
+                    send_fused_update(fusedArtifacts[newid], newid, id2);
                 }
             }
         }
@@ -370,7 +370,6 @@ class Artifact {
             }
         }
 
-
         if (!useFusedArtifact && !fuse) {
             fusedArtifacts[id] = Object.assign({}, this.artifactsList[id]);
             fusedArtifacts[id].position = Object.assign({}, this.artifactsList[id].position);
@@ -382,18 +381,18 @@ class Artifact {
 
             fusedArtifacts[id].robots = [];
             fusedArtifacts[id].robots[this.robot_name] = this.robot_name;
+
+            // Publish the new fused artifact to markers
+            send_fused_update(fusedArtifacts[id], id, '');
         }
 
         global_tabManager.fusedArtifacts.updateDisplay();
         for (let n in global_tabManager.global_vehicleArtifactsList) {
             global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
-            // Try publishing fused artifacts here to marker server ArtifactTransport
-            send_fused_update(fusedArtifacts[id], id);
         }
+
         return fuse;
     }
-
-    
 
     set_artifacts(msg) {
         // console.log("begining of setting artifact")
@@ -463,7 +462,7 @@ class Artifact {
         // console.log("set artifacts")
         if (update) {
             //this.save_file();
-            this.updateDisplay();            
+            this.updateDisplay();
         }
     }
 
@@ -477,7 +476,7 @@ class Artifact {
         // This is here for a reason as part of a scope change
         var different_scope_this = this;
         // This is called by the submit button on the modal
-        $('#edit_submit').click(function () {
+        $('#edit_submit').off('click').on('click', function () {
             console.log("submit button");
             submit_artifact(id, different_scope_this);
         });
@@ -490,7 +489,6 @@ class Artifact {
 // ================================================================================================
 // THIS IS SUBMITTING AN ARTIFACT
 // ================================================================================================
-    
 
     get_robot_name() {
         return this.robot_name;
@@ -510,13 +508,11 @@ class Artifact {
         if(fs.existsSync(robot_reported)){
             var reported_artifact_file = fs.readFileSync(robot_reported, "utf-8");
             this.reportedArtifacts = artifact_file.split("\n");
-            
             console.log("recovered artifacts");
         }else{
             fs.openSync(robot_reported, "w");
             console.log("made a recovery file for " + this.robot_name);
         }
-        
     }
 
     // Function for determining color id of artifacts in Artifact list
@@ -540,7 +536,7 @@ class Artifact {
 }
 
 async function submit_artifact(id, _this) {
-    // var robo_name = _this.get_robot_name();
+    var robo_name = _this.get_robot_name();
 
     var data = {
         "x": parseFloat($('#edit_x_pos').val()),
@@ -589,7 +585,7 @@ async function submit_artifact(id, _this) {
     var position_string =  `${$('#edit_x_pos').val()}, ${$('#edit_y_pos').val()}, ${$('#edit_z_pos').val()}`;
     var notes = $('#edit_notes ').val();
     var type = $('#edit_type').val();
-    
+
     $('#submission_tbody').append(`
     <tr>
         <td>${type}</td>
@@ -613,70 +609,69 @@ async function submit_artifact(id, _this) {
     $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
         .done(function (json) {
             log_submitted_artifacts(type, position_string, notes, json.score_change);
-            update_submitted_table(json, position_string, data);
-            
+            update_submitted_table(robo_name, id, json, position_string, data);
         });
 
     $('#NewReportModal').modal('hide');
 }
 
 // Update the submitted table
-function update_submitted_table(json, position_string, data){
+function update_submitted_table(robo_name, id, json, position_string, data){
     // This is for testing a bad artifact and darpa responding with "0"
     if(data.type == "return 0"){
-        json.score_change = 0;
-   }
-   
-   // This is where we get the darpa score back - specifically json.score_change
+      json.score_change = 0;
+    }
 
-   // Write overall reported 
-   var submission_result = "+" + json.score_change + " points";
-   // Here down is mostly formatting
-   $("[id='" + position_string + "']").text(submission_result);
+    // This is where we get the darpa score back - specifically json.score_change
 
-   var color_class = 'table-danger';
-   if(json.score_change > 0){
-       color_class = 'table-success';
-   }
-   $("[id='" + position_string + "']").parent().addClass(color_class);
+    // Write overall reported
+    var submission_result = "+" + json.score_change + " points";
+    // Here down is mostly formatting
+    $("[id='" + position_string + "']").text(submission_result);
 
-   // Put the fused artifact in the fused artifact tab
-   var fused_div = document.getElementById("fused_artifacts");
-   
-   // document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
+    var color_class = 'table-danger';
+    if(json.score_change > 0){
+        color_class = 'table-success';
+    }
+    $("[id='" + position_string + "']").parent().addClass(color_class);
 
-   // if (json.score_change > 0) {
-   //     document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
-   // }
+    // Put the fused artifact in the fused artifact tab
+    var fused_div = document.getElementById("fused_artifacts");
 
-   // if (robo_name == "Base") {
-   //     for (let id2 in org_artifacts) {
-   //         let artifact = org_artifacts[id2];
-   //         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].submitted = true;
-   //         global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].result = json.score_change;
-   //         let robot_name = global_tabManager.global_vehicleArtifactsList[artifact.n].robot_name;
-   //         if (json.score_change > 0) {
-   //             document.getElementById("submit_" + robot_name + "_" + id2).disabled = true;
-   //         }
+    document.getElementById("submit_" + robo_name + "_" + id).innerText = "submission result: " + submission_result;
 
-   //         global_tabManager.global_vehicleArtifactsList[artifact.n].updateDisplay();
-   //     }
-   // } else {
-   //     for (let id2 in global_tabManager.fusedArtifacts.artifactsList) {
-   //         let fartifact = global_tabManager.fusedArtifacts.artifactsList[id2];
-   //         for (let id3 in fartifact.originals) {
-   //             if (id3 == id) {
-   //                 fartifact.submitted = true;
-   //                 fartifact.result = json.score_change;
-   //                 if (json.score_change > 0) {
-   //                     document.getElementById("submit_Base_" + id2).disabled = true;
-   //                 }
-   //             }
-   //         }
-   //     }
-   //     global_tabManager.fusedArtifacts.updateDisplay();
-   // }
-   if(json.score_change > 0){
-       $('#' + position_string).html('Success');
-   }
+    if (json.score_change > 0) {
+        document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
+    }
+
+    if (robo_name == "Base") {
+        for (let id2 in org_artifacts) {
+            let artifact = org_artifacts[id2];
+            global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].submitted = true;
+            global_tabManager.global_vehicleArtifactsList[artifact.n].artifactsList[id2].result = json.score_change;
+            let robot_name = global_tabManager.global_vehicleArtifactsList[artifact.n].robot_name;
+            if (json.score_change > 0) {
+                document.getElementById("submit_" + robot_name + "_" + id2).disabled = true;
+            }
+
+            global_tabManager.global_vehicleArtifactsList[artifact.n].updateDisplay();
+        }
+    } else {
+        for (let id2 in global_tabManager.fusedArtifacts.artifactsList) {
+            let fartifact = global_tabManager.fusedArtifacts.artifactsList[id2];
+            for (let id3 in fartifact.originals) {
+                if (id3 == id) {
+                    fartifact.submitted = true;
+                    fartifact.result = json.score_change;
+                    if (json.score_change > 0) {
+                        document.getElementById("submit_Base_" + id2).disabled = true;
+                    }
+                }
+            }
+        }
+        global_tabManager.fusedArtifacts.updateDisplay();
+    }
+    if(json.score_change > 0){
+        $('#' + position_string).html('Success');
+    }
 }

@@ -22,7 +22,7 @@ using namespace std;
     This is a 3 dof marker used mostly for artifacts
     THIS IS USED IN THE MAIN MARKER SERVER CODE
 */
-InteractiveMarker make3dofMarker(geometry_msgs::Pose &pos, const string &artifact_name, const string &id, string world_frame){
+InteractiveMarker make3dofMarker(const string &artifact_name, const string &id, string world_frame){
     // Instatiate marker
 	InteractiveMarker int_marker;
 	// May have to change this for octomap
@@ -44,7 +44,7 @@ InteractiveMarker make3dofMarker(geometry_msgs::Pose &pos, const string &artifac
 	return int_marker;
 }
 
-InteractiveMarker make6dofMarker(geometry_msgs::Pose &pos, const string &artifact_name, string world_frame){
+InteractiveMarker make6dofMarker(const string &artifact_name, string world_frame){
     InteractiveMarker int_marker;
     // You'll want to change this
     int_marker.header.frame_id = world_frame;
