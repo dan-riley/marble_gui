@@ -1,5 +1,5 @@
 var ANALYZE_TOPICS_LIST_INTERVAL = 2000;
-var teleop_robot = "base"
+var teleop_robot = "Base"
 var goal_pose = new ROSLIB.Message();
 ros = new ROSLIB.Ros({
     url: "ws://localhost:9090"
@@ -92,17 +92,16 @@ function teleop_route(){
         messageType: "geometry_msgs/Twist"
     })
     // create a publisher
-    var last_robot = "base"
+    var last_robot = "Base"
     teleop_listener.subscribe(function (message){
         if(teleop_robot != last_robot){
-            Topic.name = `/${teleop_robot}/cmd_vel`;
+            Topic.name = `/${teleop_robot}/cmd_vel_base`;
             last_robot = teleop_robot;
             console.log("changed target robot")
         }
-        var msg = new ROSLIB.Message(message.data);
-        if(teleop_robot != 'base'){
+        var msg = new ROSLIB.Message(message);
+        if(teleop_robot != 'Base'){
             Topic.publish(msg);
-            console
         }
     });
 }

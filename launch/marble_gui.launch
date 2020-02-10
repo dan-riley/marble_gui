@@ -10,4 +10,5 @@
     <param name="frame" type="string" value="world"/>
     <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen" args="$(find marble_gui)/src">
     </node>
+    <include file="$(find marble_gui)/launch/teleop.launch" />
 </launch>
