@@ -98,6 +98,19 @@ class Artifact {
         };
         robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_yes);
 
+        let robot_artifact_tracker_delete = document.createElement("BUTTON");
+        robot_artifact_tracker_delete.setAttribute("id", "delete_" + this.robot_name + "_" + id);
+        robot_artifact_tracker_delete.innerText = "X";
+        robot_artifact_tracker_delete.onclick = function () {
+            if (robot_name == 'Base') {
+                global_tabManager.fusedArtifacts.deleteArtifact(id);
+            } else {
+                global_tabManager.global_vehicleArtifactsList[n].deleteArtifact(id);
+            }
+        };
+        robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_delete);
+
+
         let robot_artifact_tracker_reset = document.createElement("DIV");
         robot_artifact_tracker_reset.onclick = function () {
             if (robot_name == 'Base') {
@@ -171,6 +184,8 @@ class Artifact {
             if (artifact.submitted) {
                 this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").firstChild.style.color = "#aaaaaa";
                 this.artifact_tracker[id].querySelector("[id = 'submit_" + this.robot_name + "_" + id + "']").innerText = 'submission result: ' + this.artifactsList[id].result;
+                let delButton = this.artifact_tracker[id].querySelector("[id = 'delete_" + this.robot_name + "_" + id + "']");
+                if (delButton) delButton.remove();
             }
 
             this.artifact_confidence[id].setAttribute("value", toString(confidence));
@@ -466,6 +481,17 @@ class Artifact {
         }
     }
 
+    deleteArtifact(id) {
+        this.artifact_tracker[id].remove();
+        delete this.artifactsList[id];
+        delete this.artifact_tracker[id];
+        delete this.artifact_position[id];
+        delete this.artifact_type[id];
+        delete this.artifact_seen_by[id];
+        delete this.artifact_confidence[id];
+        delete this.artifact_image[id];
+    }
+
     open_edit_submit_modal(id){
         console.log("inside the submit modal");
         $('#edit_x_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).x.toFixed(2));
@@ -594,7 +620,7 @@ async function submit_artifact(id, _this) {
         <td id="${position_string}">No result yet</td>
     </tr>`);
 
-    // var org_artifacts = _this.artifactsList[id].originals;
+    var org_artifacts = _this.artifactsList[id].originals;
     console.log("submitting artifact to DARPA server. Waiting for response...");
     let t = new Date();
     t.setSeconds(t.getSeconds() - 1);
@@ -609,14 +635,14 @@ async function submit_artifact(id, _this) {
     $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
         .done(function (json) {
             log_submitted_artifacts(type, position_string, notes, json.score_change);
-            update_submitted_table(robo_name, id, json, position_string, data);
+            update_submitted_table(robo_name, id, org_artifacts, json, position_string, data);
         });
 
     $('#NewReportModal').modal('hide');
 }
 
 // Update the submitted table
-function update_submitted_table(robo_name, id, json, position_string, data){
+function update_submitted_table(robo_name, id, org_artifacts, json, position_string, data){
     // This is for testing a bad artifact and darpa responding with "0"
     if(data.type == "return 0"){
       json.score_change = 0;
@@ -644,6 +670,10 @@ function update_submitted_table(robo_name, id, json, position_string, data){
         document.getElementById("submit_" + robo_name + "_" + id).disabled = true;
     }
 
+    // Remove the delete button if we've ever tried to submit
+    var delButton = document.getElementById("delete_" + robo_name + "_" + id);
+    if (delButton) delButton.remove()
+
     if (robo_name == "Base") {
         for (let id2 in org_artifacts) {
             let artifact = org_artifacts[id2];
@@ -653,6 +683,8 @@ function update_submitted_table(robo_name, id, json, position_string, data){
             if (json.score_change > 0) {
                 document.getElementById("submit_" + robot_name + "_" + id2).disabled = true;
             }
+            delButton = document.getElementById("delete_" + robo_name + "_" + id2);
+            if (delButton) delButton.remove()
 
             global_tabManager.global_vehicleArtifactsList[artifact.n].updateDisplay();
         }
@@ -666,6 +698,9 @@ function update_submitted_table(robo_name, id, json, position_string, data){
                     if (json.score_change > 0) {
                         document.getElementById("submit_Base_" + id2).disabled = true;
                     }
+
+                    delButton = document.getElementById("delete_Base_" + id2);
+                    if (delButton) delButton.remove()
                 }
             }
         }
