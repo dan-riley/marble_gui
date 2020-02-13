@@ -112,14 +112,10 @@ function goal_to_robot(robot){
 
 
 // This tells the marker server to set a constant marker
-function submitted_marker(artifact_info, success) {
+function submitted_marker(artifact, success) {
     // Important to catch these null artifacts
     if (artifact != undefined) {
-        if (old_id){
-            console.log("Updating fused artifact " + old_id + " with " + id)
-        }else{
-            console.log("Sending new fused artifact to server: " + id)
-        }
+        console.log("Saving submitted artifact: " + artifact.id)
         var fused_pub = new ROSLIB.Topic({
             ros: ros,
             // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
@@ -130,13 +126,13 @@ function submitted_marker(artifact_info, success) {
         // console.log(artifact)
         // Use the pose to make life easy. just neglect the orientation stuff
         var pose = new ROSLIB.Message({
-            object_class: artifact_info.type,
+            object_class: artifact.type,
             position: {
-                x: artifact_info.x,
-                y: artifact_info.y,
-                z: artifact_info.z
+                x: artifact.x,
+                y: artifact.y,
+                z: artifact.z
             },
-            origin: "gui", 
+            origin: "gui",
             success: success
         });
         //   console.log(pose)

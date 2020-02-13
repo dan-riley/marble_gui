@@ -5,7 +5,7 @@
     </node>
     <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher" output="screen">
     </node>
-    <node name="marker_dev_mk1" pkg="marble_gui" type="marker_dev_mk1" output="screen">
+    <node name="marker_server" pkg="marble_gui" type="marker_server" output="screen">
     </node>
 
     <param name="frame" type="string" value="world"/>
