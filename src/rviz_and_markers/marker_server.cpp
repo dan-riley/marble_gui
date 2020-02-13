@@ -208,9 +208,9 @@ void deleteMarker(string marker_name){
     // find the index of the marker in the vector
     vector<string>::iterator itr = std::find(logged_artifacts.begin(), logged_artifacts.end(), marker_name);
     // If the marker exists then remove it
-    if(iter != logged_artifacts.cend()){
+    if(itr != logged_artifacts.cend()){
         // remove it from the logged artifact vector
-        logged_artifacts.remove(iter);
+        logged_artifacts.erase(itr);
         // remove it from the server
         server->erase(marker_name);
         server->applyChanges();
@@ -220,7 +220,7 @@ void deleteMarker(string marker_name){
 
 // This makes then publishes the non-interactive markers for the submitted artifacts
 void sumbitted_marker_callback(const marble_gui::ArtifactTransport &art){
-    Marker sub_markers[2] = makeSubmittedMarker(art, world_frame, sub_text_offsets);
+    Marker* sub_markers = makeSubmittedMarker(art, world_frame, sub_text_offsets);
     // Publish the sphere marker and the marker name in the correct colors at the correct locations
     // This is the sphere marker
     sub_mkr_pub.publish(sub_markers[0]);
@@ -232,15 +232,15 @@ void sumbitted_marker_callback(const marble_gui::ArtifactTransport &art){
 
 // This gets the x, y, z offsets for the text of the submitted artifacts
 void setOffsets(ros::NodeHandle* nh){
-    if(!n.getParam("sub_offset_text_x", sub_text_offsets[0])){
+    if(!nh->getParam("sub_offset_text_x", sub_text_offsets[0])){
         cout << "something wrong with your offset x parameter" << endl;
         exit(EXIT_FAILURE);
     }
-    if(!n.getParam("sub_offset_text_y", sub_text_offsets[1])){
+    if(!nh->getParam("sub_offset_text_y", sub_text_offsets[1])){
         cout << "something wrong with your offset y parameter" << endl;
         exit(EXIT_FAILURE);
     }
-    if(!n.getParam("sub_offset_text_z", sub_text_offsets[2])){
+    if(!nh->getParam("sub_offset_text_z", sub_text_offsets[2])){
         cout << "something wrong with your offset z parameter" << endl;
         exit(EXIT_FAILURE);
     }
@@ -258,10 +258,10 @@ int main(int argc, char **argv){
         exit(EXIT_FAILURE);
     }
     // Get the submitted text marker offsets from the launch file
-    setOffsets(&n)
+    setOffsets(&n);
 
     cout << "started marker server" << endl;
-	server->reset(new interactive_markers::InteractiveMarkerServer("gui_god", "", false));
+	server.reset(new interactive_markers::InteractiveMarkerServer("gui_god", "", false));
 	ros::Duration(0.1).sleep();
 
 	// subscribe to fused artifacts
@@ -269,7 +269,7 @@ int main(int argc, char **argv){
     // scribe to the the gui setting the goal to be closer to a robot
     ros::Subscriber goal_sub = n.subscribe("/gui/goal_to_robot", 10, goalToRobotCallback);
     // subscribe to the submitted artifact topic from the gui
-    ros::Subscriber submitted_sub = n.subscribe("/gui/submitted", 10, sumbitted_marker_callback)
+    ros::Subscriber submitted_sub = n.subscribe("/gui/submitted", 10, sumbitted_marker_callback);
 
 
     // updates to gui about fused artifacts
@@ -287,5 +287,5 @@ int main(int argc, char **argv){
 
 	ros::spin();
 
-	server->reset();
+	server.reset();
 }
