@@ -7,6 +7,8 @@
 
 #include "std_msgs/String.h"
 #include "marble_artifact_detection_msgs/Artifact.h"
+#include "marble_gui/ArtifactTransport.h"
+
 
 #include "markers.hpp"
 
@@ -62,6 +64,26 @@ InteractiveMarker make6dofMarker(const string &artifact_name, string world_frame
 }
 
 
+Marker* makeSubmittedMarker(const marble_gui::ArtifactTransport &art, string world_frame){
+    float scale = 1.0;
+    Marker sub_marker_viz = submittedMarker(scale, world_frame, art.success);
+    sub_marker_viz.pose.position.x = art.position.x;
+    sub_marker_viz.pose.position.y = art.position.y;
+    sub_marker_viz.pose.position.z = art.position.z;
+    Marker sub_marker_word = submittedMarker(scale, world_frame, art.success);
+    sub_marker_word.pose.position.x = art.position.x;
+    sub_marker_word.pose.position.y = art.position.y;
+    sub_marker_word.pose.position.z = art.position.z;
+    sub_marker_word.text = art.object_class + "_submitted";
+    
+    static Marker markers [2] = {sub_marker_viz, sub_marker_word};
+
+    return markers;
+}
+
+
+
+
 // This instantiates the control of the marker
 InteractiveMarkerControl& makeArtifactControl(InteractiveMarker &msg, int dof){
 	InteractiveMarkerControl control;
@@ -89,6 +111,30 @@ Marker makeArtifact(InteractiveMarker &msg){
 	marker.color.a = 1.0;
 
 	return marker;
+}
+
+Marker submittedMarker(float scalar, string world_frame, bool success){
+    Marker marker;
+
+    marker.header.frame_id = world_frame;
+
+    marker.type = visualization_msgs::Marker::SPHERE;
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+    marker.scale.x = scalar * 0.45;
+    marker.scale.y = scalar * 0.45;
+    marker.scale.z = scalar * 0.45;
+    marker.color.a = 1.0; // Don't forget to set the alpha!
+    marker.color.b = 0.0;
+    if(success){
+        marker.color.r = 0.0;
+        marker.color.g = 1.0;
+    }else{
+        marker.color.r = 1.0;
+        marker.color.g = 0.0;
+    }
 }
 
 

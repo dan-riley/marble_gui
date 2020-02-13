@@ -24,9 +24,15 @@ using namespace std;
 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 // boost::shared_ptr<ros::NodeHandle> n;
 interactive_markers::MenuHandler menu_handler;
+// This publishes the submitted artifact marker to rviz
+ros::Publisher sub_mkr_pub;
+// This publishes the updated location of any interactive marker
 ros::Publisher pub;
+// This publishes the goal pose for the gui
 ros::Publisher goal_pub;
+// This is so that everything can work on the same world frame
 string world_frame;
+// This is where 
 geometry_msgs::Pose robot_goal;
 
 
@@ -68,6 +74,45 @@ void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr
 	}
 
 	// server->applyChanges();
+}
+
+
+// This deals with marker messages
+// It creates new markers and updates existing ones when necessary
+void markerCallback(const marble_gui::ArtifactTransport &art){
+    // Not fully implemented
+    // return;
+    // cout << "hit the marker callback" << endl;
+    if(art.origin ==  "gui"){
+        geometry_msgs::Pose pos; 
+		// CHECK TO MAKE SURE TEHESE ARE IN THE RIGHT PLACES
+		pos.position.x = art.position.x;
+        pos.position.y = art.position.y;
+        pos.position.z = art.position.z;
+        string full_name = art.object_class + "||" + art.id;
+        string old_name = art.object_class + "||" + art.old_id;
+        // Check to see if we already have this artifact
+        if(check_for_artifact(full_name)){
+            server->setPose(full_name, pos);
+            cout << "successfully updated marker " + full_name << endl;
+        } else if (!art.old_id.empty() && check_for_artifact(old_name)) {
+            server->erase(old_name);
+            makeMarker(3, pos, art.object_class, art.id);
+            cout << "moved marker " + old_name + " to " + full_name << endl;
+        }else{
+            cout << "making a new marker for " + art.object_class << endl;
+            makeMarker(3, pos, art.object_class, art.id);
+        }
+        server->applyChanges();
+    }
+}
+
+void goalToRobotCallback(geometry_msgs::Pose msg){
+    geometry_msgs::Pose pos;
+    pos = msg;
+    pos.position.x += 1;
+    pos.position.y += 1;
+    server->setPose("GOAL", msg);
 }
 
 
@@ -131,37 +176,6 @@ bool check_for_artifact(string &name){
 }
 
 
-// This deals with marker messages
-// It creates new markers and updates existing ones when necessary
-void markerCallback(const marble_gui::ArtifactTransport &art){
-    // Not fully implemented
-    // return;
-    // cout << "hit the marker callback" << endl;
-    if(art.origin ==  "gui"){
-        geometry_msgs::Pose pos; 
-		// CHECK TO MAKE SURE TEHESE ARE IN THE RIGHT PLACES
-		pos.position.x = art.position.x;
-        pos.position.y = art.position.y;
-        pos.position.z = art.position.z;
-        string full_name = art.object_class + "||" + art.id;
-        string old_name = art.object_class + "||" + art.old_id;
-        // Check to see if we already have this artifact
-        if(check_for_artifact(full_name)){
-            server->setPose(full_name, pos);
-            cout << "successfully updated marker " + full_name << endl;
-        } else if (!art.old_id.empty() && check_for_artifact(old_name)) {
-            server->erase(old_name);
-            makeMarker(3, pos, art.object_class, art.id);
-            cout << "moved marker " + old_name + " to " + full_name << endl;
-        }else{
-            cout << "making a new marker for " + art.object_class << endl;
-            makeMarker(3, pos, art.object_class, art.id);
-        }
-        server->applyChanges();
-    }
-}
-
-
 // This just inits the goal marker and keeps publishing the goal position
 void initGoal(){
     geometry_msgs::Pose pos; 
@@ -186,10 +200,6 @@ void publishGoal(){
     }
 }
 
-void goalToRobotCallback(geometry_msgs::Pose msg){
-    server->setPose("GOAL", msg);
-}
-
 
 int main(int argc, char **argv){
 	ros::init(argc, argv, "int_mkr_srv");
@@ -211,6 +221,7 @@ int main(int argc, char **argv){
 
 	// subscribe to fused artifacts
 	ros::Subscriber sub = n.subscribe("/gui/fused_artifact", 10, markerCallback);
+    // scribe to the the gui setting the goal to be closer to a robot
     ros::Subscriber goal_sub = n.subscribe("/gui/goal_to_robot", 10, goalToRobotCallback);
 	pub = n.advertise<marble_gui::ArtifactTransport>("mkr_srv_talkback", 5);
     goal_pub = n.advertise<geometry_msgs::Pose>("robot_to_goal", 10);

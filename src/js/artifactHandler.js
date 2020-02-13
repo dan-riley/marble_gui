@@ -537,6 +537,7 @@ class Artifact {
 
 async function submit_artifact(id, _this) {
     var robo_name = _this.get_robot_name();
+    
 
     var data = {
         "x": parseFloat($('#edit_x_pos').val()),
@@ -671,7 +672,13 @@ function update_submitted_table(robo_name, id, json, position_string, data){
         }
         global_tabManager.fusedArtifacts.updateDisplay();
     }
+
+    let success = false;
+
     if(json.score_change > 0){
         $('#' + position_string).html('Success');
+        success = true;
     }
+
+    submitted_marker(data, success)
 }

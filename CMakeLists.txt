@@ -74,12 +74,11 @@ include_directories(
 #### build the interactive markers ###########
 ##############################################
 
-add_executable(marker_dev_mk1 src/marker_dev_mk1.cpp)
+add_executable(marker_dev_mk1 src/rviz_and_markers/marker_dev_mk1.cpp)
 target_link_libraries(marker_dev_mk1 markers ${catkin_LIBRARIES})
 
-add_library(markers src/markers.cpp)
+add_library(markers src/rviz_and_markers/markers.cpp)
 target_link_libraries(markers ${catkin_LIBRARIES})
-
 
 
 

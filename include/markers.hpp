@@ -9,6 +9,8 @@
 
 #include "std_msgs/String.h"
 #include "marble_artifact_detection_msgs/Artifact.h"
+#include "marble_gui/ArtifactTransport.h"
+
 
 #include <string>
 #include <math.h>
@@ -44,3 +46,9 @@ Marker makeGoal(InteractiveMarker &msg);
 void makeControls(InteractiveMarker &marker, bool rotate);
 
 void publishGoal();
+
+bool check_for_artifact(string &name);
+
+void makeMarker(int dof, geometry_msgs::Pose &pos, const string &artifact_name, const string &id);
+
+Marker submittedMarker(float scalar, string world_frame, bool success);
