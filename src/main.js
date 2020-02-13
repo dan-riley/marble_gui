@@ -15,6 +15,7 @@ function createWindow () {
     }
   })
 
+
   // and load the index.html of the app.
   mainWindow.loadFile('main.html')
 
@@ -28,6 +29,7 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
+
 }
 
 // This method will be called when Electron has finished

@@ -7,7 +7,13 @@
     </node>
     <node name="marker_dev_mk1" pkg="marble_gui" type="marker_dev_mk1" output="screen">
     </node>
+
     <param name="frame" type="string" value="world"/>
+    <!-- The submitted artifact text offsets. change these for better text placement with regard to the sphere marker-->
+    <param name="sub_offset_text_x" type="double" value="0.0"/>
+    <param name="sub_offset_text_y" type="double" value="0.0"/>
+    <param name="sub_offset_text_z" type="double" value="0.0"/>
+
     <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen" args="$(find marble_gui)/src">
     </node>
     <include file="$(find marble_gui)/launch/teleop.launch" />

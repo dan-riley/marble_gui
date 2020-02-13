@@ -64,16 +64,18 @@ InteractiveMarker make6dofMarker(const string &artifact_name, string world_frame
 }
 
 
-Marker* makeSubmittedMarker(const marble_gui::ArtifactTransport &art, string world_frame){
-    float scale = 1.0;
+// This makes the markers for the artifacts submitted to DARPA
+Marker* makeSubmittedMarker(const marble_gui::ArtifactTransport &art, string world_frame, float* text_offsets){
+    float scale = 2.0;
     Marker sub_marker_viz = submittedMarker(scale, world_frame, art.success);
     sub_marker_viz.pose.position.x = art.position.x;
     sub_marker_viz.pose.position.y = art.position.y;
     sub_marker_viz.pose.position.z = art.position.z;
+
     Marker sub_marker_word = submittedMarker(scale, world_frame, art.success);
-    sub_marker_word.pose.position.x = art.position.x;
-    sub_marker_word.pose.position.y = art.position.y;
-    sub_marker_word.pose.position.z = art.position.z;
+    sub_marker_word.pose.position.x = art.position.x + text_offsets[0];
+    sub_marker_word.pose.position.y = art.position.y + text_offsets[1];
+    sub_marker_word.pose.position.z = art.position.z + text_offsets[2];
     sub_marker_word.text = art.object_class + "_submitted";
     
     static Marker markers [2] = {sub_marker_viz, sub_marker_word};
@@ -113,6 +115,7 @@ Marker makeArtifact(InteractiveMarker &msg){
 	return marker;
 }
 
+// This is a more basic non-interactive marker used for submitted 
 Marker submittedMarker(float scalar, string world_frame, bool success){
     Marker marker;
 
@@ -156,7 +159,7 @@ Marker makeGoal(InteractiveMarker &msg){
 }
 
 
-// Make the controls for the marker
+// Make the controls for an interactive marker
 void makeControls(InteractiveMarker &marker, bool rotate){
     InteractiveMarkerControl control;
 	

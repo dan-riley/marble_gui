@@ -4,3 +4,4 @@ string old_id
 string origin
 Point position
 bool success
+bool deleted

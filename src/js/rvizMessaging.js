@@ -115,11 +115,11 @@ function goal_to_robot(robot){
 function submitted_marker(artifact_info, success) {
     // Important to catch these null artifacts
     if (artifact != undefined) {
-        if (old_id)
+        if (old_id){
             console.log("Updating fused artifact " + old_id + " with " + id)
-        else
+        }else{
             console.log("Sending new fused artifact to server: " + id)
-
+        }
         var fused_pub = new ROSLIB.Topic({
             ros: ros,
             // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it

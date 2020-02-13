@@ -16,5 +16,5 @@ sleep 5
 gnome-terminal -e 'sh -c "rosbag play ~/catkin_ws/bagfiles/2019-08-20-14-01-16.bag -r 10; exec bash"' &
 
 # Teleop broadcast node
-gnome-terminal -e 'sh -c "roslaunch `rospack find teleop_twist_joy`/launch/teleop.launch"' &
+# gnome-terminal -e 'sh -c "roslaunch `rospack find teleop_twist_joy`/launch/teleop.launch"' &
 
