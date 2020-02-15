@@ -24,29 +24,29 @@ using namespace std;
     This is a 3 dof marker used mostly for artifacts
     THIS IS USED IN THE MAIN MARKER SERVER CODE
 */
-InteractiveMarker make3dofMarker(const string &artifact_name, const string &id, string world_frame){
+InteractiveMarker make3dofMarker(const string &artifact_name, const string &id, string world_frame) {
     // Instatiate marker
-	InteractiveMarker int_marker;
-	// May have to change this for octomap
-	int_marker.header.frame_id = world_frame;
+    InteractiveMarker int_marker;
+    // May have to change this for octomap
+    int_marker.header.frame_id = world_frame;
 
-	int_marker.scale = 1;
+    int_marker.scale = 1;
 
-	int_marker.name = artifact_name + "||" + id;
-    cout << "making 3 dof marker: " << int_marker.name << endl; 
-	int_marker.description = artifact_name + "||" + id;
+    int_marker.name = artifact_name + "||" + id;
+    cout << "making 3 dof marker: " << int_marker.name << endl;
+    int_marker.description = artifact_name + "||" + id;
 
-	// insert a box
-	makeArtifactControl(int_marker, 3);
-	int_marker.controls[0].interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_3D;
+    // insert a box
+    makeArtifactControl(int_marker, 3);
+    int_marker.controls[0].interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_3D;
 
-    // This makes all of the controls and adds them to the marker 
-    makeControls(int_marker, false);    
-	
-	return int_marker;
+    // This makes all of the controls and adds them to the marker
+    makeControls(int_marker, false);
+
+    return int_marker;
 }
 
-InteractiveMarker make6dofMarker(const string &artifact_name, string world_frame){
+InteractiveMarker make6dofMarker(const string &artifact_name, string world_frame) {
     InteractiveMarker int_marker;
     // You'll want to change this
     int_marker.header.frame_id = world_frame;
@@ -65,58 +65,47 @@ InteractiveMarker make6dofMarker(const string &artifact_name, string world_frame
 
 
 // This makes the markers for the artifacts submitted to DARPA
-Marker* makeSubmittedMarker(const marble_gui::ArtifactTransport &art, string world_frame, float* text_offsets){
+Marker makeSubmittedMarker(const marble_gui::ArtifactTransport &art, string world_frame) {
     float scale = 2.0;
     Marker sub_marker_viz = submittedMarker(scale, world_frame, art.success);
     sub_marker_viz.pose.position.x = art.position.x;
     sub_marker_viz.pose.position.y = art.position.y;
     sub_marker_viz.pose.position.z = art.position.z;
 
-    Marker sub_marker_word = submittedMarker(scale, world_frame, art.success);
-    sub_marker_word.pose.position.x = art.position.x + text_offsets[0];
-    sub_marker_word.pose.position.y = art.position.y + text_offsets[1];
-    sub_marker_word.pose.position.z = art.position.z + text_offsets[2];
-    sub_marker_word.text = art.object_class + "_submitted";
-    
-    static Marker markers [2] = {sub_marker_viz, sub_marker_word};
-
-    return markers;
+    return sub_marker_viz;
 }
-
-
-
 
 // This instantiates the control of the marker
 InteractiveMarkerControl& makeArtifactControl(InteractiveMarker &msg, int dof){
-	InteractiveMarkerControl control;
-	control.always_visible = true;
-    if(dof == 3) control.markers.push_back(makeArtifact(msg));
-    if(dof == 6) control.markers.push_back(makeGoal(msg));
-	msg.controls.push_back(control);
+        InteractiveMarkerControl control;
+        control.always_visible = true;
+    if (dof == 3) control.markers.push_back(makeArtifact(msg));
+    if (dof == 6) control.markers.push_back(makeGoal(msg));
+    msg.controls.push_back(control);
 
-	return msg.controls.back();
+    return msg.controls.back();
 }
 
 
 // This makes the visible shape of the artifact in rviz
-Marker makeArtifact(InteractiveMarker &msg){
-	Marker marker;
+Marker makeArtifact(InteractiveMarker &msg) {
+    Marker marker;
 
-	// This is the shape of the marker, can be mesh object too
-	marker.type = Marker::CUBE;
-	marker.scale.x = msg.scale * 0.45;
-	marker.scale.y = msg.scale * 0.45;
-	marker.scale.z = msg.scale * 0.45;
-	marker.color.r = 0.5;
-	marker.color.g = 0.5;
-	marker.color.b = 0.5;
-	marker.color.a = 1.0;
+    // This is the shape of the marker, can be mesh object too
+    marker.type = Marker::CUBE;
+    marker.scale.x = msg.scale * 0.45;
+    marker.scale.y = msg.scale * 0.45;
+    marker.scale.z = msg.scale * 0.45;
+    marker.color.r = 0.5;
+    marker.color.g = 0.5;
+    marker.color.b = 0.5;
+    marker.color.a = 1.0;
 
-	return marker;
+    return marker;
 }
 
-// This is a more basic non-interactive marker used for submitted 
-Marker submittedMarker(float scalar, string world_frame, bool success){
+// This is a more basic non-interactive marker used for submitted
+Marker submittedMarker(float scalar, string world_frame, bool success) {
     Marker marker;
 
     marker.header.frame_id = world_frame;
@@ -131,43 +120,46 @@ Marker submittedMarker(float scalar, string world_frame, bool success){
     marker.scale.z = scalar * 0.45;
     marker.color.a = 1.0; // Don't forget to set the alpha!
     marker.color.b = 0.0;
-    if(success){
+    if (success) {
         marker.color.r = 0.0;
         marker.color.g = 1.0;
-    }else{
+    } else {
         marker.color.r = 1.0;
         marker.color.g = 0.0;
     }
+    marker.action = visualization_msgs::Marker::ADD;
+
+    return marker;
 }
 
 
 // This makes a goal marker for robots to drive to
-Marker makeGoal(InteractiveMarker &msg){
-	Marker marker;
+Marker makeGoal(InteractiveMarker &msg) {
+    Marker marker;
 
-	// This is the shape of the marker, can be mesh object too
-	marker.type = Marker::ARROW;
-	marker.scale.x = msg.scale * 0.5;
-	marker.scale.y = msg.scale * 0.3;
-	marker.scale.z = msg.scale * 0.3;
-	marker.color.r = 0.5;
-	marker.color.g = 1.0;
-	marker.color.b = 0.0;
-	marker.color.a = 1.0;
+    // This is the shape of the marker, can be mesh object too
+    marker.type = Marker::ARROW;
+    marker.scale.x = msg.scale * 0.5;
+    marker.scale.y = msg.scale * 0.3;
+    marker.scale.z = msg.scale * 0.3;
+    marker.color.r = 0.5;
+    marker.color.g = 1.0;
+    marker.color.b = 0.0;
+    marker.color.a = 1.0;
 
-	return marker;
+    return marker;
 }
 
 
 // Make the controls for an interactive marker
-void makeControls(InteractiveMarker &marker, bool rotate){
+void makeControls(InteractiveMarker &marker, bool rotate) {
     InteractiveMarkerControl control;
-	
+
     control.orientation.w = 1;
     control.orientation.x = 1;
     control.orientation.y = 0;
     control.orientation.z = 0;
-    if(rotate){
+    if (rotate) {
         control.name = "rotate_x";
         control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
         marker.controls.push_back(control);
@@ -175,12 +167,12 @@ void makeControls(InteractiveMarker &marker, bool rotate){
     control.name = "move_x";
     control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
     marker.controls.push_back(control);
-    
+
     control.orientation.w = 1;
     control.orientation.x = 0;
     control.orientation.y = 1;
     control.orientation.z = 0;
-    if(rotate){
+    if (rotate) {
         control.name = "rotate_z";
         control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
         marker.controls.push_back(control);
@@ -193,7 +185,7 @@ void makeControls(InteractiveMarker &marker, bool rotate){
     control.orientation.x = 0;
     control.orientation.y = 0;
     control.orientation.z = 1;
-    if(rotate){
+    if (rotate) {
         control.name = "rotate_y";
         control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
         marker.controls.push_back(control);
@@ -201,5 +193,4 @@ void makeControls(InteractiveMarker &marker, bool rotate){
     control.name = "move_y";
     control.interaction_mode = InteractiveMarkerControl::MOVE_AXIS;
     marker.controls.push_back(control);
-
 }

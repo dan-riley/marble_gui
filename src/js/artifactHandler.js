@@ -618,7 +618,7 @@ async function submit_artifact(id, _this) {
         <td>${type}</td>
         <td>${position_string}</td>
         <td>${notes}</td>
-        <td id="${position_string}">No result yet</td>
+        <td id="${type}_${position_string}">No result yet</td>
     </tr>`);
 
     var org_artifacts = _this.artifactsList[id].originals;
@@ -636,14 +636,14 @@ async function submit_artifact(id, _this) {
     $.post(SCORING_SERVER_ROOT + '/api/artifact_reports/', JSON.stringify(data))
         .done(function (json) {
             log_submitted_artifacts(type, position_string, notes, json.score_change);
-            update_submitted_table(robo_name, id, org_artifacts, json, position_string, data);
+            update_submitted_table(robo_name, id, org_artifacts, json, type + '_' + position_string, data);
         });
 
     $('#NewReportModal').modal('hide');
 }
 
 // Update the submitted table
-function update_submitted_table(robo_name, id, org_artifacts, json, position_string, data){
+function update_submitted_table(robo_name, id, org_artifacts, json, htmlid, data){
     // This is for testing a bad artifact and darpa responding with "0"
     if(data.type == "return 0"){
       json.score_change = 0;
@@ -654,13 +654,13 @@ function update_submitted_table(robo_name, id, org_artifacts, json, position_str
     // Write overall reported
     var submission_result = "+" + json.score_change + " points";
     // Here down is mostly formatting
-    $("[id='" + position_string + "']").text(submission_result);
+    $("[id='" + htmlid + "']").text(submission_result);
 
     var color_class = 'table-danger';
     if(json.score_change > 0){
         color_class = 'table-success';
     }
-    $("[id='" + position_string + "']").parent().addClass(color_class);
+    $("[id='" + htmlid + "']").parent().addClass(color_class);
 
     // Put the fused artifact in the fused artifact tab
     var fused_div = document.getElementById("fused_artifacts");
@@ -711,7 +711,6 @@ function update_submitted_table(robo_name, id, org_artifacts, json, position_str
     let success = false;
 
     if(json.score_change > 0){
-        $('#' + position_string).html('Success');
         success = true;
     }
 

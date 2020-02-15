@@ -115,11 +115,11 @@ function goal_to_robot(robot){
 function submitted_marker(artifact, success) {
     // Important to catch these null artifacts
     if (artifact != undefined) {
-        console.log("Saving submitted artifact: " + artifact.id)
+        console.log("Saving submitted artifact")
         var fused_pub = new ROSLIB.Topic({
             ros: ros,
             // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
-            name: `/gui/fused_artifact`,
+            name: `/gui/submitted`,
             // Probably change this to a custom message
             messageType: "marble_gui/ArtifactTransport"
         });

@@ -3,6 +3,7 @@
 
 #include <interactive_markers/interactive_marker_server.h>
 #include <interactive_markers/menu_handler.h>
+#include <visualization_msgs/MarkerArray.h>
 
 #include <tf/transform_broadcaster.h>
 #include <tf/tf.h>
@@ -10,7 +11,6 @@
 #include "std_msgs/String.h"
 #include "marble_artifact_detection_msgs/Artifact.h"
 #include "marble_gui/ArtifactTransport.h"
-
 
 #include <string>
 #include <math.h>
@@ -60,4 +60,4 @@ void makeMarker(int dof, geometry_msgs::Pose &pos, const string &artifact_name, 
 Marker submittedMarker(float scalar, string world_frame, bool success);
 
 // This makes the markers for the artifacts submitted to DARPA
-Marker* makeSubmittedMarker(const marble_gui::ArtifactTransport &art, string world_frame, float* text_offsets);
+Marker makeSubmittedMarker(const marble_gui::ArtifactTransport &art, string world_frame);
