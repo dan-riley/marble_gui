@@ -61,16 +61,37 @@ function send_string_to(robot_name, signal, text) {
 
 
 // This changes what robot we want to teleop to
-function teleop_to(robot_name){
-    var tele_btn = document.getElementById(`${robot_name}_teleop`);
+// This is legacy code kept around in case I broke something and we need to stitch back
+// function teleop_to(robot_name){
+//     var tele_btn = document.getElementById(`${robot_name}_teleop`);
+//     var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
+//     if(tele_btn.value == "Teleop"){
+//         teleop_robot = robot_name;
+//         tele_btn.value = "Disable Teleop";
+//         robot_ctrl_card.style.backgroundColor = "#FF4C26";
+//     }else{
+//         teleop_robot = "Base";
+//         tele_btn.value = "Teleop";
+//         robot_ctrl_card.style.backgroundColor = "darkgrey";
+//     }
+// }
+
+
+// This changes the teleop robot to whatever is selcted by the controls card
+function teleop_toII(){
+    var opt = document.getElementById("teleop_robot_select");
+    var robot_name = opt.options[opt.selectedIndex].value;
+
+    var tele_btn = document.getElementById(`teleop_toggle`);
     var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
-    if(tele_btn.value == "Teleop"){
+
+    if(tele_btn.value == "Joystick Teleop"){
         teleop_robot = robot_name;
         tele_btn.value = "Disable Teleop";
         robot_ctrl_card.style.backgroundColor = "#FF4C26";
     }else{
         teleop_robot = "Base";
-        tele_btn.value = "Teleop";
+        tele_btn.value = "Joystick Teleop";
         robot_ctrl_card.style.backgroundColor = "darkgrey";
     }
 }
@@ -273,7 +294,7 @@ class TabManager {
         });
 
         // Creating tab at top of screen for selecting robot view
-        $('#Robot_Tabs').prepend(`
+        $('#Robot_Tabs').append(`
             <li class="nav-item" id="${this.robot_name[n]}_nav_link" robot_name="${this.robot_name[n]}">
                 <a  class="nav-link" onclick="window.openPage('${this.robot_name[n]}', ${n})" >
                     ${this.robot_name[n]}
@@ -282,8 +303,11 @@ class TabManager {
                 </a>
             </li>`);
 
+        // add robot to possible robots to teleop
+        this.add_robot_to_teleop(this.robot_name[n]);
+
         // This is for creatiung the control card for each robot on the sidebar
-        $('#controls_bar_inner').prepend(`
+        $('#controls_bar_inner').append(`
         <li id="${this.robot_name[n]}_control_card" class="quick_control">
             <h4>${this.robot_name[n]}</h4>
             <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
@@ -304,7 +328,7 @@ class TabManager {
                 Go Home
             </button>
             <br>
-            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_deploy"
+            <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_deploy"
                 onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')">
                 Deploy Beacon
             </button>
@@ -322,12 +346,14 @@ class TabManager {
                 onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)">
                 Radio Reset
             </button>
-            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
-                onclick="teleop_to('${this.robot_name[n]}')" value="Teleop"></input><br>
-            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
-                onclick="publish_goal('${this.robot_name[n]}')" value="Goal"></input><br>
         </li>
         `)
+
+        // this is some legacy code for the old way of starting teleop
+        // <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
+        //         onclick="teleop_to('${this.robot_name[n]}')" value="Teleop"></input><br>
+        //     <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
+        //         onclick="publish_goal('${this.robot_name[n]}')" value="Goal"></input><br></br>
 
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");
@@ -541,6 +567,15 @@ class TabManager {
 
     get_TopicsFromROS() {
         update_topics_list(global_tabManager.search_robots);
+    }
+
+    // this adds robots to the options in the teleop control card3
+    add_robot_to_teleop(robot_name){
+        var teleop_options = document.getElementById("teleop_robot_select");
+        var option = document.createElement("option");
+        option.text = robot_name;
+        option.value = robot_name;
+        teleop_options.add(option);
     }
 }
 /* Plugin designed to fill the chart with white */

@@ -4,6 +4,18 @@ var fs = require("fs");
 // Leave the file blank to display any that match
 var robots_file = fs.readFileSync("js/robots.txt", "utf-8");
 var robots_disp = robots_file.split("\n");
+// Use these robots to add optopns to the etelop card
+function populate_teleop_robots(){
+    var teleop_options = document.getElementById("teleop_robot_select");
+    for(var i = 0; i < robots_disp.length; i++){
+        var artifact = artifacts[i];
+        var option = document.createElement("option");
+        option.text = artifact;
+        option.value = artifact;
+        modal_options.add(option);
+    }
+}
+
 
 // you might wnat to change where the artifact file is
 // It works by putting each artifact on a new line

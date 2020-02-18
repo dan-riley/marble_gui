@@ -11,17 +11,37 @@ function listen_to_pose(){
     });
 }
 
-function publish_goal(robot){
+// This is legacy code in case i break something and we need to switch back
+// function publish_goal(robot){
+//     var Topic = new ROSLIB.Topic({
+//         ros: ros,
+//         name: `Base/neighbors/${robot}/guiGoalPoint`,
+//         messageType: "geometry_msgs/Pose"
+//     });
+//     Topic.name = `Base/neighbors/${robot}/guiGoalPoint`;
+//     if(robot != 'base'){
+//         Topic.publish(goal_pose);
+//     }
+// }
+
+
+// This sends the goal location to  the specified robot
+function publish_goalII(){
+    var opt = document.getElementById("teleop_robot_select");
+    var robot = opt.options[opt.selectedIndex].value;
+
     var Topic = new ROSLIB.Topic({
         ros: ros,
         name: `Base/neighbors/${robot}/guiGoalPoint`,
         messageType: "geometry_msgs/Pose"
     });
+    
     Topic.name = `Base/neighbors/${robot}/guiGoalPoint`;
     if(robot != 'base'){
         Topic.publish(goal_pose);
     }
 }
+
 
 // This sends a fused artifact to the marker server
 function send_fused_update(artifact, id, old_id) {

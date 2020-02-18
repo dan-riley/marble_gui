@@ -87,6 +87,19 @@
         scrolls independently from any of the rest of the page -->
     <div id="controls_bar" >
         <ul id="controls_bar_inner" class="sidenav">
+            <li id="teleopo_control_card" class="quick_control">
+                <h4>Teleop Controls</h4>
+                <div class="form-group">
+                    <!-- This is for selecting the robot to control -->
+                    <select class="custom-select" id="teleop_robot_select">
+
+                    </select>
+                </div>
+                <input type='button' class="btn btn-warning btn-sm" id="teleop_toggle"
+                    onclick="teleop_toII()" value="Joystick Teleop"></input><br>
+                <input type='button' class="btn btn-warning btn-sm" id="robot_to_goal"
+                    onclick="publish_goalII()" value="Go to goal"></input><br>
+            </li>
             <!-- The cards go in here -->
             <!-- Make the card styling better because rn...its not great -->
         </ul>
