@@ -8,11 +8,12 @@ var robots_disp = robots_file.split("\n");
 function populate_teleop_robots(){
     var teleop_options = document.getElementById("teleop_robot_select");
     for(var i = 0; i < robots_disp.length; i++){
-        var artifact = artifacts[i];
+        var robot = robots_disp[i];
         var option = document.createElement("option");
-        option.text = artifact;
-        option.value = artifact;
-        modal_options.add(option);
+        option.text = robot;
+        option.value = robot;
+        option.style.width = "8vw";
+        teleop_options.add(option);
     }
 }
 
@@ -113,7 +114,9 @@ function get_darpa_artifacts(){
 }
 
 //Move files from this mission to another folder with date and stuff
+// end mission
 function end_mission(){
+    console.log(existing_logs)
     // MAKE BETTER DIR NAME
     var currentdate = new Date(); 
     var folder = currentdate.getFullYear() + "."
@@ -122,11 +125,22 @@ function end_mission(){
                 + currentdate.getHours() + "."  
                 + currentdate.getMinutes() + "." 
                 + currentdate.getSeconds();
-    fs.mkdirSync(`past_missions/${folder}`)
+    fs.mkdirSync(`js/saved_missions/${folder}`)
     for(f = 0; f < existing_logs.length; f++){
-        fs.renameSync(`js/${existing_logs[f]}`, `${folder}/${existing_logs[f]}`);
+        let oldPath = `js/${existing_logs[f]}_reported.txt`;
+        let newPath = `js/saved_missions/${folder}/${existing_logs[f]}_reported.txt`; 
+        copy(oldPath, newPath);
     }
     $('#EndMissionModal').modal('hide');
+}
+
+function copy(oldPath, newPath) {
+    fs.rename(oldPath, newPath, (err) => {
+        if (err) throw err;
+        console.log('Rename complete!');
+      });
+
+    
 }
 
 

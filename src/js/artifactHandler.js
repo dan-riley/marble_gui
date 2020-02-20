@@ -562,7 +562,14 @@ class Artifact {
 }
 
 async function submit_artifact(id, _this) {
-    var robo_name = _this.get_robot_name();
+    var robo_name;
+    
+    // Catches for custom artifacts
+    if(_this != undefined){
+        robo_name = _this.get_robot_name();
+    }else{
+        robo_name = "base";
+    }
     
 
     var data = {
@@ -571,6 +578,11 @@ async function submit_artifact(id, _this) {
         "z": parseFloat($('#edit_z_pos').val()),
         "type": $('#edit_type').val()
     };
+
+    // Catching for custom artifacts
+    if(id == 'base'){
+        id = `${data.x}-${data.y}-${data.z}`; 
+    }
 
     // Old code for finding the highest confidence.  We're doing this using
     // base_artifact_fusion.  If this comes back, need to check code for new layout
@@ -621,7 +633,7 @@ async function submit_artifact(id, _this) {
         <td id="${type}_${position_string}">No result yet</td>
     </tr>`);
 
-    var org_artifacts = _this.artifactsList[id].originals;
+    // var org_artifacts = _this.artifactsList[id].originals;
     console.log("submitting artifact to DARPA server. Waiting for response...");
     let t = new Date();
     t.setSeconds(t.getSeconds() - 1);
@@ -715,4 +727,18 @@ function update_submitted_table(robo_name, id, org_artifacts, json, htmlid, data
     }
 
     submitted_marker(data, success)
+}
+
+// This is a work around for the custom submit modal so
+// it actually submits when there are no fused artifacts
+function custom_submission(){
+    console.log("inside the submit modal");
+    $('#edit_submit').off('click').on('click', function () {
+        console.log("submit button");
+        submit_artifact("base", undefined);
+        $('#NewReportModal').modal("hide");
+    });
+
+    $('#NewReportModal').modal({backdrop: 'static', keyboard: false});
+    $('#NewReportModal').modal("show");
 }

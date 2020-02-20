@@ -77,24 +77,7 @@ function send_string_to(robot_name, signal, text) {
 // }
 
 
-// This changes the teleop robot to whatever is selcted by the controls card
-function teleop_toII(){
-    var opt = document.getElementById("teleop_robot_select");
-    var robot_name = opt.options[opt.selectedIndex].value;
 
-    var tele_btn = document.getElementById(`teleop_toggle`);
-    var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
-
-    if(tele_btn.value == "Joystick Teleop"){
-        teleop_robot = robot_name;
-        tele_btn.value = "Disable Teleop";
-        robot_ctrl_card.style.backgroundColor = "#FF4C26";
-    }else{
-        teleop_robot = "Base";
-        tele_btn.value = "Joystick Teleop";
-        robot_ctrl_card.style.backgroundColor = "darkgrey";
-    }
-}
 
 
 // This needs to run all the time
@@ -333,15 +316,10 @@ class TabManager {
                 Deploy Beacon
             </button>
             <br>
-            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off"
-                onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', false)">
-                E-Stop Disabled
-            </button>
-            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_estop"
-                onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', true)">
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_toggle"
+                onclick="estop_toggle('${this.robot_name[n]}')">
                 E-Stop
             </button>
-            <br>
             <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_radio"
                 onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)">
                 Radio Reset
@@ -354,6 +332,15 @@ class TabManager {
         //         onclick="teleop_to('${this.robot_name[n]}')" value="Teleop"></input><br>
         //     <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
         //         onclick="publish_goal('${this.robot_name[n]}')" value="Goal"></input><br></br>
+
+        //     <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off"
+        //         onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', false)">
+        //         E-Stop Disabled
+        //     </button>
+        //     <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_estop"
+        //         onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', true)">
+        //         E-Stop
+        //     </button>
 
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");

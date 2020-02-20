@@ -43,6 +43,15 @@ function publish_goalII(){
 }
 
 
+// This send the goal near the pose of the specified robot
+function goal_to_robot(){
+    var opt = document.getElementById("teleop_robot_select");
+    var robot = opt.options[opt.selectedIndex].value;
+
+    send_string_to("gui", "goal_to_robot", robot)
+}
+
+
 // This sends a fused artifact to the marker server
 function send_fused_update(artifact, id, old_id) {
     // Important to catch these null artifacts

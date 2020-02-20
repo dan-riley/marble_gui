@@ -33,6 +33,8 @@
     <script type="text/javascript" src="js/fileCopy.js"></script>
     <script type="text/javascript" src="js/battery.js"></script>
     <script type="text/javascript" src="js/renderjson.js"></script>
+    <script type="text/javascript" src="js/buttons.js"></script>
+
     <!-- <script type="text/javascript" src="js/webviz.js"></script> -->
 
     <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
@@ -91,14 +93,16 @@
                 <h4>Teleop Controls</h4>
                 <div class="form-group">
                     <!-- This is for selecting the robot to control -->
-                    <select class="custom-select" id="teleop_robot_select">
+                    <select class="form-control" id="teleop_robot_select">
 
                     </select>
                 </div>
                 <input type='button' class="btn btn-warning btn-sm" id="teleop_toggle"
                     onclick="teleop_toII()" value="Joystick Teleop"></input><br>
                 <input type='button' class="btn btn-warning btn-sm" id="robot_to_goal"
-                    onclick="publish_goalII()" value="Go to goal"></input><br>
+                    onclick="publish_goalII()" value="Go to goal"></input>
+                <input type='button' class="btn btn-warning btn-sm" id="goal_to_robot"
+                    onclick="goal_to_robot()" value="Goal to robot"></input><br>
             </li>
             <!-- The cards go in here -->
             <!-- Make the card styling better because rn...its not great -->
@@ -232,11 +236,15 @@
                 
                 <div>
                     <!-- Button to Open the Modal -->
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#NewReportModal"
-                        data-backdrop="static" data-keyboard="false" style="float: left;">
+                    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#NewReportModal"
+                        data-backdrop="static" data-keyboard="false" style="float: left;" id="custom_submit_btn" onclick="custom_submission()">
+
+                        New Report
+                    </button> -->
+                    <button type="button" class="btn btn-primary" style="float: left;" id="custom_submit_btn" onclick="custom_submission()">
+
                         New Report
                     </button>
-
                     <!-- Button to end mission -->
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#EndMissionModal"
                         data-backdrop="static" data-keyboard="false" style="float: right;">
@@ -325,18 +333,7 @@
 
         </div>
 
-        <!-- <div id="Rviz_Viewer">
-            <div id="rviz">
-                <dom-bind>
-                    <template id='dom-bind'>
-                        <ros-websocket auto id="websocket" ros="{{ros}}" url="{{url}}"></ros-websocket>
-                        <ros-rviz ros="{{ros}}" websocket-url="{{url}}"></ros-rviz>
-                    </template>
-                </dom-bind>
-            </div>
-        </div> -->
-        <!-- This is where the vizualizer should go -->
-       
+
     </div>
 
 
