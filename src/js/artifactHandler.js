@@ -443,7 +443,7 @@ class Artifact {
             // The old way to do IDs
             // let id = msg[i].position.x + '-' + msg[i].position.y + '-' + msg[i].position.z;
 
-            if ((this.artifactsList[id] == undefined) && (msg[i].position.x > 0)) {
+            if (this.artifactsList[id] == undefined) {
                 update = true;
                 this.artifactsList[id] = {}
                 this.artifactsList[id].id = id;
