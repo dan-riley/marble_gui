@@ -127,6 +127,11 @@ function teleop_route(){
     });
 }
 
+function pubTask(task_dom, task) {
+    setTimeout(function() {
+        task_dom.html('<font color="red">' + task + '</font>');
+    }, 1000);
+}
 
 class TabManager {
     constructor() {
@@ -226,8 +231,15 @@ class TabManager {
                 status_dom.html('<font color="red">Disconnected</font>');
             }
 
+            var task = '';
+            var task2;
             var task_dom = $('#task_status_' + _this.robot_name[i]);
-            var task = global_tabManager.tasks[i];
+            var full_task = global_tabManager.tasks[i];
+            if (full_task) {
+              var tasks = full_task.split('+++');
+              task = tasks[0];
+              task2 = tasks[1];
+            }
             if (task == "Home") {
                 task_dom.html('<font color="yellow">Going Home</font>');
             } else if (task == "Report") {
@@ -243,6 +255,10 @@ class TabManager {
             } else {
                 if (task == undefined) task = '';
                 task_dom.html('<font color="red">' + task + '</font>');
+            }
+
+            if (task2) {
+              pubTask(task_dom, task2);
             }
 
         }
@@ -306,10 +322,19 @@ class TabManager {
         // add robot to possible robots to teleop
         this.add_robot_to_teleop(this.robot_name[n]);
 
+        var disarmBtn = '';
+        if (this.robot_name[n].includes('A'))
+            disarmBtn = `
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_disarm"
+                onclick="send_signal_to('${this.robot_name[n]}', 'disarm', true)">
+                Disarm
+            </button><br>`;
+
         // This is for creatiung the control card for each robot on the sidebar
         $('#controls_bar_inner').append(`
         <li id="${this.robot_name[n]}_control_card" class="quick_control">
             <h4>${this.robot_name[n]}</h4>
+            ${disarmBtn}
             <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
                 onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)">
                 Start
