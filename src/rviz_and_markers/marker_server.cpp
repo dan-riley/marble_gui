@@ -257,13 +257,15 @@ geometry_msgs::Pose get_robot_pose(const std_msgs::String &robot_name){
     // look for the correct robot
     // this should be changed to a better search algorithm in the future
     for(int i = 0; i < robots.size(); i++){
+        cout << robots[i].name << endl;
         if(robots[i].name == robot_name.data){
+            cout << "found robot and pose" << endl;
             return robots[i].pose_;
         }
     }
+    cout << "never found robot" << endl;
     // Error case, dont do anything
     return robot_goal; 
-
 }
 
 // This should move the goal to the robot
@@ -271,9 +273,9 @@ void goal_to_robot(const std_msgs::String &robot_name){
     geometry_msgs::Pose near_robot_pose = get_robot_pose(robot_name);
 
     // Change the pose marker to be close but not on top of the robot
-    near_robot_pose.position.x += 1;
-    near_robot_pose.position.y += 1;
-    near_robot_pose.position.z += 0.5;
+    // near_robot_pose.position.x += 1;
+    // near_robot_pose.position.y += 1;
+    // near_robot_pose.position.z += 0.5;
 
     cout << near_robot_pose << endl;
 
@@ -298,7 +300,6 @@ vector<string> get_config_robots(){
         config_file.close();
     }else{
         cout << "Unable to open robots config file" << endl;
-
     }
     return robot_names;
 }
@@ -315,10 +316,12 @@ int main(int argc, char **argv) {
     if (!nh->getParam("frame", world_frame)) {
         cout << "something wrong with your frame parameter" << endl;
         exit(EXIT_FAILURE);
+    }else{
+        cout << "world frame set to: " + world_frame << endl;
     }
     // Get the submitted text marker offsets from the launch file
     setOffsets();
-    
+
     // initialize robots vector for goal to robot functionality
     add_robots();
 
