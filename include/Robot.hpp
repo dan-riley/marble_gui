@@ -39,15 +39,19 @@ struct oer{
 class Robot{
     public:
         std::string name;
-        geometry_msgs::Pose pose_;
 
         Robot(ros::NodeHandle nh, std::string robot_name, float* scales);
         void update_robot_callback(const nav_msgs::Odometry &odom);
+
+        geometry_msgs::Pose get_pose();
 
     private: 
         // For future additions of interactive robots
         boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server_;
         interactive_markers::MenuHandler menu_handler_;
+
+
+        geometry_msgs::Pose pose_;
 
         ros::NodeHandle nh_;
         // Fix the topic string
