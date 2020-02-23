@@ -86,20 +86,20 @@ function teleop_route(){
     // send to /teleop_robot/twist
     var teleop_listener = new ROSLIB.Topic({
         ros: ros,
-        name: '/cmd_vel',
-        messageType: 'geometry_msgs/Twist'
+        name: '/joy',
+        messageType: 'sensor_msgs/Joy'
     });
     var Topic = new ROSLIB.Topic({
         ros: ros,
         // HEY YOU CHANGED THIS BEFORE THE TEST ON THE 15th
-        name: `/${teleop_robot}/joy_cmd_vel`,
-        messageType: "geometry_msgs/Twist"
+        name: `/${teleop_robot}/joy_base`,
+        messageType: "sensor_msgs/Joy"
     })
     // create a publisher
     var last_robot = "Base"
     teleop_listener.subscribe(function (message){
         if(teleop_robot != last_robot){
-            Topic.name = `/${teleop_robot}/cmd_vel_base`;
+            Topic.name = `/${teleop_robot}/joy_base`;
             last_robot = teleop_robot;
             console.log("changed target robot")
         }
