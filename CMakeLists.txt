@@ -75,10 +75,13 @@ include_directories(
 ##############################################
 
 add_executable(marker_server src/rviz_and_markers/marker_server.cpp)
-target_link_libraries(marker_server markers ${catkin_LIBRARIES})
+target_link_libraries(marker_server markers Robot ${catkin_LIBRARIES})
 
 add_library(markers src/rviz_and_markers/markers.cpp)
 target_link_libraries(markers ${catkin_LIBRARIES})
+
+add_library(Robot src/rviz_and_markers/Robot.cpp)
+target_link_libraries(Robot ${catkin_LIBRARIES})
 
 
 
