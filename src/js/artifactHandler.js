@@ -254,7 +254,7 @@ class Artifact {
     // Use this to save the image received from ROS
     save_image(msg) {
         this.artifactImages[msg.image_id] = msg.artifact_img.data;
-        // this.save_file();
+        this.save_file();
         this.updateDisplay();
     }
 
@@ -431,12 +431,6 @@ class Artifact {
                     break;
                 case "extinguisher":
                     obj_class = "Fire Extinguisher";
-                    break;
-                case "gas":
-                    obj_class = "Gas";
-                    break;
-                case "vent":
-                    obj_clas = "Vent";
                     break;
             }
 
@@ -639,7 +633,7 @@ async function submit_artifact(id, _this) {
         <td id="${type}_${position_string}">No result yet</td>
     </tr>`);
 
-    var org_artifacts = _this.artifactsList[id].originals;
+    // var org_artifacts = _this.artifactsList[id].originals;
     console.log("submitting artifact to DARPA server. Waiting for response...");
     let t = new Date();
     t.setSeconds(t.getSeconds() - 1);

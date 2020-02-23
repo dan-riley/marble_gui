@@ -11,6 +11,7 @@
 #include "marble_gui/ArtifactTransport.h"
 
 #include "markers.hpp"
+#include "Robot.hpp"
 
 #include <string>
 #include <math.h>
@@ -19,6 +20,7 @@
 
 using namespace visualization_msgs;
 using namespace std;
+// using namespace robot;
 
 // Important kind of setup stuff
 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
@@ -35,6 +37,10 @@ string world_frame;
 // store the offsets for the text of the submitted marker -> get from launch file
 // [x, y, z]
 float sub_text_offsets[3];
+
+// This scales the size of the robots in rviz
+float robot_scales[3] = {1.0, 1.0, 1.0};
+
 // This keeps track of the the goal pose so it can be published constantly
 geometry_msgs::Pose robot_goal;
 // This is the vector of artifact names in play right now
@@ -42,6 +48,13 @@ vector<string> logged_artifacts;
 // Submitted markers array so we can just append to it
 visualization_msgs::MarkerArray submitted_markers;
 int num_submitted = 0;
+
+// This verctor has all of the robots being tracked right now
+vector<Robot> robots;
+
+boost::shared_ptr<ros::NodeHandle> nh;
+
+// ros::NodeHandle n;
 
 // This publishes the marker position when its moved in rviz
 void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback) {
@@ -219,7 +232,7 @@ void submittedMarkerCallback(const marble_gui::ArtifactTransport &art) {
 }
 
 // This gets the x, y, z offsets for the text of the submitted artifacts
-void setOffsets(ros::NodeHandle* nh) {
+void setOffsets() {
     if (!nh->getParam("sub_offset_text_x", sub_text_offsets[0])) {
         cout << "something wrong with your offset x parameter" << endl;
         exit(EXIT_FAILURE);
@@ -234,35 +247,76 @@ void setOffsets(ros::NodeHandle* nh) {
     }
 }
 
+
+// Make a new robot and add it to the robots vector
+void add_robot_callback(const std_msgs::String &robot_name){
+    Robot new_robot(*nh, robot_name.data, world_frame, robot_scales);
+    robots.push_back(new_robot);
+}
+
+
+geometry_msgs::Pose get_robot_pose(const std_msgs::String &robot_name){
+    
+    // look for the correct robot
+    // this should be changed to a better search algorithm in the future
+    for(int i = 0; i < robots.size(); i++){
+        if(robots[i].name == robot_name.data){
+            return robots[i].pose_;
+        }
+    }
+    // Error case, dont do anything
+    return robot_goal; 
+
+}
+
+// This should move the goal to the robot
+void goal_to_robot(const std_msgs::String &robot_name){
+    geometry_msgs::Pose near_robot_pose = get_robot_pose(robot_name);
+
+    // Change the pose marker to be close but not on top of the robot
+    near_robot_pose.position.x += 1;
+    near_robot_pose.position.y += 1;
+    near_robot_pose.position.z += 0.5;
+
+    cout << near_robot_pose << endl;
+
+    server->setPose("GOAL", near_robot_pose);    
+}
+
+
+
 int main(int argc, char **argv) {
     ros::init(argc, argv, "int_mkr_srv");
-    ros::NodeHandle n;
+    nh.reset(new ros::NodeHandle);
 
     // Get the world frame parameterfrom the launch file
-    if (!n.getParam("frame", world_frame)) {
+    if (!nh->getParam("frame", world_frame)) {
         cout << "something wrong with your frame parameter" << endl;
         exit(EXIT_FAILURE);
     }
     // Get the submitted text marker offsets from the launch file
-    setOffsets(&n);
+    setOffsets();
 
     cout << "started marker server" << endl;
     server.reset(new interactive_markers::InteractiveMarkerServer("gui_god", "", false));
     ros::Duration(0.1).sleep();
 
     // subscribe to fused artifacts
-    ros::Subscriber sub = n.subscribe("/gui/fused_artifact", 10, markerCallback);
+    ros::Subscriber sub = nh->subscribe("/gui/fused_artifact", 10, markerCallback);
     // scribe to the the gui setting the goal to be closer to a robot
-    ros::Subscriber goal_sub = n.subscribe("/gui/goal_to_robot", 10, goalToRobotCallback);
+    ros::Subscriber goal_sub = nh->subscribe("/gui/goal_to_robot", 10, goalToRobotCallback);
     // subscribe to the submitted artifact topic from the gui
-    ros::Subscriber submitted_sub = n.subscribe("/gui/submitted", 10, submittedMarkerCallback);
+    ros::Subscriber submitted_sub = nh->subscribe("/gui/submitted", 10, submittedMarkerCallback);
+    // This adds a robot to the vector of robots
+    ros::Subscriber add_robot = nh->subscribe("/gui/add_robot", 10, add_robot_callback);
+
 
     // updates to gui about fused artifacts
-    pub = n.advertise<marble_gui::ArtifactTransport>("mkr_srv_talkback", 1);
+    pub = nh->advertise<marble_gui::ArtifactTransport>("mkr_srv_talkback", 1);
     // sends the goal for the robot to the gui
-    goal_pub = n.advertise<geometry_msgs::Pose>("robot_to_goal", 10);
+    goal_pub = nh->advertise<geometry_msgs::Pose>("robot_to_goal", 10);
     // send non interactive markers to rviz
-    sub_mkr_pub = n.advertise<visualization_msgs::MarkerArray>("submitted_markers", 1);
+    sub_mkr_pub = nh->advertise<visualization_msgs::MarkerArray>("submitted_markers", 1);
 
     server->applyChanges();
 

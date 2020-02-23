@@ -60,26 +60,6 @@ function send_string_to(robot_name, signal, text) {
 }
 
 
-// This changes what robot we want to teleop to
-// This is legacy code kept around in case I broke something and we need to stitch back
-// function teleop_to(robot_name){
-//     var tele_btn = document.getElementById(`${robot_name}_teleop`);
-//     var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
-//     if(tele_btn.value == "Teleop"){
-//         teleop_robot = robot_name;
-//         tele_btn.value = "Disable Teleop";
-//         robot_ctrl_card.style.backgroundColor = "#FF4C26";
-//     }else{
-//         teleop_robot = "Base";
-//         tele_btn.value = "Teleop";
-//         robot_ctrl_card.style.backgroundColor = "darkgrey";
-//     }
-// }
-
-
-
-
-
 // This needs to run all the time
 function teleop_route(){
     // listen to /base/twist
@@ -91,7 +71,6 @@ function teleop_route(){
     });
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        // HEY YOU CHANGED THIS BEFORE THE TEST ON THE 15th
         name: `/${teleop_robot}/joy_base`,
         messageType: "sensor_msgs/Joy"
     })
@@ -471,6 +450,9 @@ class TabManager {
             // }
 
         });
+
+        // Add robot to to rviz
+        send_string_to("gui", "add_robot", this.robot_name[n]);
 
     }
 
