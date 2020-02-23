@@ -111,15 +111,6 @@ void markerCallback(const marble_gui::ArtifactTransport &art) {
     }
 }
 
-// This sends the goal to the same area as a robot
-void goalToRobotCallback(geometry_msgs::Pose msg) {
-    geometry_msgs::Pose pos;
-    pos = msg;
-    pos.position.x += 1;
-    pos.position.y += 1;
-    server->setPose("GOAL", msg);
-}
-
 // This seperates the ID from the NAME of the marker
 string* getIdFromName(string glob) {
     int globby_boi = glob.length();
@@ -304,7 +295,7 @@ int main(int argc, char **argv) {
     // subscribe to fused artifacts
     ros::Subscriber sub = nh->subscribe("/gui/fused_artifact", 10, markerCallback);
     // scribe to the the gui setting the goal to be closer to a robot
-    ros::Subscriber goal_sub = nh->subscribe("/gui/goal_to_robot", 10, goalToRobotCallback);
+    ros::Subscriber goal_sub = nh->subscribe("/gui/goal_to_robot", 10, goal_to_robot);
     // subscribe to the submitted artifact topic from the gui
     ros::Subscriber submitted_sub = nh->subscribe("/gui/submitted", 10, submittedMarkerCallback);
     // This adds a robot to the vector of robots
