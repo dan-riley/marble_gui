@@ -271,7 +271,8 @@ void goal_to_robot(const std_msgs::String &robot_name){
 
     cout << near_robot_pose << endl;
 
-    server->setPose("GOAL", near_robot_pose);    
+    server->setPose("GOAL", near_robot_pose);   
+    server->applyChanges() 
 }
 
 
