@@ -11,19 +11,6 @@ function listen_to_pose(){
     });
 }
 
-// This is legacy code in case i break something and we need to switch back
-// function publish_goal(robot){
-//     var Topic = new ROSLIB.Topic({
-//         ros: ros,
-//         name: `Base/neighbors/${robot}/guiGoalPoint`,
-//         messageType: "geometry_msgs/Pose"
-//     });
-//     Topic.name = `Base/neighbors/${robot}/guiGoalPoint`;
-//     if(robot != 'base'){
-//         Topic.publish(goal_pose);
-//     }
-// }
-
 
 // This sends the goal location to  the specified robot
 function publish_goalII(){
@@ -37,7 +24,7 @@ function publish_goalII(){
     });
     
     Topic.name = `Base/neighbors/${robot}/guiGoalPoint`;
-    if(robot != 'base'){
+    if(robot != 'Base'){
         Topic.publish(goal_pose);
     }
 }
@@ -98,49 +85,6 @@ function listen_to_markers(){
         // listener.unsubscribe();
     });
 }
-
-
-// This moves the goal marker to the robot 
-// This is a convienience so dan doesn't have to drag a marker through the whole map
-// function goal_to_robot(robot){
-//     let cur_robot_pose;
-    
-//     // listen to Base/neighbors/${robot}/guiGoalPoint to get the current pose of the robot
-//     var odom_listener = new ROSLIB.Topic({
-//         ros : ros,
-//         name : `/Base/neighbors/${robot}/odometry`,
-//         messageType : 'nav_msgs/Odometry'
-//     });
-    
-//     odom_listener.subscribe(function(message) {
-//         // get the pose info from the robot then un subscribe
-//         cur_robot_pose = message.pose.pose;
-//         odom_listener.unsubscribe();
-//     });
-    
-    
-//     var fused_pub = new ROSLIB.Topic({
-//         ros: ros,
-//         // You should probably make this actually work, it super doesn't now and current nick is too tired to deal with it
-//         name: `/gui/goal_to_robot`,
-//         // Probably change this to a custom message
-//         messageType: "geometry_msgs/Pose"
-//     });
-//     // console.log(artifact)
-//     // Use the pose to make life easy. just neglect the orientation stuff
-//     var pose = new ROSLIB.Message({
-//         position: cur_robot_pose,
-//         orientation: {
-//             x: 0,
-//             y: 0,
-//             z: 0,
-//             w: 1
-//         }
-//     });
-//     //   console.log(pose)
-//     fused_pub.publish(pose)
-// }
-
 
 // This tells the marker server to set a constant marker
 function submitted_marker(artifact, success) {
