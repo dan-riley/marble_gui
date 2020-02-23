@@ -37,7 +37,19 @@ function goal_to_robot(){
 
     console.log("goal to robot: " + robot);
 
-    send_string_to("gui", "goal_to_robot", robot);
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: `/gui/goal_to_robot`,
+        messageType: "std_msgs/String"
+    });
+    var msg = new ROSLIB.Message({
+        data: robot
+    });
+    Topic.publish(msg);
+
+    // Also publish to multi-agent so it can relay it
+    send_ma_task("gui", "goal_to_robot", robot);
+
 }
 
 

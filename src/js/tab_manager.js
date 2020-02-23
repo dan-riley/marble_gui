@@ -44,7 +44,7 @@ function send_signal_to(robot_name, signal, value) {
     send_ma_task(robot_name, signal, (value ? 'True': 'False'));
 }
 
-async function send_string_to(robot_name, signal, text) {
+function send_string_to(robot_name, signal, text) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
         name: `/${robot_name}/${signal}`,
@@ -94,6 +94,8 @@ function pubTask(task_dom, task) {
         task_dom.html('<font color="red">' + task + '</font>');
     }, 1000);
 }
+
+
 
 class TabManager {
     constructor() {
@@ -451,9 +453,6 @@ class TabManager {
 
         });
 
-        // Add robot to to rviz
-        console.log("adding " + this.robot_name[n] + " to rviz");
-        send_string_to("gui", "add_robot", this.robot_name[n]);
 
     }
 

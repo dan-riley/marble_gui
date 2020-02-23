@@ -50,7 +50,7 @@ void Robot::update_robot_callback(const nav_msgs::Odometry &odom){
     pose_.orientation.z = odom_pose.orientation.z;
     pose_.orientation.w = odom_pose.orientation.w;
 
-    cout << "hit robot odom callback" << endl;
+    // cout << "hit robot odom callback" << endl;
 }
 
 
