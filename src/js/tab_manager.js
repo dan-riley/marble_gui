@@ -452,6 +452,7 @@ class TabManager {
         });
 
         // Add robot to to rviz
+        console.log("adding " + this.robot_name[n] + " to rviz");
         send_string_to("gui", "add_robot", this.robot_name[n]);
 
     }
