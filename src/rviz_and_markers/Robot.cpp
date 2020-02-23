@@ -12,6 +12,7 @@ boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 interactive_markers::MenuHandler menu_handler;
 
 using namespace visualization_msgs;
+using namespace std;
 
 
 Robot::Robot(ros::NodeHandle nh, std::string robot_name, std::string world_frame, float* scales){
@@ -21,6 +22,9 @@ Robot::Robot(ros::NodeHandle nh, std::string robot_name, std::string world_frame
         world_frame_ = world_frame;
         scale_ = scales;
         odom_sub = nh_.subscribe("/Base/neighbors/" + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);    
+
+        cout << name << endl;
+        cout << scales << endl;
 
     }
     catch(const std::exception& e)
@@ -46,6 +50,8 @@ void Robot::update_robot_callback(const nav_msgs::Odometry &odom){
     pose_.orientation.y = odom_pose.orientation.y;
     pose_.orientation.z = odom_pose.orientation.z;
     pose_.orientation.w = odom_pose.orientation.w;
+
+    cout << "hit robot odom callback" << endl;
 }
 
 
