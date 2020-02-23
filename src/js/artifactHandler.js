@@ -432,6 +432,12 @@ class Artifact {
                 case "extinguisher":
                     obj_class = "Fire Extinguisher";
                     break;
+                case "gas":
+                    obj_class = "Gas";
+                    break;
+                case "vent":
+                    obj_clas = "Vent";
+                    break;
             }
 
             // Set a unique id.  Position never changes, but index can
@@ -633,7 +639,7 @@ async function submit_artifact(id, _this) {
         <td id="${type}_${position_string}">No result yet</td>
     </tr>`);
 
-    // var org_artifacts = _this.artifactsList[id].originals;
+    var org_artifacts = _this.artifactsList[id].originals;
     console.log("submitting artifact to DARPA server. Waiting for response...");
     let t = new Date();
     t.setSeconds(t.getSeconds() - 1);
