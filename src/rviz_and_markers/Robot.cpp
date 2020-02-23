@@ -20,7 +20,8 @@ Robot::Robot(ros::NodeHandle nh, std::string robot_name, std::string world_frame
         name = robot_name;
         world_frame_ = world_frame;
         scale_ = scales;
-        odom_sub = nh_.subscribe("/base/neighbors/" + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);    
+        odom_sub = nh_.subscribe("/Base/neighbors/" + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);    
+
     }
     catch(const std::exception& e)
     {
@@ -38,13 +39,13 @@ void Robot::update_robot_callback(const nav_msgs::Odometry &odom){
 
     // Get the current pose of the robot from odom messages
     // this is the best way i've found to do it because the odom comes in as a const and that makes things weird
-    odom_pose.position.x = pose_.position.x;
-    odom_pose.position.y = pose_.position.y;
-    odom_pose.position.z = pose_.position.z;
-    odom_pose.orientation.x = pose_.orientation.x;
-    odom_pose.orientation.y = pose_.orientation.y;
-    odom_pose.orientation.z = pose_.orientation.z;
-    odom_pose.orientation.w = pose_.orientation.w;
+    pose_.position.x = odom_pose.position.x;
+    pose_.position.y = odom_pose.position.y;
+    pose_.position.z = odom_pose.position.z;
+    pose_.orientation.x = odom_pose.orientation.x;
+    pose_.orientation.y = odom_pose.orientation.y;
+    pose_.orientation.z = odom_pose.orientation.z;
+    pose_.orientation.w = odom_pose.orientation.w;
 }
 
 
