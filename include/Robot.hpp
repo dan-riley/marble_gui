@@ -41,7 +41,7 @@ class Robot{
         std::string name;
         geometry_msgs::Pose pose_;
 
-        Robot(ros::NodeHandle nh, std::string robot_name, std::string world_frame, float* scales);
+        Robot(ros::NodeHandle nh, std::string robot_name, float* scales);
         void update_robot_callback(const nav_msgs::Odometry &odom);
 
     private: 

@@ -14,6 +14,14 @@
     <param name="sub_offset_text_y" type="double" value="0.0"/>
     <param name="sub_offset_text_z" type="double" value="0.0"/>
 
+    <!-- set the scale of different markersfor rviz -->
+    <param name="" type="double" value=""/>
+    <param name="" type="double" value=""/>
+    <param name="" type="double" value=""/>
+
+    <!-- get the names of each robot in play from dan's config file -->
+    <param name="robot_names_config" type="string" value="../js/robots.txt"/>
+
     <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen" args="$(find marble_gui)/src">
     </node>
     <include file="$(find marble_gui)/launch/teleop.launch" />
