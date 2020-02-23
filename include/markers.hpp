@@ -49,12 +49,6 @@ Marker makeGoal(InteractiveMarker &msg);
 // Make the controls for an interactive marker
 void makeControls(InteractiveMarker &marker, bool rotate);
 
-void publishGoal();
-
-bool check_for_artifact(string &name);
-
-
-void makeMarker(int dof, geometry_msgs::Pose &pos, const string &artifact_name, const string &id);
 
 // This is a more basic non-interactive marker used for submitted 
 Marker submittedMarker(float scalar, string world_frame, bool success);

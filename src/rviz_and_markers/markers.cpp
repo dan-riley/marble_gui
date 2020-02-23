@@ -30,7 +30,8 @@ InteractiveMarker make3dofMarker(const string &artifact_name, const string &id, 
     // May have to change this for octomap
     int_marker.header.frame_id = world_frame;
 
-    int_marker.scale = 3;
+    // This should be param from launch file
+    int_marker.scale = 2;
 
     int_marker.name = artifact_name + "||" + id;
     cout << "making 3 dof marker: " << int_marker.name << endl;
@@ -50,7 +51,9 @@ InteractiveMarker make6dofMarker(const string &artifact_name, string world_frame
     InteractiveMarker int_marker;
     // You'll want to change this
     int_marker.header.frame_id = world_frame;
-    int_marker.scale = 2;
+
+    // This should be a param in the launch file
+    int_marker.scale = 3;
 
     int_marker.name = artifact_name;
     int_marker.description = artifact_name;
@@ -66,6 +69,7 @@ InteractiveMarker make6dofMarker(const string &artifact_name, string world_frame
 
 // This makes the markers for the artifacts submitted to DARPA
 Marker makeSubmittedMarker(const marble_gui::ArtifactTransport &art, string world_frame) {
+    // get this from a param in the launch file in the future
     float scale = 2.0;
     Marker sub_marker_viz = submittedMarker(scale, world_frame, art.success);
     sub_marker_viz.pose.position.x = art.position.x;

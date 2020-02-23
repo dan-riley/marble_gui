@@ -6,17 +6,22 @@
 #include <tf/transform_broadcaster.h>
 #include <tf/tf.h>
 
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <math.h>
+#include <vector>
+#include <algorithm>
+
 #include "std_msgs/String.h"
 #include "marble_artifact_detection_msgs/Artifact.h"
 #include "marble_gui/ArtifactTransport.h"
 
 #include "markers.hpp"
 #include "Robot.hpp"
+#include "marker_server.hpp"
 
-#include <string>
-#include <math.h>
-#include <vector>
-#include <algorithm>
+
 
 using namespace visualization_msgs;
 using namespace std;
@@ -57,7 +62,7 @@ boost::shared_ptr<ros::NodeHandle> nh;
 // ros::NodeHandle n;
 
 // This publishes the marker position when its moved in rviz
-void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback) {
+void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback){
     // std::ostringstream s;
     // s << "Feedback from marker '" << feedback->marker_name << "' "
     //   << " / control '" << feedback->control_name << "'";
@@ -85,7 +90,7 @@ void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr
 
 // This deals with marker messages
 // It creates new markers and updates existing ones when necessary
-void markerCallback(const marble_gui::ArtifactTransport &art) {
+void markerCallback(const marble_gui::ArtifactTransport &art){
     if (art.origin ==  "gui") {
         geometry_msgs::Pose pos;
         // CHECK TO MAKE SURE TEHESE ARE IN THE RIGHT PLACES
@@ -112,7 +117,7 @@ void markerCallback(const marble_gui::ArtifactTransport &art) {
 }
 
 // This seperates the ID from the NAME of the marker
-string* getIdFromName(string glob) {
+string* getIdFromName(string glob){
     int globby_boi = glob.length();
 
     // declaring character array to make strtok happy
@@ -161,7 +166,7 @@ void makeMarker(int dof, geometry_msgs::Pose &pos, const string &artifact_name, 
 }
 
 // This checks for the existance ofan artifact in the logged artifact vector  9135-
-bool check_for_artifact(string &name) {
+bool check_for_artifact(string &name){
     if (std::find(logged_artifacts.begin(), logged_artifacts.end(), name) != logged_artifacts.end()) {
         return true;
     }
@@ -170,9 +175,8 @@ bool check_for_artifact(string &name) {
     return false;
 }
 
-
 // This just inits the goal marker and keeps publishing the goal position
-void initGoal() {
+void initGoal(){
     geometry_msgs::Pose pos;
     // CHECK TO MAKE SURE THESE ARE IN THE RIGHT PLACES
     pos.position.x = 0;
@@ -187,7 +191,7 @@ void initGoal() {
 }
 
 // This continuiousely publishes the goal marker position
-void publishGoal() {
+void publishGoal(){
     ros::Rate r(1); // 1 hz
     while (ros::ok) {
         goal_pub.publish(robot_goal);
@@ -197,7 +201,7 @@ void publishGoal() {
 }
 
 // This deletes a marker from the server and from the logged artifacts vector
-void deleteMarker(string marker_name) {
+void deleteMarker(string marker_name){
     // find the index of the marker in the vector
     vector<string>::iterator itr = std::find(logged_artifacts.begin(), logged_artifacts.end(), marker_name);
     // If the marker exists then remove it
@@ -211,7 +215,7 @@ void deleteMarker(string marker_name) {
 }
 
 // This makes then publishes the non-interactive markers for the submitted artifacts
-void submittedMarkerCallback(const marble_gui::ArtifactTransport &art) {
+void submittedMarkerCallback(const marble_gui::ArtifactTransport &art){
     // Build the marker for this artifact
     Marker marker = makeSubmittedMarker(art, world_frame);
     // Adjust the id or only the most recent will display
@@ -223,7 +227,7 @@ void submittedMarkerCallback(const marble_gui::ArtifactTransport &art) {
 }
 
 // This gets the x, y, z offsets for the text of the submitted artifacts
-void setOffsets() {
+void setOffsets(){
     if (!nh->getParam("sub_offset_text_x", sub_text_offsets[0])) {
         cout << "something wrong with your offset x parameter" << endl;
         exit(EXIT_FAILURE);
@@ -238,14 +242,16 @@ void setOffsets() {
     }
 }
 
-
 // Make a new robot and add it to the robots vector
-void add_robot_callback(const std_msgs::String &robot_name){
-    Robot new_robot(*nh, robot_name.data, world_frame, robot_scales);
-    robots.push_back(new_robot);
+void add_robots(){
+    vector<string> robot_names = get_config_robots();
+    for(int i = 0; i < robot_names.size(); i++){
+        Robot new_robot(*nh, robot_names[i], robot_scales);
+        robots.push_back(new_robot);
+    }
 }
 
-
+// gets the robot pose for a specified robot
 geometry_msgs::Pose get_robot_pose(const std_msgs::String &robot_name){
     
     // look for the correct robot
@@ -272,11 +278,35 @@ void goal_to_robot(const std_msgs::String &robot_name){
     cout << near_robot_pose << endl;
 
     server->setPose("GOAL", near_robot_pose);   
-    server->applyChanges() 
+    server->applyChanges();
 }
 
 
+// This reads the config used for the js to get the robot names in play
+vector<string> get_config_robots(){
+    vector<string> robot_names;
+    string new_robot;
+    string config_name;
 
+    nh->getParam("robot_names_config", config_name);
+
+    ifstream config_file(config_name);
+    if (config_file.is_open()){
+        while(getline(config_file, new_robot)){
+            robot_names.push_back(new_robot);
+        }
+        config_file.close();
+    }else{
+        cout << "Unable to open robots config file" << endl;
+
+    }
+    return robot_names;
+}
+
+
+//=======================================================
+// MAIN
+//=======================================================
 int main(int argc, char **argv) {
     ros::init(argc, argv, "int_mkr_srv");
     nh.reset(new ros::NodeHandle);
@@ -288,6 +318,9 @@ int main(int argc, char **argv) {
     }
     // Get the submitted text marker offsets from the launch file
     setOffsets();
+    
+    // initialize robots vector for goal to robot functionality
+    add_robots();
 
     cout << "started marker server" << endl;
     server.reset(new interactive_markers::InteractiveMarkerServer("gui_god", "", false));
@@ -299,8 +332,13 @@ int main(int argc, char **argv) {
     ros::Subscriber goal_sub = nh->subscribe("/gui/goal_to_robot", 10, goal_to_robot);
     // subscribe to the submitted artifact topic from the gui
     ros::Subscriber submitted_sub = nh->subscribe("/gui/submitted", 10, submittedMarkerCallback);
+    // REMOVE THIS AND ADD IT BASED ON THE robots.txt FILE
+    // http://www.cplusplus.com/doc/tutorial/files/
     // This adds a robot to the vector of robots
-    ros::Subscriber add_robot = nh->subscribe("/gui/add_robot", 10, add_robot_callback);
+    // ros::Subscriber add_robot = nh->subscribe("/gui/add_robot", 10, add_robot_callback);
+
+    // Read in the robot names from the config 
+    vector<string> config_robots = get_config_robots();
 
 
     // updates to gui about fused artifacts

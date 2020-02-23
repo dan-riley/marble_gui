@@ -15,21 +15,20 @@ using namespace visualization_msgs;
 using namespace std;
 
 
-Robot::Robot(ros::NodeHandle nh, std::string robot_name, std::string world_frame, float* scales){
+Robot::Robot(ros::NodeHandle nh, std::string robot_name, float* scales){
     try{
         nh_ = nh;
+        nh.getParam("frame", world_frame_);
         name = robot_name;
-        world_frame_ = world_frame;
         scale_ = scales;
         odom_sub = nh_.subscribe("/Base/neighbors/" + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);    
 
-        cout << name << endl;
-        cout << scales << endl;
+        // cout << name << endl;
+        // cout << scales << endl;
 
     }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
+    catch(const std::exception& e){
+        cout << "there was an error making the new robot" << endl;
     }
 
     // makeRobotMarker();

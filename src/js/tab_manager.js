@@ -44,7 +44,7 @@ function send_signal_to(robot_name, signal, value) {
     send_ma_task(robot_name, signal, (value ? 'True': 'False'));
 }
 
-function send_string_to(robot_name, signal, text) {
+async function send_string_to(robot_name, signal, text) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
         name: `/${robot_name}/${signal}`,
