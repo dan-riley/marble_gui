@@ -260,7 +260,8 @@ geometry_msgs::Pose get_robot_pose(const std_msgs::String &robot_name){
         cout << robots[i].name << endl;
         if(robots[i].name == robot_name.data){
             cout << "found robot and pose" << endl;
-            return robots[i].pose_;
+
+            return robots[i].get_pose();
         }
     }
     cout << "never found robot" << endl;
@@ -328,6 +329,8 @@ int main(int argc, char **argv) {
     cout << "started marker server" << endl;
     server.reset(new interactive_markers::InteractiveMarkerServer("gui_god", "", false));
     ros::Duration(0.1).sleep();
+
+
 
     // subscribe to fused artifacts
     ros::Subscriber sub = nh->subscribe("/gui/fused_artifact", 10, markerCallback);

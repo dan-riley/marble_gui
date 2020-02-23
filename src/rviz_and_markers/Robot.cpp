@@ -54,6 +54,11 @@ void Robot::update_robot_callback(const nav_msgs::Odometry &odom){
 }
 
 
+geometry_msgs::Pose Robot::get_pose(){
+    return pose_;
+}
+
+
 // // This makes the model of the robot for rviz
 // Marker makeModel(std::string robot_name){
 //     Marker marker;
