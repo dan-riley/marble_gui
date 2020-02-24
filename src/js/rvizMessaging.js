@@ -12,17 +12,17 @@ function listen_to_pose(){
 }
 
 // This is legacy code in case i break something and we need to switch back
-// function publish_goal(robot){
-//     var Topic = new ROSLIB.Topic({
-//         ros: ros,
-//         name: `Base/neighbors/${robot}/guiGoalPoint`,
-//         messageType: "geometry_msgs/Pose"
-//     });
-//     Topic.name = `Base/neighbors/${robot}/guiGoalPoint`;
-//     if(robot != 'base'){
-//         Topic.publish(goal_pose);
-//     }
-// }
+function publish_goal(robot){
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: `Base/neighbors/${robot}/guiGoalPoint`,
+        messageType: "geometry_msgs/Pose"
+    });
+    Topic.name = `Base/neighbors/${robot}/guiGoalPoint`;
+    if(robot != 'base'){
+        Topic.publish(goal_pose);
+    }
+}
 
 
 // This sends the goal location to  the specified robot

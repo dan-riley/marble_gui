@@ -30,7 +30,7 @@ InteractiveMarker make3dofMarker(const string &artifact_name, const string &id, 
     // May have to change this for octomap
     int_marker.header.frame_id = world_frame;
 
-    int_marker.scale = 1;
+    int_marker.scale = 3;
 
     int_marker.name = artifact_name + "||" + id;
     cout << "making 3 dof marker: " << int_marker.name << endl;
@@ -50,7 +50,7 @@ InteractiveMarker make6dofMarker(const string &artifact_name, string world_frame
     InteractiveMarker int_marker;
     // You'll want to change this
     int_marker.header.frame_id = world_frame;
-    int_marker.scale = 1;
+    int_marker.scale = 2;
 
     int_marker.name = artifact_name;
     int_marker.description = artifact_name;

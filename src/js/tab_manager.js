@@ -62,23 +62,19 @@ function send_string_to(robot_name, signal, text) {
 
 // This changes what robot we want to teleop to
 // This is legacy code kept around in case I broke something and we need to stitch back
-// function teleop_to(robot_name){
-//     var tele_btn = document.getElementById(`${robot_name}_teleop`);
-//     var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
-//     if(tele_btn.value == "Teleop"){
-//         teleop_robot = robot_name;
-//         tele_btn.value = "Disable Teleop";
-//         robot_ctrl_card.style.backgroundColor = "#FF4C26";
-//     }else{
-//         teleop_robot = "Base";
-//         tele_btn.value = "Teleop";
-//         robot_ctrl_card.style.backgroundColor = "darkgrey";
-//     }
-// }
-
-
-
-
+function teleop_to(robot_name){
+    var tele_btn = document.getElementById(`${robot_name}_teleop`);
+    var robot_ctrl_card = document.getElementById(`${robot_name}_control_card`)
+    if(tele_btn.value == "Teleop"){
+        teleop_robot = robot_name;
+        tele_btn.value = "Disable Teleop";
+        robot_ctrl_card.style.backgroundColor = "#FF4C26";
+    }else{
+        teleop_robot = "Base";
+        tele_btn.value = "Teleop";
+        robot_ctrl_card.style.backgroundColor = "darkgrey";
+    }
+}
 
 // This needs to run all the time
 function teleop_route(){
@@ -349,15 +345,15 @@ class TabManager {
                 onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)">
                 Radio Reset
             </button>
+
+        <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
+                onclick="teleop_to('${this.robot_name[n]}')" value="Teleop"></input><br>
+            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
+                onclick="publish_goal('${this.robot_name[n]}')" value="Goal"></input><br></br>
         </li>
         `)
 
         // this is some legacy code for the old way of starting teleop
-        // <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
-        //         onclick="teleop_to('${this.robot_name[n]}')" value="Teleop"></input><br>
-        //     <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
-        //         onclick="publish_goal('${this.robot_name[n]}')" value="Goal"></input><br></br>
-
         //     <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off"
         //         onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', false)">
         //         E-Stop Disabled

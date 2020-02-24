@@ -1,8 +1,28 @@
-function update_fused_artifact(msg){
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function update_fused_artifact(msg){
     let id = msg.id;
     let fusedArtifacts = global_tabManager.fusedArtifacts.artifactsList;
     fusedArtifacts[id].position = msg.position;
     global_tabManager.fusedArtifacts.updateDisplay();
+
+    let fa = global_tabManager.fusedArtifacts;
+    fa.artifact_type[id].style.backgroundColor = "#dca200";
+    fa.artifact_seen_by[id].style.backgroundColor = "#dca200";
+    fa.artifact_confidence[id].style.backgroundColor = "#dca200";
+    fa.artifact_position[id].style.backgroundColor = "#dca200";
+    fa.artifact_image[id].style.backgroundColor = "#dca200";
+    fa.artifact_tracker[id].querySelector("[id = 'Base_" + id + "']").style.backgroundColor = "#dca200";
+
+    await sleep(5000);
+    fa.artifact_type[id].style.backgroundColor = "#6c757d";
+    fa.artifact_seen_by[id].style.backgroundColor = "#6c757d";
+    fa.artifact_confidence[id].style.backgroundColor = "#6c757d";
+    fa.artifact_position[id].style.backgroundColor = "#6c757d";
+    fa.artifact_image[id].style.backgroundColor = "#6c757d";
+    fa.artifact_tracker[id].querySelector("[id = 'Base_" + id + "']").style.backgroundColor = "#6c757d";
 }
 
 
@@ -436,7 +456,7 @@ class Artifact {
                     obj_class = "Gas";
                     break;
                 case "vent":
-                    obj_clas = "Vent";
+                    obj_class = "Vent";
                     break;
             }
 
