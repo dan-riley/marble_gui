@@ -39,13 +39,14 @@ struct oer{
 class Robot{
     public:
         std::string name;
+        geometry_msgs::Pose pose_;
+        int test;
 
-        Robot(ros::NodeHandle nh, std::string robot_name, float* scales);
-        void update_robot_callback(const nav_msgs::Odometry &odom);
+        Robot(ros::NodeHandle* nodehandle, std::string robot_name, float scale);
+        void update_robot_callback(const nav_msgs::Odometry odom);
+        geometry_msgs::Pose getPose();
 
-        geometry_msgs::Pose get_pose();
-
-    private: 
+    private:
         // For future additions of interactive robots
         boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server_;
         interactive_markers::MenuHandler menu_handler_;
@@ -60,7 +61,7 @@ class Robot{
 
         std::string world_frame_;
         // for scaling the marker [x, y, z]
-        float* scale_;
+        float scale_;
 
 };
 //}
