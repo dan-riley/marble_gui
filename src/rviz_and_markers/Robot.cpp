@@ -15,15 +15,17 @@ using namespace visualization_msgs;
 using namespace std;
 
 
-Robot::Robot(ros::NodeHandle nh, std::string robot_name, float* scales){
+Robot::Robot(ros::NodeHandle* nodehandle, std::string robot_name, float scale):nh_(*nodehandle) {
     try{
-        nh_ = nh;
-        nh.getParam("frame", world_frame_);
+        // nh_ = nh;
+        nh_.getParam("frame", world_frame_);
         name = robot_name;
-        scale_ = scales;
-        odom_sub = nh_.subscribe("/Base/neighbors/" + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);    
+        scale_ = scale;
+        odom_sub = nh_.subscribe("/Base/neighbors/" + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);
 
-        // cout << name << endl;
+        test = 1;
+        cout << name << endl;
+        cout << "finished" << endl;
         // cout << scales << endl;
 
     }
@@ -36,23 +38,26 @@ Robot::Robot(ros::NodeHandle nh, std::string robot_name, float* scales){
 }
 
 // This is the upodate callback for getting the robot's current pose and storing that
-void Robot::update_robot_callback(const nav_msgs::Odometry &odom){
+void Robot::update_robot_callback(const nav_msgs::Odometry odom){
 
-    geometry_msgs::Pose odom_pose = odom.pose.pose;
-
+    // cout << "before" << endl;
+    // cout << name << endl;
+    // cout << pose_ << endl;
     // Get the current pose of the robot from odom messages
     // this is the best way i've found to do it because the odom comes in as a const and that makes things weird
-    pose_.position.x = odom_pose.position.x;
-    pose_.position.y = odom_pose.position.y;
-    pose_.position.z = odom_pose.position.z;
-    pose_.orientation.x = odom_pose.orientation.x;
-    pose_.orientation.y = odom_pose.orientation.y;
-    pose_.orientation.z = odom_pose.orientation.z;
-    pose_.orientation.w = odom_pose.orientation.w;
+    pose_.position = odom.pose.pose.position;
+    pose_.orientation = odom.pose.pose.orientation;
 
-    // cout << "hit robot odom callback" << endl;
+    // cout << "after" << endl;
+    // cout << name << endl;
+    // cout << pose_ << endl;
+
+    test++;
 }
 
+geometry_msgs::Pose Robot::getPose() {
+  return pose_;
+}
 
 // // This makes the model of the robot for rviz
 // Marker makeModel(std::string robot_name){
