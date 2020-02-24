@@ -37,9 +37,9 @@ void submittedMarkerCallback(const marble_gui::ArtifactTransport &art);
 
 void deleteMarker(string marker_name);
 
-void publishGoal(Robot* testrobot);
+void publishGoal();
 
-void initGoal(Robot* testrobot);
+void initGoal();
 
 bool check_for_artifact(string &name);
 

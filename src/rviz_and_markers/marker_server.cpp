@@ -58,6 +58,7 @@ int num_submitted = 0;
 // This verctor has all of the robots being tracked right now
 // CRH: moved from global to main, but there is a dependency in get_robot_pose which would require handing off this vector.
 vector<Robot> robots;
+Robot* testrobot;
 
 // ros::NodeHandle n;
 
@@ -176,7 +177,7 @@ bool check_for_artifact(string &name){
 }
 
 // This just inits the goal marker and keeps publishing the goal position
-void initGoal(Robot* testrobot){
+void initGoal(){
     geometry_msgs::Pose pos;
     // CHECK TO MAKE SURE THESE ARE IN THE RIGHT PLACES
     pos.position.x = 0;
@@ -187,14 +188,14 @@ void initGoal(Robot* testrobot){
     makeMarker(6, pos, name, name);
     server->applyChanges();
     // cout << "applied changes to server" << endl;
-    publishGoal(testrobot);
+    publishGoal();
 }
 
 // This continuiousely publishes the goal marker position
-void publishGoal(Robot* testrobot){
+void publishGoal(){
     ros::Rate r(1); // 1 hz
     while (ros::ok) {
-        cout << testrobot->pose_ << endl;
+        // cout << testrobot->pose_ << endl;
         // for (int i = 0; i < robots.size(); i++) {
         //   cout << robots[i].test << endl;
         //   cout << robots[i].pose_ << endl;
@@ -249,8 +250,8 @@ void setOffsets(ros::NodeHandle* nh){
 
 // gets the robot pose for a specified robot
 geometry_msgs::Pose get_robot_pose(const std_msgs::String& robot_name){
-  // cout << testrobot->name << endl;
-    // return testrobot->pose_;
+  cout << testrobot->name << endl;
+    return testrobot->pose_;
     // look for the correct robot
     // this should be changed to a better search algorithm in the future
     // for(auto i = 0; i < robots.size(); i++){
@@ -364,12 +365,13 @@ int main(int argc, char **argv) {
     // send non interactive markers to rviz
     sub_mkr_pub = nh.advertise<visualization_msgs::MarkerArray>("submitted_markers", 1);
 
-    Robot *testrobot = new Robot(&nh, "X1", robot_scale);
-  cout << testrobot->name << endl;
+    testrobot = new Robot(&nh, "X1", robot_scale);
+    cout << testrobot->name << endl;
+
     server->applyChanges();
 
     // This initializes the goal interactive marker
-    initGoal(testrobot);
+    initGoal();
     ros::spin();
     server.reset();
 }
