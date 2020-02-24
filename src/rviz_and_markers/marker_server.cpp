@@ -57,7 +57,7 @@ int num_submitted = 0;
 
 // This verctor has all of the robots being tracked right now
 // CRH: moved from global to main, but there is a dependency in get_robot_pose which would require handing off this vector.
-vector<Robot> robots;
+vector<Robot*> robots;
 Robot* testrobot;
 
 // ros::NodeHandle n;
@@ -197,8 +197,8 @@ void publishGoal(){
     while (ros::ok) {
         // cout << testrobot->pose_ << endl;
         // for (int i = 0; i < robots.size(); i++) {
-        //   cout << robots[i].test << endl;
-        //   cout << robots[i].pose_ << endl;
+        //   cout << robots[i]->test << endl;
+        //   cout << robots[i]->pose_ << endl;
         // }
         goal_pub.publish(robot_goal);
         ros::spinOnce();
@@ -250,24 +250,24 @@ void setOffsets(ros::NodeHandle* nh){
 
 // gets the robot pose for a specified robot
 geometry_msgs::Pose get_robot_pose(const std_msgs::String& robot_name){
-  cout << testrobot->name << endl;
-    return testrobot->pose_;
+  // cout << testrobot->name << endl;
+  //   return testrobot->pose_;
     // look for the correct robot
     // this should be changed to a better search algorithm in the future
-    // for(auto i = 0; i < robots.size(); i++){
-    //     cout << robots[i].name << endl;
-    //     if(robots[i].name == robot_name.data){
-    //         cout << "found robot and pose" << endl;
-    //         cout << robots[i].name;
-    //         cout << " ";
-    //         cout << robot_name.data;
-    //         cout << robots[i].pose_ << endl;
-    //         return robots[i].pose_;
-    //     }
-    // }
-    // cout << "never found robot" << endl;
-    // // Error case, dont do anything
-    // return robot_goal; 
+    for(auto i = 0; i < robots.size(); i++){
+        cout << robots[i]->name << endl;
+        if(robots[i]->name == robot_name.data){
+            cout << "found robot and pose" << endl;
+            cout << robots[i]->name;
+            cout << " ";
+            cout << robot_name.data;
+            cout << robots[i]->pose_ << endl;
+            return robots[i]->pose_;
+        }
+    }
+    cout << "never found robot" << endl;
+    // Error case, dont do anything
+    return robot_goal; 
 }
 
 // This should move the goal to the robot
@@ -334,10 +334,10 @@ int main(int argc, char **argv) {
     // initialize robots vector for goal to robot functionality
     // Make a new robot and add it to the robots vector
     vector<string> robot_names = get_config_robots(&nh);
-    // for(auto i = 0; i < robot_names.size(); i++){
-    //     Robot *new_robot = new Robot(&nh, robot_names[i], robot_scale);
-    //     robots.push_back(*new_robot);
-    // }
+    for(auto i = 0; i < robot_names.size(); i++){
+        Robot *new_robot = new Robot(&nh, robot_names[i], robot_scale);
+        robots.push_back(new_robot);
+    }
 
     // Read in the robot names from the config
     vector<string> config_robots = get_config_robots(&nh);
