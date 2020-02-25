@@ -15,7 +15,7 @@
     <param name="sub_offset_text_z" type="double" value="0.0"/>
 
     <!-- get the names of each robot in play from dan's config file -->
-    <param name="robot_names_config" type="string" value="/home/dan/catkin/src/marble/marble_gui/src/js/robots.txt"/>
+    <param name="robot_names_config" type="string" value="$(find marble_gui)/src/js/robots.txt"/>
 
     <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen" args="$(find marble_gui)/src">
     </node>

@@ -17,10 +17,10 @@ using namespace std;
 
 Robot::Robot(ros::NodeHandle* nodehandle, std::string robot_name, float scale):nh_(*nodehandle) {
     try{
-        // nh_ = nh;
         nh_.getParam("frame", world_frame_);
         name = robot_name;
         scale_ = scale;
+        // This should be in the launch file
         odom_sub = nh_.subscribe("/Base/neighbors/" + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);
 
         cout << name << endl;

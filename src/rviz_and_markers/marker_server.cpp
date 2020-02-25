@@ -21,8 +21,6 @@
 #include "Robot.hpp"
 #include "marker_server.hpp"
 
-
-
 using namespace visualization_msgs;
 using namespace std;
 // using namespace robot;
@@ -54,13 +52,8 @@ vector<string> logged_artifacts;
 visualization_msgs::MarkerArray submitted_markers;
 int num_submitted = 0;
 
-
-// This verctor has all of the robots being tracked right now
-// CRH: moved from global to main, but there is a dependency in get_robot_pose which would require handing off this vector.
+// This vector has all of the robots being tracked right now
 vector<Robot*> robots;
-Robot* testrobot;
-
-// ros::NodeHandle n;
 
 // This publishes the marker position when its moved in rviz
 void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback){
@@ -144,7 +137,6 @@ string* getIdFromName(string glob){
 
 // This makes a marker
 void makeMarker(int dof, geometry_msgs::Pose &pos, const string &artifact_name, const string &id) {
-
     // Instatiate marker
     InteractiveMarker int_marker;
     if (dof == 3) {
@@ -195,11 +187,6 @@ void initGoal(){
 void publishGoal(){
     ros::Rate r(1); // 1 hz
     while (ros::ok) {
-        // cout << testrobot->pose_ << endl;
-        // for (int i = 0; i < robots.size(); i++) {
-        //   cout << robots[i]->test << endl;
-        //   cout << robots[i]->pose_ << endl;
-        // }
         goal_pub.publish(robot_goal);
         ros::spinOnce();
         r.sleep();
@@ -250,40 +237,32 @@ void setOffsets(ros::NodeHandle* nh){
 
 // gets the robot pose for a specified robot
 geometry_msgs::Pose get_robot_pose(const std_msgs::String& robot_name){
-  // cout << testrobot->name << endl;
-  //   return testrobot->pose_;
     // look for the correct robot
     // this should be changed to a better search algorithm in the future
-    for(int i = 0; i < robots.size(); i++){
-        cout << robots[i].name << endl;
-        if(robots[i].name == robot_name.data){
+    for (int i = 0; i < robots.size(); i++) {
+        cout << robots[i]->name << endl;
+        if (robots[i]->name == robot_name.data) {
             cout << "found robot and pose" << endl;
-
-            return robots[i].get_pose();
+            return robots[i]->getPose();
         }
     }
     cout << "never found robot" << endl;
     // Error case, dont do anything
-    return robot_goal; 
+    return robot_goal;
 }
 
 // This should move the goal to the robot
-void goal_to_robot(const std_msgs::String& robot_name){
+void goal_to_robot(const std_msgs::String& robot_name) {
     geometry_msgs::Pose near_robot_pose = get_robot_pose(robot_name);
 
     // Change the pose marker to be close but not on top of the robot
-    // near_robot_pose.position.x += 1;
-    // near_robot_pose.position.y += 1;
-    // near_robot_pose.position.z += 0.5;
+    near_robot_pose.position.z += 1;
 
-    // cout << near_robot_pose << endl;
-
-    server->setPose("GOAL", near_robot_pose);   
+    server->setPose("GOAL", near_robot_pose);
     server->applyChanges();
 
     cout << "Got goal_to_robot" << endl;
 }
-
 
 // This reads the config used for the js to get the robot names in play
 vector<string> get_config_robots( ros::NodeHandle* nh ){
@@ -312,10 +291,7 @@ vector<string> get_config_robots( ros::NodeHandle* nh ){
 int main(int argc, char **argv) {
     ros::init(argc, argv, "int_mkr_srv");
 
-    // ros::NodeHandle* nh = nullptr;
     ros::NodeHandle nh;
-    // CRH: removed the below line when I moved the above away from global.
-   // nh.reset(new ros::NodeHandle);
 
     // Get the world frame parameterfrom the launch file
     if (!nh.getParam("frame", world_frame)) {
@@ -331,7 +307,7 @@ int main(int argc, char **argv) {
     // initialize robots vector for goal to robot functionality
     // Make a new robot and add it to the robots vector
     vector<string> robot_names = get_config_robots(&nh);
-    for(auto i = 0; i < robot_names.size(); i++){
+    for (auto i = 0; i < robot_names.size(); i++) {
         Robot *new_robot = new Robot(&nh, robot_names[i], robot_scale);
         robots.push_back(new_robot);
     }
@@ -342,8 +318,6 @@ int main(int argc, char **argv) {
     server.reset(new interactive_markers::InteractiveMarkerServer("gui_god", "", false));
     ros::Duration(0.1).sleep();
 
-
-
     // subscribe to fused artifacts
     ros::Subscriber sub = nh.subscribe("/gui/fused_artifact", 10, markerCallback);
     // scribe to the the gui setting the goal to be closer to a robot
@@ -351,7 +325,6 @@ int main(int argc, char **argv) {
     // subscribe to the submitted artifact topic from the gui
     ros::Subscriber submitted_sub = nh.subscribe("/gui/submitted", 10, submittedMarkerCallback);
 
-    // cout << robots[0].pose_ << endl;
     // REMOVE THIS AND ADD IT BASED ON THE robots.txt FILE
     // http://www.cplusplus.com/doc/tutorial/files/
     // This adds a robot to the vector of robots
@@ -363,9 +336,6 @@ int main(int argc, char **argv) {
     goal_pub = nh.advertise<geometry_msgs::Pose>("robot_to_goal", 10);
     // send non interactive markers to rviz
     sub_mkr_pub = nh.advertise<visualization_msgs::MarkerArray>("submitted_markers", 1);
-
-    testrobot = new Robot(&nh, "X1", robot_scale);
-    cout << testrobot->name << endl;
 
     server->applyChanges();
 
