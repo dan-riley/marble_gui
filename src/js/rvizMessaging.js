@@ -59,10 +59,21 @@ function goal_to_robot(){
         data: robot
     });
     Topic.publish(msg);
+}
 
-    // Also publish to multi-agent so it can relay it
-    send_ma_task("gui", "goal_to_robot", robot);
+// This send the goal near the pose of the specified robot
+function goal_to_robotII(robot){
+    console.log("goal to robot: " + robot);
 
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: `/gui/goal_to_robot`,
+        messageType: "std_msgs/String"
+    });
+    var msg = new ROSLIB.Message({
+        data: robot
+    });
+    Topic.publish(msg);
 }
 
 
