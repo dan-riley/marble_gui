@@ -262,17 +262,10 @@ class TabManager {
         let titles_data = [];
         let robot_name_front1 = this.robot_name[n].charAt(0);
         let robot_name_front2 = this.robot_name[n].substring(0, 2);
-        if (true) {//robot_name_front2 == "X1" || robot_name_front2 == "X2" || robot_name_front1 == "G" || this.robot_name[n] == "HUSKY_SIM") {
-            this.global_vehicleType[n] = "Ground Vehicle";
-            titles_data = ['linear_x', 'angular_z', 'cmd_linear_x', 'cmd_angular_z'];
-        } else if (robot_name_front2 == "X3" || robot_name_front2 == "X4" || robot_name_front1 == "A" || this.robot_name[n] == "DJI_SIM") {
-            this.global_vehicleType[n] = "Air Vehicle";
-            // titles_data contains the name of each dataset that is represented on the robots chart
-            titles_data = ['linear_x', 'linear_y', 'linear_z', 'angular_x', 'angular_y', 'angular_z', 'cmd_linear_x', 'cmd_linear_y', 'cmd_linear_z', 'cmd_angular_x', 'cmd_angular_y', 'cmd_angular_z'];
-        } else {
-            console.log(this.robot_name[n] + " is not recognized by this application...")
-            return;
-        }
+        
+        this.global_vehicleType[n] = "Ground Vehicle";
+        titles_data = ['linear_x', 'angular_z', 'cmd_linear_x', 'cmd_angular_z'];
+       
 
         // This function (found below) gets up all the listeners for this robot
         this.listen_to_robot_topics(n, robot)
@@ -346,13 +339,13 @@ class TabManager {
                 onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)">
                 Radio Reset
             </button>
-
-        <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
-                onclick="teleop_to('${this.robot_name[n]}')" value="Teleop"></input><br>
+            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
+                    onclick="teleop_to('${this.robot_name[n]}')" value="The Force"></input>
             <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
-                onclick="publish_goal('${this.robot_name[n]}')" value="Goal"></input><br></br>
-        </li>
-        `)
+                onclick="publish_goal('${this.robot_name[n]}')" value="Go to Goal"></input>
+            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
+                onclick="goal_to_robotII('${this.robot_name[n]}')" value="Goal to Robot"></input></br>
+        </li>`)
 
         // this is some legacy code for the old way of starting teleop
         //     <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off"

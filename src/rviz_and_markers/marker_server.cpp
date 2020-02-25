@@ -255,11 +255,11 @@ geometry_msgs::Pose get_robot_pose(const std_msgs::String& robot_name){
     // look for the correct robot
     // this should be changed to a better search algorithm in the future
     for(int i = 0; i < robots.size(); i++){
-        cout << robots[i].name << endl;
-        if(robots[i].name == robot_name.data){
+        cout << robots[i]->name << endl;
+        if(robots[i]->name == robot_name.data){
             cout << "found robot and pose" << endl;
 
-            return robots[i].get_pose();
+            return robots[i]->getPose();
         }
     }
     cout << "never found robot" << endl;

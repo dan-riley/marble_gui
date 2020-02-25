@@ -39,7 +39,6 @@ struct oer{
 class Robot{
     public:
         std::string name;
-        geometry_msgs::Pose pose_;
         int test;
 
         Robot(ros::NodeHandle* nodehandle, std::string robot_name, float scale);
