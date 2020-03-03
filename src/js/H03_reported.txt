@@ -1,9 +1,0 @@
-
-Backpack | 19.38, 1.47, 0.72
-Fire Extinguisher | 101.79, 2.47, 0.20
-Survivor | 243.71, 4.89, -0.37
-Drill | 262.54, 44.55, -1.14
-Drill | 262.54, 44.55, -1.14
-Fire Extinguisher | 101.79, 2.47, 0.20
-Survivor | 243.71, 4.89, -0.37
-Backpack | 19.38, 1.47, 0.72
