@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<style>
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* The sidebar menu */
+.sidenav {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 160px; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  background-color: #111; /* Black */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+}
+
+/* The navigation menu links */
+.sidenav a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+/* Style page content */
+.main {
+  margin-left: 160px; /* Same as the width of the sidebar */
+  padding: 0px 10px;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+</style>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <!--! Electrons way of loading jquery into the application  -->
+    <script>window.$ = window.jQuery = require('jquery');</script>
+
+    <!--! Bootstrap is a css/js library that allows for quick and easy builds of dynamic web pages -->
+    <script type="text/javascript" src="bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="charts/Chart.min.js"> </script>
+
+    <!--! Entire robotwebtoools library  -->
+    <script type="text/javascript" src="robotwebtools/three.min.js"></script>
+    <script type="text/javascript" src="robotwebtools/eventemitter2.min.js"></script>
+    <script type="text/javascript" src="robotwebtools/roslib.min.js"></script>
+    <script type="text/javascript" src="robotwebtools/ros3d.min.js"></script>
+
+    <script type="text/javascript" src="js/artifactHandlerII.js"></script>
+    <script type="text/javascript" src="js/darpaServerComm.js"></script>
+    <script type="text/javascript" src="js/octomap_viewer.js"></script>
+    <script type="text/javascript" src="js/tab_managerII.js"></script>
+    <script type="text/javascript" src="js/readData.js"></script>
+    <script type="text/javascript" src="js/tabs.js"></script>
+    <script type="text/javascript" src="js/fileCopy.js"></script>
+    <script type="text/javascript" src="js/battery.js"></script>
+    <script type="text/javascript" src="js/renderjson.js"></script>
+
+    <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+
+    <link rel="stylesheet" href="bootstrap-4.3.1-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!--! Personal CSS files used to change the style of default tabs and pages -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tabs.css">
+
+    <link rel="import" href="bower_components/ros-websocket/ros-websocket.html" />
+    <link rel="import" href="bower_components/ros-rviz/ros-rviz.html" />
+    <link rel="import" href="bower_components/polymer/lib/elements/dom-bind.html" />
+
+</head>
+
+
+<body onload="populateOpts()">
+
+    <!-- Tabs for different connections to robots and darps -->
+    <div id="connections_bar">
+        <div class="connect_nav" id="connections_bar_inner">
+            <li class="nav-item">
+                <a class="nav-link" onclick="window.openPage('Home')" id="DARPA_nav_link">HOME<br>
+                    <!-- <span id="connection_status_DARPA"> </span> -->
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="window.openPage('DARPA')" id="DARPA_nav_link">DARPA<br>
+                    <span id="connection_status_DARPA"> </span>
+                </a>
+            </li>
+          </div>
+    </div>
+
+    <!-- sidebar to control each robot 
+        scrolls independently from any of the rest of the page -->
+    <div id="controls_bar">
+        <div class="sidenav" id="controls_bar_inner">
+            <li class="quick_control">
+                <h1>ROBOTNAME</h1>
+                <a class="button btn btn-primary" id="ROBOTNAME_start" onclick="send_signal_to('ROBOTNAME', 'control', 'start'"> Start </a><br>
+                <a class="button" id="ROBOTNAME_stop" onclick="send_signal_to('ROBOTNAME', 'control', 'stop'"> Stop </a><br>
+                <a class="button" id="ROBOTNAME_home" onclick="send_signal_to('ROBOTNAME', 'control', 'go_home'"> go home</a><br>
+            </li>
+        </div>
+    </div>
+
+    <div class="main"> 
+        <!-- fixed page location
+        scrollable content -->
+        <div id="fused artifacts">
+            
+        </div>
+    
+        <!-- fixed page location
+            scrollable content -->
+        <div id="all_artifacts">
+    
+        </div>
+    
+        <!-- fixed page location
+            scrollable content -->
+        <div id="submitted">
+    
+        </div>
+    
+        <!-- pop-up modal for creating and submitting custom artifacts -->
+        <div id="custom_report">
+            <!-- Trigger/Open The Modal -->
+            <button type="button" class="btn btn-primary" id="custom_report_button" data-toggle="modal" data-target="#NewReportModal">New Report</button>
+    
+            <div class="modal fade" id="NewReportModal" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+    
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Artifact Submit</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+    
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <form id="NewReportForm">
+                                <!-- ITEM SELECTION (get from config file) -->
+                                <select class="custom-select" id="artifactSelect">
+    
+                                </select>
+                                <br>
+    
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="xVal" placeholder="Enter X value"><br>
+                                    <input type="text" class="form-control" id="yVal" placeholder="Enter Y value"><br>
+                                    <input type="text" class="form-control" id="zVal" placeholder="Enter Z value"><br>
+                                </div>
+                                <div class="form-group">
+                                    <label for="notesTextArea">Notes</label>
+                                    <textarea class="form-control" id="notesTextArea" rows="3"></textarea>
+                                </div>
+                            </form>
+    
+                        </div>
+    
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button id="edit_submit" type="button" class="btn btn-primary"
+                                onclick="reportArtifact()">Report</button>
+                        </div>
+    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>

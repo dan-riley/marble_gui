@@ -1,4 +1,4 @@
-.vscode/c_cpp_properties.json
+.vscode/
 src/node_modules/
 *.pyc
 src/bower_components

@@ -19,6 +19,6 @@ $.ajaxSetup({
         xhr.setRequestHeader('Content-Type', 'application/json');
     },
     error: function (_, error) {
-        //console.log(error);
+        console.log(error);
     }
 });
