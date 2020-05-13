@@ -1,10 +1,6 @@
 # marble_gui
 
-marble_gui was created to meet the following demands listed in the DARPA Subterranean Challenge Competition Rules PDF:, Tunnel Circuit, Revision 2 (June 28, 2019)
-
-* Provide rapid situational awareness to a small team of operators preparing to enter unknown and dynamic subterranean environments
-* Provide real-time 3D volumetric map updates to the DARPA Command Post at a minimum frequency
-* Provide a base station which sends both artifact reports and map updates to the DARPA scoring interface
+marble_gui is a package devoted to optimizing the management of multiple robots and managing the data they relay to the operatot
 
 
 ## Instalation
@@ -12,13 +8,18 @@ marble_gui was created to meet the following demands listed in the DARPA Subterr
 Make sure you have the following installed
 
 ```
+# We assume you already have a catkin workspace setup and ros installed with the gui downloaded
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-sudo apt -y install ros-$ROS_DISTRO-rosbridge-server ros-$ROS_DISTRO-tf2-web-republisher ros-$ROS_DISTRO-rosapi nodejs
+
+# cd ...marble_gui/scripts
+sudo ./gui_setup.sh
 ```
+This script will need some human intervestion but should get everything setup. 
 
 You'll probably also be wanting DARPA's test scoring server. See their installation instructions at https://bitbucket.org/subtchallenge/test_scoring_server/src/master/
 
 ### For Every Clone:
+As a breakout and debugging help this section may help you fix any issues the setup script had.
 ```
 cd ~/marble_ws/src/marble/marble_gui/src/
 sudo npm install -save electron --unsafe-perm=true --allow-root
@@ -28,11 +29,19 @@ sudo npm install fs csv-writer csv-parser jquery path node-ssh polymer-cli
 sudo npm install -g bower
 
 # when asked which version of ros-websocket to install, choose 3.0.2
-sudo bower install --save jstnhuang/ros-websocket jstnhuang/ros-rviz --allow-root
+sudo bower install --save jstnhuang/ros-websocket --allow-root
 ```
 
 
 ## Test setup
+To launch a test
+```
+# roscd marble_gui
+./scripts/launch_local_test.sh
+```
+This may need modification to meet the demands of ignition and other systems. It was originally made for a simplier setup without multimaster and other packages.
+
+
 ### Launch the GUI
 ```
 roslaunch marble_gui marble_gui.launch

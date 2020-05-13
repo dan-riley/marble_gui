@@ -5,8 +5,6 @@
 
 source ~/catkin_ws/devel/setup.bash
 
-sudo apt -y install ros-melodic-rosbridge-server
-
 cd ~/catkin_ws/src/
 
 git clone https://github.com/RobotWebTools/tf2_web_republisher 
@@ -26,9 +24,14 @@ cd ~/catkin_ws/src/marble_gui/src
 
 npm install
 
-sudo npm install fs csv-writer csv-parser jquery path node-ssh polymer-cli
+sudo npm install fs jquery path polymer-cli
 sudo npm install -g bower
 
 cd ~/catkin_ws/src/marble_gui/src
 sudo bower install --save jstnhuang/ros-websocket jstnhuang/ros-rviz --allow-root
 echo 3.0.2
+
+echo -e "\e[31mPLEASE OPEN THE 'rosbridge_packages' FOLDER AND INSTALL THEM THROUGH EDDY\
+THESE ARE THE ROSBRIDGE PACKAGES THAT WORK AND EDDY IS ANNOYING BUT WORKS FOR INSTALLING THEM"
+
+nautilus ~/catkin_ws/src/marble_gui/rosbridge_packages

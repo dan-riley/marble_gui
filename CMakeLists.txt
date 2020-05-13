@@ -83,6 +83,9 @@ target_link_libraries(markers ${catkin_LIBRARIES})
 add_library(Robot src/rviz_and_markers/Robot.cpp)
 target_link_libraries(Robot ${catkin_LIBRARIES})
 
+# add_library(Robot src/rviz_and_markers/Robot.cpp)
+# target_link_libraries(Robot ${catkin_LIBRARIES})
+
 
 
 #############

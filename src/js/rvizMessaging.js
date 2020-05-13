@@ -44,22 +44,22 @@ function publish_goalII(){
 
 
 // This send the goal near the pose of the specified robot
-function goal_to_robot(){
-    var opt = document.getElementById("teleop_robot_select");
-    var robot = opt.options[opt.selectedIndex].value;
+// function goal_to_robot(){
+//     var opt = document.getElementById("teleop_robot_select");
+//     var robot = opt.options[opt.selectedIndex].value;
 
-    console.log("goal to robot: " + robot);
+//     console.log("goal to robot: " + robot);
 
-    var Topic = new ROSLIB.Topic({
-        ros: ros,
-        name: `/gui/goal_to_robot`,
-        messageType: "std_msgs/String"
-    });
-    var msg = new ROSLIB.Message({
-        data: robot
-    });
-    Topic.publish(msg);
-}
+//     var Topic = new ROSLIB.Topic({
+//         ros: ros,
+//         name: `/gui/goal_to_robot`,
+//         messageType: "std_msgs/String"
+//     });
+//     var msg = new ROSLIB.Message({
+//         data: robot
+//     });
+//     Topic.publish(msg);
+// }
 
 // This send the goal near the pose of the specified robot
 function goal_to_robotII(robot){
