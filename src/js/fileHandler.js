@@ -4,9 +4,9 @@ var fs = require("fs");
 // Leave the file blank to display any that match
 var robots_file = fs.readFileSync("js/robots.txt", "utf-8");
 var robots_disp = robots_file.split("\n");
-// Use these robots to add optopns to the etelop card
-function populate_teleop_robots(){
-    var teleop_options = document.getElementById("teleop_robot_select");
+// This adds robot options for 
+function populate_robots(where){
+    var teleop_options = document.getElementById(where);
     for(var i = 0; i < robots_disp.length; i++){
         var robot = robots_disp[i];
         var option = document.createElement("option");

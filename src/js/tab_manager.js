@@ -111,7 +111,40 @@ function pubTask(task_dom, task) {
     }, 1000);
 }
 
+function send_tf_to(){
+    var robot = document.getElementById("select_robot_transform").value();
+    var tf_publisher = new ROSLIB.Topic({
+        ros: ros,
+        name: `${robot}/kyles/tf/topic/`,
+        messageType: "geometry_msgs/Transform"
+    });
+    tf_publisher.publish(robot_transform);
+}
 
+var robot_transform;
+
+function listen_for_tf(){
+    // Listen to the transform that kyle sends over
+    var tf_listener = new ROSLIB.Topic({
+        ros: ros,
+        name: "/kyles/tf/topic",
+        messageType: "geometry_msgs/Transform"
+    });
+    // update the tf variable to be sent to a robot
+    tf_listener.subscribe(function (message){
+        robot_transform = message.transform;
+
+        // update the modal with message data
+        $('#x_translation').val(robot_transform.transform.translation.x);
+        $('#y_translation').val(robot_transform.transform.translation.y);
+        $('#z_translation').val(robot_transform.transform.translation.z);
+        
+        $('#x_rotation').val(robot_transform.transform.rotation.x);
+        $('#y_rotation').val(robot_transform.transform.rotation.y);
+        $('#z_rotation').val(robot_transform.transform.rotation.z);
+        $('#w_rotation').val(robot_transform.transform.rotation.w);
+    });
+}
 
 class TabManager {
     constructor() {
@@ -291,8 +324,6 @@ class TabManager {
                 </a>
             </li>`);
 
-        // add robot to possible robots to teleop
-        this.add_robot_to_teleop(this.robot_name[n]);
 
         var disarmBtn = '';
         if (this.robot_name[n].includes('A'))
@@ -580,17 +611,4 @@ class TabManager {
         teleop_options.add(option);
     }
 }
-/* Plugin designed to fill the chart with white */
-Chart.pluginService.register({
-    beforeDraw: function (chart, easing) {
-        if (chart.config.options.chartArea && chart.config.options.chartArea.backgroundColor) {
-            var ctx = chart.chart.ctx;
-            var chartArea = chart.chartArea;
 
-            ctx.save();
-            ctx.fillStyle = chart.config.options.chartArea.backgroundColor;
-            ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
-            ctx.restore();
-        }
-    }
-});
