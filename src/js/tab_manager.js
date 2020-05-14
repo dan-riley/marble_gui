@@ -111,28 +111,33 @@ function pubTask(task_dom, task) {
     }, 1000);
 }
 
+// This sends the transform to the correct robot
 function send_tf_to(){
-    var robot = document.getElementById("select_robot_transform").value();
+    var robot = document.getElementById("select_robot_transform").value;
     var tf_publisher = new ROSLIB.Topic({
         ros: ros,
-        name: `${robot}/kyles/tf/topic/`,
-        messageType: "geometry_msgs/Transform"
+        name: `/${robot}/kyles/tf/topic/`,
+        messageType: "geometry_msgs/TransformStamped"
     });
     tf_publisher.publish(robot_transform);
 }
 
+// This stores the transform to get it from the subscriber to the publisher to the correct robot
 var robot_transform;
 
 function listen_for_tf(){
+    console.log("listening for the tf");
     // Listen to the transform that kyle sends over
     var tf_listener = new ROSLIB.Topic({
         ros: ros,
-        name: "/kyles/tf/topic",
-        messageType: "geometry_msgs/Transform"
+        name: "/tf/topic",
+        messageType: "geometry_msgs/TransformStamped"
     });
     // update the tf variable to be sent to a robot
+    console.log("maybe its subscribed");
     tf_listener.subscribe(function (message){
-        robot_transform = message.transform;
+        console.log("got transform");
+        robot_transform = message;
 
         // update the modal with message data
         $('#x_translation').val(robot_transform.transform.translation.x);
@@ -144,7 +149,10 @@ function listen_for_tf(){
         $('#z_rotation').val(robot_transform.transform.rotation.z);
         $('#w_rotation').val(robot_transform.transform.rotation.w);
     });
+    console.log("what is going on with transforms?");
 }
+
+
 
 class TabManager {
     constructor() {
