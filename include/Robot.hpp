@@ -2,6 +2,7 @@
 #define ROBOT
 
 #include <string>
+#include <vector>
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
@@ -11,45 +12,29 @@
 #include <interactive_markers/interactive_marker_server.h>
 #include <interactive_markers/menu_handler.h>
 
-#include "markers.hpp"
-
-
-// using namespace std;
-
-
-// robot class for doing things related to robots in rviz
-//namespace robot{
-
-// position struct
-struct pos{
-    double x = 0;
-    double y = 0;
-    double z = 0;
-};
-
-// orientation struct
-struct oer{
-    double x = 0;
-    double y = 0;
-    double z = 0;
-    double w = 1;
-};
+using namespace visualization_msgs;
 
 
 class Robot{
     public:
         std::string name;
+        geometry_msgs::Pose pose_;
 
-        Robot(ros::NodeHandle* nodehandle, std::string robot_name, float scale);
+        Robot(ros::NodeHandle* nodehandle, std::string robot_name, float scale, boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server);
         void update_robot_callback(const nav_msgs::Odometry odom);
         geometry_msgs::Pose getPose();
 
     private:
-        // For future additions of interactive robots
         boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server_;
         interactive_markers::MenuHandler menu_handler_;
 
-        geometry_msgs::Pose pose_;
+        Marker makeModel();
+
+        void makeRobotMarker();
+
+        void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
+
+        bool listen_to_odom_;
 
         ros::NodeHandle nh_;
         // Fix the topic string
@@ -57,8 +42,10 @@ class Robot{
         ros::Publisher pub;
 
         std::string world_frame_;
-        // for scaling the marker [x, y, z]
+        // for scaling the marker 
         float scale_;
+
+       
+
 };
-//}
 #endif

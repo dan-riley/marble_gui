@@ -9,6 +9,10 @@ cd ~/catkin_ws/src/
 
 git clone https://github.com/RobotWebTools/tf2_web_republisher 
 
+git clone https://github.com/RobotWebTools/rosbridge_suite.git -b release_0.11.5
+
+git cone https://github.com/GT-RAIL/rosauth.git -b master
+
 cd ~/catkin_ws
 
 catkin_make
@@ -31,7 +35,9 @@ cd ~/catkin_ws/src/marble_gui/src
 sudo bower install --save jstnhuang/ros-websocket jstnhuang/ros-rviz --allow-root
 echo 3.0.2
 
-echo -e "\e[31mPLEASE OPEN THE 'rosbridge_packages' FOLDER AND INSTALL THEM THROUGH EDDY\
-THESE ARE THE ROSBRIDGE PACKAGES THAT WORK AND EDDY IS ANNOYING BUT WORKS FOR INSTALLING THEM"
+pip install pymongo twisted tornado
 
-nautilus ~/catkin_ws/src/marble_gui/rosbridge_packages
+# echo -e "\e[31mPLEASE OPEN THE 'rosbridge_packages' FOLDER AND INSTALL THEM THROUGH EDDY\
+# THESE ARE THE ROSBRIDGE PACKAGES THAT WORK AND EDDY IS ANNOYING BUT WORKS FOR INSTALLING THEM"
+
+# nautilus ~/catkin_ws/src/marble_gui/rosbridge_packages

@@ -1,4 +1,4 @@
-.vscode/
+*.vscode/
 src/node_modules/
 *.pyc
 src/bower_components

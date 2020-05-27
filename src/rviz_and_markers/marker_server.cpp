@@ -284,6 +284,14 @@ vector<string> get_config_robots( ros::NodeHandle* nh ){
     return robot_names;
 }
 
+void preview_tf(string robot_name, geometry_msgs::TransformStamped tf){
+    // look for robot with name
+    for(auto robot : robots){
+        if(robot->name == robot_name)
+            robot->PreviewTF(tf)
+    }
+}
+
 
 //=======================================================
 // MAIN
@@ -292,6 +300,9 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "int_mkr_srv");
 
     ros::NodeHandle nh;
+
+    // reset the interactive marker server so it works
+    server.reset(new interactive_markers::InteractiveMarkerServer("gui_god", "", false));
 
     // Get the world frame parameterfrom the launch file
     if (!nh.getParam("frame", world_frame)) {
@@ -308,14 +319,14 @@ int main(int argc, char **argv) {
     // Make a new robot and add it to the robots vector
     vector<string> robot_names = get_config_robots(&nh);
     for (auto i = 0; i < robot_names.size(); i++) {
-        Robot *new_robot = new Robot(&nh, robot_names[i], robot_scale);
+        Robot *new_robot = new Robot(&nh, robot_names[i], robot_scale, server);
         robots.push_back(new_robot);
     }
 
     // Read in the robot names from the config
     vector<string> config_robots = get_config_robots(&nh);
 
-    server.reset(new interactive_markers::InteractiveMarkerServer("gui_god", "", false));
+    
     ros::Duration(0.1).sleep();
 
     // subscribe to fused artifacts

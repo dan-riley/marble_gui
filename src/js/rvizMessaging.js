@@ -11,7 +11,7 @@ function listen_to_pose(){
     });
 }
 
-// This is legacy code in case i break something and we need to switch back
+// This sends the goal pose to the robot
 function publish_goal(robot){
     var Topic = new ROSLIB.Topic({
         ros: ros,
@@ -22,25 +22,26 @@ function publish_goal(robot){
     if(robot != 'base'){
         Topic.publish(goal_pose);
     }
+    console.log()
 }
 
 
 // This sends the goal location to  the specified robot
-function publish_goalII(){
-    var opt = document.getElementById("teleop_robot_select");
-    var robot = opt.options[opt.selectedIndex].value;
+// function publish_goalII(){
+//     var opt = document.getElementById("teleop_robot_select");
+//     var robot = opt.options[opt.selectedIndex].value;
 
-    var Topic = new ROSLIB.Topic({
-        ros: ros,
-        name: `Base/neighbors/${robot}/guiGoalPoint`,
-        messageType: "geometry_msgs/Pose"
-    });
+//     var Topic = new ROSLIB.Topic({
+//         ros: ros,
+//         name: `Base/neighbors/${robot}/guiGoalPoint`,
+//         messageType: "geometry_msgs/Pose"
+//     });
     
-    Topic.name = `Base/neighbors/${robot}/guiGoalPoint`;
-    if(robot != 'Base'){
-        Topic.publish(goal_pose);
-    }
-}
+//     Topic.name = `Base/neighbors/${robot}/guiGoalPoint`;
+//     if(robot != 'Base'){
+//         Topic.publish(goal_pose);
+//     }
+// }
 
 
 // This send the goal near the pose of the specified robot
