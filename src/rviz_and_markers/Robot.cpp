@@ -28,7 +28,7 @@ Robot::Robot(ros::NodeHandle* nh, std::string robot_name, float scale, boost::sh
         makeRobotMarker();
         // menu_handler_.insert("Goal to robot", &Robot::processFeedback);
         // menu_handler_.insert("Go to goal", &Robot::processFeedback);
-        menu_handler_.insert("preview tf", &Robot::processFeedback);
+        //menu_handler_.insert("preview tf", &Robot::processFeedback);
     }
     catch(const std::exception& e){
         cout << "there was an error making the new robot" << endl;
@@ -145,8 +145,14 @@ void Robot::PreviewTF(const geometry_msgs::TransformStamped tf){
 
     // get the robot pose from the odom
     geometry_msgs::Pose preview;
-    preview.position = tf.transform.translation;
-    preview.orientation = tf.transform.rotation;
+    // This is stupid because point is the same as vector3 but we'll roll with it
+    preview.position.x = tf.transform.translation.x;
+    preview.position.y = tf.transform.translation.y;
+    preview.position.z = tf.transform.translation.z;
+    preview.orientation.x = tf.transform.rotation.x;
+    preview.orientation.y = tf.transform.rotation.y;
+    preview.orientation.z = tf.transform.rotation.z;
+    preview.orientation.w = tf.transform.rotation.w;
 
     // This is where the inteactive marker server updates the robot pose
     server_->setPose(name, preview);

@@ -7,6 +7,9 @@ source ~/catkin_ws/devel/setup.bash
 
 cd ~/catkin_ws/src/
 
+# Boost libraries 
+sudo apt-get -y install libboost-all-dev
+
 git clone https://github.com/RobotWebTools/tf2_web_republisher 
 
 git clone https://github.com/RobotWebTools/rosbridge_suite.git -b release_0.11.5

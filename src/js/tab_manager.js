@@ -111,7 +111,7 @@ function pubTask(task_dom, task) {
     }, 1000);
 }
 
-// This sends the transform to the correct robot
+// This sends kyle's transform to the correct robot
 function send_tf_to(){
     var robot = document.getElementById("select_robot_transform").value;
     var tf_publisher = new ROSLIB.Topic({
@@ -125,7 +125,10 @@ function send_tf_to(){
 // This stores the transform to get it from the subscriber to the publisher to the correct robot
 var robot_transform;
 
+// This listens for kyle's tf message to pass to a robot
 function listen_for_tf(){
+    // This is verrified with two messages at 1hz
+    //roslibjs seems to lose the first message but recieves everyone after that
     console.log("listening for the tf");
     // Listen to the transform that kyle sends over
     var tf_listener = new ROSLIB.Topic({

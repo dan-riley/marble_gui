@@ -7,6 +7,7 @@ sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31
 sudo apt update
 
 sudo apt -y install ros-melodic-desktop-full python-rosinstall python-rosinstall-generator python-wstool build-essential python-catkin-tools ros-melodic-rosbridge-server ros-melodic-tf2-web-republisher ros-melodic-rosapi
+sudo apt-get -y install libboost-all-dev
 
 
 sudo rosdep init

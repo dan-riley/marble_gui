@@ -8,6 +8,8 @@
 #include <std_msgs/String.h>
 #include <geometry_msgs/Pose.h>
 #include <nav_msgs/Odometry.h>
+#include <geometry_msgs/TransformStamped.h>
+
 
 #include <interactive_markers/interactive_marker_server.h>
 #include <interactive_markers/menu_handler.h>
@@ -23,6 +25,8 @@ class Robot{
         Robot(ros::NodeHandle* nodehandle, std::string robot_name, float scale, boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server);
         void update_robot_callback(const nav_msgs::Odometry odom);
         geometry_msgs::Pose getPose();
+        void PreviewTF(const geometry_msgs::TransformStamped tf);
+        void TurnOffTFPreview();
 
     private:
         boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server_;

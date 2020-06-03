@@ -35,6 +35,9 @@ ros::Publisher sub_mkr_pub;
 ros::Publisher pub;
 // This publishes the goal pose for the gui
 ros::Publisher goal_pub;
+// Save transform preview from kyle
+tf::TransformStamped kylePreviewTF;
+
 // This is so that everything can work on the same world frame
 string world_frame;
 // store the offsets for the text of the submitted marker -> get from launch file
@@ -284,11 +287,11 @@ vector<string> get_config_robots( ros::NodeHandle* nh ){
     return robot_names;
 }
 
-void preview_tf(string robot_name, geometry_msgs::TransformStamped tf){
+void preview_tf(string robot_name){
     // look for robot with name
     for(auto robot : robots){
         if(robot->name == robot_name)
-            robot->PreviewTF(tf)
+            robot->PreviewTF(tf);
     }
 }
 
@@ -336,10 +339,7 @@ int main(int argc, char **argv) {
     // subscribe to the submitted artifact topic from the gui
     ros::Subscriber submitted_sub = nh.subscribe("/gui/submitted", 10, submittedMarkerCallback);
 
-    // REMOVE THIS AND ADD IT BASED ON THE robots.txt FILE
-    // http://www.cplusplus.com/doc/tutorial/files/
-    // This adds a robot to the vector of robots
-    // ros::Subscriber add_robot = nh->subscribe("/gui/add_robot", 10, add_robot_callback);
+    ros::Subscriber transform_preview = nh.subscribe("/gui/transform_preview", 10, preview_tf);
 
     // updates to gui about fused artifacts
     pub = nh.advertise<marble_gui::ArtifactTransport>("mkr_srv_talkback", 1);
