@@ -20,6 +20,7 @@
 #include "markers.hpp"
 #include "Robot.hpp"
 #include "marker_server.hpp"
+#include "utilities.hpp"
 
 using namespace visualization_msgs;
 using namespace std;
@@ -36,7 +37,7 @@ ros::Publisher pub;
 // This publishes the goal pose for the gui
 ros::Publisher goal_pub;
 // Save transform preview from kyle
-tf::TransformStamped kylePreviewTF;
+geometry_msgs::TransformStamped kylePreviewTF;
 
 // This is so that everything can work on the same world frame
 string world_frame;
@@ -98,10 +99,10 @@ void markerCallback(const marble_gui::ArtifactTransport &art){
         string old_name = art.object_class + "||" + art.old_id;
 
         // Check to see if we already have this artifact
-        if (check_for_artifact(full_name)) {
+        if (check_for_artifact(full_name, logged_artifacts)) {
             server->setPose(full_name, pos);
             cout << "successfully updated marker " + full_name << endl;
-        } else if (!art.old_id.empty() && check_for_artifact(old_name)) {
+        } else if (!art.old_id.empty() && check_for_artifact(old_name, logged_artifacts)) {
             server->erase(old_name);
             makeMarker(3, pos, art.object_class, art.id);
             cout << "moved marker " + old_name + " to " + full_name << endl;
@@ -111,31 +112,6 @@ void markerCallback(const marble_gui::ArtifactTransport &art){
         }
         server->applyChanges();
     }
-}
-
-// This seperates the ID from the NAME of the marker
-string* getIdFromName(string glob){
-    int globby_boi = glob.length();
-
-    // declaring character array to make strtok happy
-    char char_array[globby_boi + 1];
-
-    // copying the contents of the
-    // string to char array
-    strcpy(char_array, glob.c_str());
-    // [artifact name] [artifact id]
-    string* components = new string[2];
-
-    char *token = strtok(char_array, "||");
-
-    // Keep printing tokens while one of the
-    // delimiters present in str[].
-    for (int i = 0; i < 2; i++) {
-        components[i] = token;
-        token = strtok(NULL, "||");
-    }
-
-    return components;
 }
 
 // This makes a marker
@@ -159,16 +135,6 @@ void makeMarker(int dof, geometry_msgs::Pose &pos, const string &artifact_name, 
     server->insert(int_marker);
     server->setCallback(int_marker.name, &processFeedback);
     server->setPose(int_marker.name, pos);
-}
-
-// This checks for the existance ofan artifact in the logged artifact vector  9135-
-bool check_for_artifact(string &name){
-    if (std::find(logged_artifacts.begin(), logged_artifacts.end(), name) != logged_artifacts.end()) {
-        return true;
-    }
-    // Because this will be a new marker we added it to the logged vector in here to make life easier
-    logged_artifacts.push_back(name);
-    return false;
 }
 
 // This just inits the goal marker and keeps publishing the goal position
@@ -267,31 +233,14 @@ void goal_to_robot(const std_msgs::String& robot_name) {
     cout << "Got goal_to_robot" << endl;
 }
 
-// This reads the config used for the js to get the robot names in play
-vector<string> get_config_robots( ros::NodeHandle* nh ){
-    vector<string> robot_names;
-    string new_robot;
-    string config_name;
 
-    nh->getParam("robot_names_config", config_name);
-
-    ifstream config_file(config_name);
-    if (config_file.is_open()){
-        while(getline(config_file, new_robot)){
-            robot_names.push_back(new_robot);
-        }
-        config_file.close();
-    }else{
-        cout << "Unable to open robots config file" << endl;
-    }
-    return robot_names;
-}
-
-void preview_tf(string robot_name){
+// This applies a preview of the transform kyle sends
+void preview_tf(const std_msgs::String::ConstPtr& robot_name){
     // look for robot with name
     for(auto robot : robots){
-        if(robot->name == robot_name)
-            robot->PreviewTF(tf);
+        if(robot->name == robot_name->data.c_str()){
+            robot->PreviewTF(kylePreviewTF);
+        }
     }
 }
 
@@ -339,6 +288,7 @@ int main(int argc, char **argv) {
     // subscribe to the submitted artifact topic from the gui
     ros::Subscriber submitted_sub = nh.subscribe("/gui/submitted", 10, submittedMarkerCallback);
 
+    // Use this to activate the transform preview
     ros::Subscriber transform_preview = nh.subscribe("/gui/transform_preview", 10, preview_tf);
 
     // updates to gui about fused artifacts

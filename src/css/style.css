@@ -343,3 +343,8 @@ button {
 /* 
 .custom-select{
 } */
+
+.control-icons{
+  width: 25px;
+  height: 25px;
+}

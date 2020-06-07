@@ -344,60 +344,56 @@ class TabManager {
                 Disarm
             </button><br>`;
 
-        // This is for creatiung the control card for each robot on the sidebar
-        $('#controls_bar_inner').append(`
-        <li id="${this.robot_name[n]}_control_card" class="quick_control">
-            <h4>${this.robot_name[n]}</h4>
-            ${disarmBtn}
-            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
-                onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)">
-                Start
-            </button>
-            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop"
-                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Stop')">
-                Stop
-            </button>
-            <br>
-            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_explore"
-                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Explore')">
-                Explore
-            </button>
-            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home"
-                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Home')">
-                Go Home
-            </button>
-            <br>
-            <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_deploy"
-                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')">
-                Deploy Beacon
-            </button>
-            <br>
-            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_toggle"
-                onclick="estop_toggle('${this.robot_name[n]}')">
-                E-Stop
-            </button>
-            <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_radio"
-                onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)">
-                Radio Reset
-            </button>
-            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
-                onclick="teleop_to('${this.robot_name[n]}')" value="Teleop"></input>
-            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
-                onclick="publish_goal('${this.robot_name[n]}')" value="Go to Goal"></input>
-            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
-                onclick="goal_to_robotII('${this.robot_name[n]}')" value="Goal to Robot"></input></br>
-        </li>`)
+            $('#controls_bar_inner').append(`
+            <li id="${this.robot_name[n]}_control_card" class="quick_control">
+                <h4>${this.robot_name[n]}</h4>
+                ${disarmBtn}
+                <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
+                    onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)">
+                    <img src="./images/start.png" class="control-icons">
+                </button>
+                <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop"
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Stop')">
+                    <img src="./images/Stop_sign.png" class="control-icons">
+                </button>
+                <br>
+                <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_explore"
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Explore')">
+                    <img src="./images/enterprise.png" class="control-icons">
+                </button>
+                <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home"
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Home')">
+                    <img src="./images/go_home.png" class="control-icons">
+                </button>
+                <br>
+                <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_deploy"
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')">
+                    <img src="./images/deploy_beacon.png" class="control-icons">
+                </button>
+                <br>
+                <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_toggle"
+                    onclick="estop_toggle('${this.robot_name[n]}')">
+                    E-Stop
+                </button>
+                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_radio"
+                    onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)">
+                    <img src="./images/radio_reset.png" class="control-icons">
+                </button>
+                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
+                    onclick="teleop_to('${this.robot_name[n]}')" value="Teleop">
+                    <img src="./images/teleop.png" class="control-icons">
+                </button>
+                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
+                    onclick="publish_goal('${this.robot_name[n]}')" value="Go to Goal">
+                    <img src="./images/go_to_goal.png" class="control-icons">
+                </button>
+                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
+                    onclick="goal_to_robotII('${this.robot_name[n]}')" value="Goal to Robot">
+                    <img src="./images/goal_to_robot.png" class="control-icons">
+                </button></br>
+            </li>`)
 
-        // this is some legacy code for the old way of starting teleop
-        //     <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off"
-        //         onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', false)">
-        //         E-Stop Disabled
-        //     </button>
-        //     <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_estop"
-        //         onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', true)">
-        //         E-Stop
-        //     </button>
-
+        
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");
         tab_content.setAttribute("id", this.robot_name[n]);
