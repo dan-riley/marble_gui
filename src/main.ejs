@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <%- include ../src/ejs_modules/infastructure/header.ejs %>
+</head>
+
+
+<!-- <body onload="window.setTimeout(function(){window.setSpeed(1000);},1000);"> -->
+
+<body onload="populateOpts(), teleop_route(), get_darpa_artifacts(), what_logs(), listen_to_markers(), listen_to_pose(), populate_robots('select_robot_transform'), listen_for_tf()" style="overflow: hidden;">
+    <!-- <div class="container"> -->
+    <!--! Tab bar at the top of web page that displays all vehicles and default tabs -->
+    <%- include ../src/ejs_modules/nav_bars/connections_bar.ejs %>
+
+
+    <!-- sidebar to control each robot 
+        scrolls independently from any of the rest of the page -->
+    <%- include ../src/ejs_modules/nav_bars/controls_bar.ejs %>
+
+     <!--! Top bar on web page that displays all information reported back by DARPA when getting the score -->
+     <div id="Universal_Page" class="row">
+        <!-- Score: <label style="background-color: white; padding: 2px;"> 10 </label> -->
+        <span class="badge badge-secondary col-sm-4" style="text-align: center">Time: <span
+            id="header_time">nan</span></span>
+        <span class="badge badge-secondary col-sm-4" style="text-align: center">Score: <span
+            id="header_score">0</span></span>
+        <span class="badge badge-secondary col-sm-4" style="text-align: center">Remaining Artifacts: <span
+            id="header_remaining_reports">nan</span></span>
+    </div>
+
+    <div class="main">
+
+        <!--! DIV that contains all details within each tab, vehicle pages are added as subsections through javascript -->
+        <div id="Robot_Pages" >
+
+
+            <div id="DARPA" class="tabcontent">`
+                <%- include ../src/ejs_modules/infastructure/darpa_tab.ejs %>
+            </div>
+
+            <!-- This is where the rviz map lives -->
+            <div id="Beacons" class="tabcontent">
+                <h1>Beacons</h1>
+                <div id="Beacon_Cards">
+
+                </div>
+            </div>
+
+            <!-- It is what it says, this is where the artifacts show up and where they are submitted thorugh -->
+            <div id="Artifact_Page" class="tabcontent">
+                <div class="section_div">
+                    <h3>Fused Artifacts</h3>
+                    <div class="col-sm-12, fused_div" robot_name="Base">
+                        <!-- <div class="row" artifact_id="header">
+                            <span class="badge badge-secondary col-sm-12" style="font-size: 20px"><b>Fused Artifacts</b></span>
+                        </div> -->
+
+                        <div class="row" artifact_id="title">
+                            <span id="type" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Type</b></span>
+                            <!--
+                            <span id="num_seen" class="badge badge-secondary col-sm-1" style="text-align: center"><b># Seen</b></span>
+                            -->
+                            <span id="seen_by" class="badge badge-secondary col-sm-2" style="text-align: center"><b>Seen By</b></span>
+                            <span id="confidence" class="badge badge-secondary col-sm-1" style="text-align: center"><b>Confidence</b></span>
+                            <span id="position" class="badge badge-secondary col-sm-3" style="text-align: center"><b>Position</b></span>
+                            <span class="badge badge-secondary col-sm-2" style="text-align: center"><b>DARPA</b></span>
+                            <span class="badge badge-secondary col-sm-2" style="text-align: center"><b>Image</b></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WHERE THE ROBOT ARTIFACTS GO -->
+                <div class="section_div">
+                    <h3>Raw Robot Artifacts</h3>
+                    <div id="robot_artifact_tables" class="raw_div">
+                    
+                    </div>
+                </div>
+                
+                <!-- WHERE THE SUBMISSIONS LIVE -->
+                <div id="submissions_table" class="section_div">
+                    <%- include ../src/ejs_modules/infastructure/submission_table.ejs %>
+                </div>
+                
+                <div>
+                    <!-- Button to Open the Modal -->
+                    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#NewReportModal"
+                        data-backdrop="static" data-keyboard="false" style="float: left;" id="custom_submit_btn" onclick="custom_submission()">
+
+                        New Report
+                    </button> -->
+                    <button type="button" class="btn btn-primary" style="float: left;" id="custom_submit_btn" onclick="custom_submission()">
+                        New Report
+                    </button>
+
+                    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#TFModal"
+                        data-backdrop="static" data-keyboard="false" style="float: center;">
+                        Transform Transport
+                    </button>
+
+
+                    <!-- Button to end mission -->
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#EndMissionModal"
+                        data-backdrop="static" data-keyboard="false" style="float: right;">
+                        End Mission
+                    </button>
+                </div>
+                
+
+                <!-- New Report Modal -->
+                <%- include ../src/ejs_modules/modals/new_report.ejs %>
+
+                <!-- End Mission Modal -->
+                <%- include ../src/ejs_modules/modals/end_mission.ejs %>
+
+                <!-- Transport TF modal -->
+                <%- include ../src/ejs_modules/modals/tf_transport.ejs %>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</body>
+
+</html>

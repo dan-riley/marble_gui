@@ -1,0 +1,35 @@
+<!-- add stuff here for DARPA server -->
+<div class="card card-body" style="margin-bottom: 40px;">
+    <h1>DARPA Reporting</h1>
+    <p><i>Systems Teams must provide real-time 3D volumetric map updates to the DARPA Command Post at a minimum
+        frequency of one update per 10 seconds.</i></p>
+
+    <div class="row">
+    <div class="col-4">
+        Last mapping report sent (PointCloud2):
+        <div style="padding-left: 10px;">
+        time sent: <span id="mapping_cloud_report_last_sent_raw">-</span>
+        <br>
+        time elapsed since last sent: <span id="mapping_cloud_report_last_sent_secs_ago">-</span>
+        </div>
+    </div>
+    <div class="col-4">
+        Last mapping report sent (OccupancyGrid):
+        <div style="padding-left: 10px;">
+        time sent: <span id="mapping_grid_report_last_sent_raw">-</span>
+        <br>
+        time elapsed since last sent: <span id="mapping_grid_report_last_sent_secs_ago">-</span>
+        </div>
+    </div>
+
+    <div class="col-4">
+        Last telemetry report sent (PoseArray): <span id="telemetry_report_last_sent">-</span>
+        <div style="padding-left: 10px;">
+        time sent: <span id="telemetry_report_last_sent_raw">-</span>
+        <br>
+        time elapsed since last sent: <span id="telemetry_report_last_sent_secs_ago">-</span>
+        </div>
+    </div>
+
+    </div>
+</div>

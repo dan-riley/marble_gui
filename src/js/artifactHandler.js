@@ -219,39 +219,8 @@ class Artifact {
             }
             if (this.artifactImages[image_id] == null) {
                 this.artifact_image[id].innerText = "No Image";
-            }
-            else {
-                if (this.robot_name == 'Base') {
-                    if (this.artifact_image[id].children.length == 0) {
-                        this.artifact_image[id].innerText = "View Image";
-                        let robot_artifact_image = document.createElement("IMG");
-                        robot_artifact_image.setAttribute("id", "myPopup");
-                        robot_artifact_image.setAttribute("class", "popuptext");
-                        this.artifact_image[id].appendChild(robot_artifact_image);
-                    }
-                    this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
-
-                    this.artifact_image[id].onclick = function () {
-                        $(this.children[0]).toggleClass("show");
-                    }
-                } else {
-                    if (this.artifact_image[id].children.length == 0) {
-                        this.artifact_image[id].innerText = "View Image";
-                        let robot_artifact_image = document.createElement("IMG");
-                        robot_artifact_image.setAttribute("id", "myPopup");
-                        robot_artifact_image.setAttribute("class", "popuptext");
-                        robot_artifact_image.style.height = '480px';
-                        robot_artifact_image.style.width = '640px';
-                        robot_artifact_image.style.left = '-300px';
-                        robot_artifact_image.style.top = '-300px';
-                        this.artifact_image[id].appendChild(robot_artifact_image);
-                    }
-                    this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
-
-                    this.artifact_image[id].onclick = function () {
-                        $(this.children[0]).toggleClass("show");
-                    }
-                }
+            }else{
+                
             }
 
             let color = this.color_artifacts(type);

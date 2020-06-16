@@ -31,7 +31,7 @@ cd ~/catkin_ws/src/marble_gui/src
 
 npm install
 
-sudo npm install fs jquery path polymer-cli
+sudo npm install fs jquery path polymer-cli ejs-electron
 sudo npm install -g bower
 
 cd ~/catkin_ws/src/marble_gui/src

@@ -22,11 +22,9 @@ curl -L https://www.npmjs.com/install.sh | sudo sh
 sudo npm install -save electron --unsafe-perm=true --allow-root
 
 npm install fs
-npm install csv-writer
-npm install csv-parser
 npm install jquery
 npm install path
-npm install node-ssh
+npm install ejs-electron
 
 npm install -g bower
 
