@@ -116,7 +116,7 @@ function send_tf_to(){
     var robot = document.getElementById("select_robot_transform").value;
     var tf_publisher = new ROSLIB.Topic({
         ros: ros,
-        name: `/${robot}/kyles/tf/topic/`,
+        name: `/${robot}/origin_from_dan`,
         messageType: "geometry_msgs/TransformStamped"
     });
     tf_publisher.publish(robot_transform);

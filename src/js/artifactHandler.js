@@ -220,7 +220,27 @@ class Artifact {
             if (this.artifactImages[image_id] == null) {
                 this.artifact_image[id].innerText = "No Image";
             }else{
-                
+                if (this.artifact_image[id].children.length == 0) {
+                    console.log("image things");
+                    this.artifact_image[id].innerText = "View Image";
+                    let robot_artifact_image = document.createElement("IMG");
+                    robot_artifact_image.setAttribute("id", `arti_img_${this.robot_name}_${image_id}`);
+                    // "popuptext" is really important to keep the images hidden
+                    robot_artifact_image.setAttribute("class", "popuptext");
+                    this.artifact_image[id].appendChild(robot_artifact_image);
+                }
+                this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
+
+                this.artifact_image[id].onclick = function () {
+                    console.log("uhh showing");
+                    // $(this.children[0]).toggleClass("show");
+                    let img_modal = document.getElementById("artifact_image_modal");
+                    let img = document.getElementById(`arti_img_${this.robot_name}_${image_id}`);
+                    let modalImg = document.getElementById("artifact_image");
+                    img_modal.style.display = "block";
+                    modalImg.src = this.src;
+                }
+
             }
 
             let color = this.color_artifacts(type);
