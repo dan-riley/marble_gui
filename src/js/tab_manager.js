@@ -120,13 +120,14 @@ function send_tf_to(){
         messageType: "geometry_msgs/TransformStamped"
     });
     tf_publisher.publish(robot_transform);
+    $('#TFModal').modal('hide');
 }
 
 // This stores the transform to get it from the subscriber to the publisher to the correct robot
 var robot_transform;
 
 // This listens for kyle's tf message to pass to a robot
-async function listen_for_tf(){
+function listen_for_tf(){
     // This is verrified with two messages at 1hz
     //roslibjs seems to lose the first message but recieves everyone after that
     console.log("listening for the tf");

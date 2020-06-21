@@ -8,8 +8,9 @@ from geometry_msgs.msg import TransformStamped
 
 check_tf = TransformStamped()
 
+
 def talker():
-    pub = rospy.Publisher('/tf/topic', TransformStamped, queue_size=10)
+    pub = rospy.Publisher('/leica/robot_to_origin_transform', TransformStamped, queue_size=10)
     tf = TransformStamped()
     tf.transform.translation.x = random.uniform(-3.0, 3.0)
     tf.transform.translation.y = random.uniform(-3.0, 3.0)
@@ -31,6 +32,7 @@ def talker():
 def listener(message):
     rospy.loginfo("returned tf")
     rospy.loginfo(message.transform)
+    exit()
     
 
 
@@ -38,7 +40,7 @@ if __name__ == '__main__':
     try:
         rospy.init_node('optimus_prime', anonymous=True)
         talker()
-        rospy.Subscriber("/A01/kyles/tf/topic", TransformStamped, listener)
+        rospy.Subscriber("/X1/origin_from_dan", TransformStamped, listener)
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
