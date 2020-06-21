@@ -126,18 +126,18 @@ function send_tf_to(){
 var robot_transform;
 
 // This listens for kyle's tf message to pass to a robot
-function listen_for_tf(){
+async function listen_for_tf(){
     // This is verrified with two messages at 1hz
     //roslibjs seems to lose the first message but recieves everyone after that
     console.log("listening for the tf");
     // Listen to the transform that kyle sends over
     var tf_listener = new ROSLIB.Topic({
         ros: ros,
-        name: "/tf/topic",
+        name: "/leica/robot_to_origin_transform",
         messageType: "geometry_msgs/TransformStamped"
     });
     // update the tf variable to be sent to a robot
-    console.log("maybe its subscribed");
+    // console.log("maybe its subscribed");
     tf_listener.subscribe(function (message){
         console.log("got transform");
         robot_transform = message;
@@ -152,7 +152,7 @@ function listen_for_tf(){
         $('#z_rotation').val(robot_transform.transform.rotation.z);
         $('#w_rotation').val(robot_transform.transform.rotation.w);
     });
-    console.log("what is going on with transforms?");
+    // console.log("what is going on with transforms?");
 }
 
 

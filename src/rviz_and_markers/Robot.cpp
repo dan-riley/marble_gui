@@ -19,13 +19,19 @@ Robot::Robot(ros::NodeHandle* nh, std::string robot_name, float scale, boost::sh
         nh_.getParam("frame", world_frame_);
         name = robot_name;
         scale_ = scale;
-        // cout << "added " << name << " marker to rviz" << endl;
-        odom_sub = nh_.subscribe("/" + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);
-
 
         // this makes the interactive marker server usable here inside the robot object
         server_ = server;
-        makeRobotMarker();
+
+        // Decide wether to use robot mesh. use of meshes has a performance penalty
+        bool to_show = false;
+        // This actually gets the option from the launch file
+        nh_.getParam("show_robot_mesh", to_show);
+        if(to_show){
+            odom_sub = nh_.subscribe("/" + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);
+            makeRobotMarker();
+        }
+        
         // menu_handler_.insert("Goal to robot", &Robot::processFeedback);
         // menu_handler_.insert("Go to goal", &Robot::processFeedback);
         //menu_handler_.insert("preview tf", &Robot::processFeedback);
@@ -46,7 +52,7 @@ void Robot::update_robot_callback(const nav_msgs::Odometry odom){
     // cout << name << "pose update in rviz" << pose_ << endl;
 
     // this integrates with the tf preview system and can stop this piece of code from showing new odom messages
-    if(listen_to_odom_ == false){
+    if(listen_to_odom_ == true){
         // This is where the inteactive marker server updates the robot pose
         server_->setPose(name, pose_);
         server_->applyChanges();

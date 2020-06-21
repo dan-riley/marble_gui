@@ -28,6 +28,9 @@ class Robot{
         void PreviewTF(const geometry_msgs::TransformStamped tf);
         void TurnOffTFPreview();
 
+        // Robot class destructor
+        ~Robot();
+
     private:
         boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server_;
         interactive_markers::MenuHandler menu_handler_;
@@ -38,7 +41,7 @@ class Robot{
 
         void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
 
-        bool listen_to_odom_;
+        bool listen_to_odom_ = true;
 
         ros::NodeHandle nh_;
         // Fix the topic string
@@ -52,4 +55,17 @@ class Robot{
        
 
 };
+
+
+// Destructor
+Robot::~Robot(){
+    std::cout << "destroy" << std::endl;
+    delete &nh_;
+    delete &server_;
+    delete &pub;
+    delete &odom_sub;
+    delete &name;
+    delete &pose_;
+}
 #endif
+

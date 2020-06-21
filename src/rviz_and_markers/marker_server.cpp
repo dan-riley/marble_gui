@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <ros/console.h>
 
 #include <interactive_markers/interactive_marker_server.h>
 #include <interactive_markers/menu_handler.h>
@@ -24,7 +25,7 @@
 
 using namespace visualization_msgs;
 using namespace std;
-// using namespace robot;
+
 
 // Important kind of setup stuff
 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
@@ -249,6 +250,7 @@ void preview_tf(const std_msgs::String::ConstPtr& robot_name){
 // MAIN
 //=======================================================
 int main(int argc, char **argv) {
+
     ros::init(argc, argv, "int_mkr_srv");
 
     ros::NodeHandle nh;
@@ -302,6 +304,32 @@ int main(int argc, char **argv) {
 
     // This initializes the goal interactive marker
     initGoal();
-    ros::spin();
-    server.reset();
+
+    cout << "inited goal" << endl;
+
+    ros::Rate loop_rate(10);
+    while(true){
+        if(ros::ok()){
+            ros::spinOnce();
+            cout << "heart beat" << endl;
+            loop_rate.sleep();
+        }else{
+            cout << "server reset" << endl;
+            // server.reset();
+
+            for(int i = 0; i < robots.size(); i++)
+                delete robots[i];
+
+            // delete the server
+            server.reset();
+            
+            return 0;
+            // exit(0);
+            
+        }
+        
+    }
+
+    return 0;
+    
 }
