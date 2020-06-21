@@ -350,46 +350,46 @@ class TabManager {
                 <h4>${this.robot_name[n]}</h4>
                 ${disarmBtn}
                 <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
-                    onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)">
+                    onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)" title="Start">
                     <img src="./images/start.png" class="control-icons">
                 </button>
                 <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop"
-                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Stop')">
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Stop')" title="Stop">
                     <img src="./images/Stop_sign.png" class="control-icons">
                 </button>
                 <br>
                 <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_explore"
-                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Explore')">
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Explore')" title="Explore">
                     <img src="./images/enterprise.png" class="control-icons">
                 </button>
                 <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home"
-                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Home')">
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Home')" title="Go Home">
                     <img src="./images/go_home.png" class="control-icons">
                 </button>
                 <br>
                 <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_deploy"
-                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')">
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')" title="Deploy Beacon">
                     <img src="./images/deploy_beacon.png" class="control-icons">
                 </button>
                 <br>
                 <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_toggle"
-                    onclick="estop_toggle('${this.robot_name[n]}')">
+                    onclick="estop_toggle('${this.robot_name[n]}')" title="Estop">
                     E-Stop
                 </button>
                 <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_radio"
-                    onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)">
+                    onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)" title="Radio Reset">
                     <img src="./images/radio_reset.png" class="control-icons">
                 </button>
                 <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
-                    onclick="teleop_to('${this.robot_name[n]}')" value="Teleop">
+                    onclick="teleop_to('${this.robot_name[n]}')" value="Teleop" title="Teleop">
                     <img src="./images/teleop.png" class="control-icons">
                 </button>
                 <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
-                    onclick="publish_goal('${this.robot_name[n]}')" value="Go to Goal">
+                    onclick="publish_goal('${this.robot_name[n]}')" value="Go to Goal" title="Go To Goal">
                     <img src="./images/go_to_goal.png" class="control-icons">
                 </button>
                 <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
-                    onclick="goal_to_robotII('${this.robot_name[n]}')" value="Goal to Robot">
+                    onclick="goal_to_robotII('${this.robot_name[n]}')" value="Goal to Robot" title="Goal To Robot">
                     <img src="./images/goal_to_robot.png" class="control-icons">
                 </button></br>
             </li>`)
