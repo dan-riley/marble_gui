@@ -153,7 +153,6 @@ function listen_for_tf(){
         $('#z_rotation').val(robot_transform.transform.rotation.z);
         $('#w_rotation').val(robot_transform.transform.rotation.w);
     });
-    // console.log("what is going on with transforms?");
 }
 
 

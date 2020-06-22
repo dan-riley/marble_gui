@@ -307,6 +307,8 @@ int main(int argc, char **argv) {
 
     cout << "inited goal" << endl;
 
+
+    // The "main" loop
     ros::Rate loop_rate(10);
     while(true){
         if(ros::ok()){
