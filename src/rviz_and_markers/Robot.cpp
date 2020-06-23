@@ -23,12 +23,15 @@ Robot::Robot(ros::NodeHandle* nh, std::string robot_name, float scale, boost::sh
         // this makes the interactive marker server usable here inside the robot object
         server_ = server;
 
+        string prefix;
+        nh_.getParam("comms_prefix", prefix);
+        odom_sub = nh_.subscribe(prefix + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);    
+
         // Decide wether to use robot mesh. use of meshes has a performance penalty
         bool to_show = false;
         // This actually gets the option from the launch file
         nh_.getParam("show_robot_mesh", to_show);
         if(to_show){
-            odom_sub = nh_.subscribe("/" + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);
             makeRobotMarker();
         }
         

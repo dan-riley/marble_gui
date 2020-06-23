@@ -1,34 +1,25 @@
-<div style="display: none;" id="artifact_image_modal" class="modal">
+<div id="artifact_image_modal" class="modal">
     <div class="modal-dialog">
         <div class="modal-content">
             <!-- The Close Button -->
-            <span class="close">&times;</span>
-        
-            <!-- Modal Content (The Image) -->
-            <img class="modal-content" id="artifact_image">
-        
-            <!-- Modal Caption (Image Text) -->
-            <div id="artifact_info">
-                <h2>Type: </h2> <h2 id="artifact_image_type"> </h2> </br>
-                <h2>Confidence: </h2> <h2 id="artifact_image_conf"> </h2> </br>
-                <h2>Seen By: </h2> <h2 id="artifact_image_robot"> </h2> </br>
-                <h2>Position: </h2> <h2 id="artifact_image_pos"> </h2> </br>
+            <div class="modal-header">
+                <h4 class="modal-title">Image</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-        </div>
         
+            <div class="modal-body">
+                <!-- Modal Content (The Image) -->
+                <img class="modal-content" id="artifact_image" src="">
+                        
+                <!-- Modal Caption (Image Text) -->
+                <div id="artifact_info">
+                    <h2>Type: </h2> <h2 id="artifact_image_type"> </h2> </br>
+                    <h2>Confidence: </h2> <h2 id="artifact_image_conf"> </h2> </br>
+                    <h2>Seen By: </h2> <h2 id="artifact_image_robot"> </h2> </br>
+                    <h2>Position: </h2> <h2 id="artifact_image_pos"> </h2> </br>
+                </div>
+            </div>
+            
+        </div>
     </div>
-
-
 </div>
-
-<script>
-let modal = document.getElementById("artifact_image_modal");
-
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
-</script>

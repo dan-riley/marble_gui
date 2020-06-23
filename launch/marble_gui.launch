@@ -17,9 +17,18 @@
     <!-- This turns on and off the robot meshes, it helps with performance -->
     <param name="show_robot_mesh" type="bool" value="false"/>
 
+    <!-- This is the prefix used for multiagent or local tests "/Base/neighbors/" or "/" -->
+    <param name="comms_prefix" type="string" value="/Base/neighbors/"/>
+
     <!-- get the names of each robot in play from dan's config file -->
     <param name="robot_names_config" type="string" value="$(find marble_gui)/src/js/robots.txt"/>
 
+    <!-- mesh scaling for each robot -->
+    <!-- <param name="x_scale" type="double" value=""/>
+    <param name="h_scale" type="double" value=""/>
+    <param name="t_scale" type="double" value=""/>
+    <param name="a_scale" type="double" value=""/>
+     -->
     <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen" args="$(find marble_gui)/src">
     </node>
     <include file="$(find marble_gui)/launch/teleop.launch" />

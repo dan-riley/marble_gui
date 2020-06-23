@@ -1,15 +1,6 @@
-Documentation.txt
-Blake McHale 5/9/2019 bmchale@ssci.com
-
 Order of file loading, starting with last loaded files and their dependencies
 Framework:
-- fileCopy.js
-- readData.js
-    - tabs.js
-    - tab_manager.js
-        - artifactHandler.js
-            - darpaServerComm.js
-        - octomap_viewer.js
+
 
 Hardcoded areas:
 - darpa command post interaction variables
@@ -53,21 +44,8 @@ Launch Scripts:
     - needs rosapi to gather information about what topics are currently active
     - needs tf2_web_republisher to display 3D visuals in the gui
 
+
 Description of each js file:
-- fileCopy.js
-    - used to send files over ssh to remote computer
-    - functions are included within test.html <div id="File"> tab
-    - attached in js file with jquery reference to id
-- readData.js
-    - file for handling major setup for ros gui. It creates and builds all designs and  code for every tab except for the static tab "File"
-    - order of operations
-        - establish ros connection (sets ros variable)
-        - grabs topics from rostopic list
-            - used to find what robots are connected
-        - call CreateTab() to setup all robots and their corresponding subscribers for each tab in the gui
-        - call window.setInterval() with startGet_Status()
-            - establish connection with darpa for streaming back information related to score, time, and number of artifact reports left    
-        - set up window.pubTopicMsg() to handle publishing msgs in the future
 - tabs.js
     - file used to establish window.openPage() function for use with switching tabs and loading subscribers for robots
     - all robots immediately subscribe to their odometry and battery topics on tab load
@@ -76,6 +54,7 @@ Description of each js file:
             - other topics are not always subscribed to because that increases the latency for input on the application
     - establishes graph with data and voltage outputs on individual robot tabs
     - recolors all tabs and their corresponding pages to match clicked tab
+
 - tab_manager.js
     - establishes class for tabManager, the controller for this gui
     - functions included in class:
@@ -103,9 +82,8 @@ Description of each js file:
             - allows to use json formats for establishing styles on a tag in javascript
         - get_TopicsFromROS()
             - updates the TopicList information so that tabs can be removed or added correspondingly
-    - (function) Chart.pluginService.register()
-        - establishes chart color so that the graph is only colored within the bounds of the x-axis and y-axis
-            - used to make chart more appealing
+    
+
 - artifactHandler.js
     - contains class for establishing and evaluating a robots artifact list
     - functions included in class:
@@ -134,13 +112,11 @@ Description of each js file:
             - saves csv file containing robots reported artifact list, used for data storage and collection in case of ros gui failure/crash
         - read_file()
             - reads in csv file if it exists and stores the reported artifacts as an array
+
+
 - darpaServerComm.js
     - Config values for DARPA server
-- octomap_viewer.js
-    - contains function to create a viewer using ROS3Djs
-    - functions in file:
-        - create_viewer()
-            - adds a viewer to a robot that streams point cloud data
+
 
 Libraries Used:
 - robotwebtools
@@ -153,10 +129,4 @@ Libraries Used:
     - used as application framework, allows for inclusion of libraries that have direct access to computers commands
 - fs
     - used to open and read files
-- path
-- node-ssh
-    - used for transferring files between computers in javascript
-- csv-writer
-    - used to create csv file from array in javascript
-- csv-parser
-    - used to read csv file and convert it to array in javascript
+

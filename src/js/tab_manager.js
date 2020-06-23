@@ -5,6 +5,15 @@ ros = new ROSLIB.Ros({
     url: "ws://localhost:9090"
 });
 
+var comms_param = new ROSLIB.Param({
+    ros: ros,
+    name: "comms_prefix"
+});
+
+comms_param.get(function(param){
+    console.log(param);
+});
+
 function send_ma_task(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
@@ -210,7 +219,7 @@ class TabManager {
     // list if they are not there already
     search_robots() {
         var _this = global_tabManager;
-
+        let robots_disp = get_mission_robots();
         if (robots_disp.length == 1) {
             // This is where robots and beacons are filtered
             var patt = /^((?!B).)\d{1,2}(?!_)/;

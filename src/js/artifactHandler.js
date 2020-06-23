@@ -36,7 +36,7 @@ class Artifact {
         this.robot_name = name;
         this.n = n;
         this.artifact_All = [];
-        this.artifactsList = [];
+        this.artifactsList = recover_artifacts(name);
         this.artifactImages = [];
         this.reportedArtifacts = [];
         this.savedArtifacts = recover_artifacts(name);
@@ -61,6 +61,8 @@ class Artifact {
         this.artifact_confidence = [];
         this.artifact_image = [];
         this.artifact_image_id = [];
+
+        this.updateDisplay();
     }
 
     set_artifact_tracker(robot_artifacts, id) {
@@ -147,6 +149,7 @@ class Artifact {
         }
         robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_reset);
 
+        // CHNAGE TO BE A BUTTON THAT ACTIVATES A FUNCTION THAT PASSES ROBOT AND IMAGE ID SO IT CAN BE DISPLAYED IN THE IMAGE MODAL
         let robot_artifact_image_container = document.createElement("DIV");
         robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-2 popup");
         robot_artifact_image_container.setAttribute("id", "image");
@@ -220,26 +223,51 @@ class Artifact {
             if (this.artifactImages[image_id] == null) {
                 this.artifact_image[id].innerText = "No Image";
             }else{
-                if (this.artifact_image[id].children.length == 0) {
-                    console.log("image things");
-                    this.artifact_image[id].innerText = "View Image";
-                    let robot_artifact_image = document.createElement("IMG");
-                    robot_artifact_image.setAttribute("id", `arti_img_${this.robot_name}_${image_id}`);
-                    // "popuptext" is really important to keep the images hidden
-                    robot_artifact_image.setAttribute("class", "popuptext");
-                    this.artifact_image[id].appendChild(robot_artifact_image);
-                }
-                this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
+                if (this.robot_name == 'Base') {
+                    if (this.artifact_image[id].children.length == 0) {
+                        this.artifact_image[id].innerText = "View Image";
+                        let robot_artifact_image = document.createElement("IMG");
+                        robot_artifact_image.setAttribute("id", "myPopup");
+                        robot_artifact_image.setAttribute("class", "popuptext");
+                        this.artifact_image[id].appendChild(robot_artifact_image);
+                    }
+                    this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
 
-                this.artifact_image[id].onclick = function () {
-                    console.log("uhh showing");
-                    // $(this.children[0]).toggleClass("show");
-                    let img_modal = document.getElementById("artifact_image_modal");
-                    let img = document.getElementById(`arti_img_${this.robot_name}_${image_id}`);
-                    let modalImg = document.getElementById("artifact_image");
-                    img_modal.style.display = "block";
-                    modalImg.src = this.src;
+                    this.artifact_image[id].onclick = function () {
+                        $(this.children[0]).toggleClass("show");
+                    }
+
+                } else {
+                    if (this.artifact_image[id].children.length == 0) {
+                        console.log("image things");
+                        this.artifact_image[id].innerText = "View Image" + id;
+                        this.artifact_image[id].id = image_id;
+                        let robot_artifact_image = document.createElement("IMG");
+                        robot_artifact_image.setAttribute("id", `arti_img_${this.robot_name}_${image_id}`);
+                        // "popuptext" is really important to keep the images hidden
+                        robot_artifact_image.setAttribute("class", "popuptext");
+                        this.artifact_image[id].appendChild(robot_artifact_image);
+                    }
+                    // this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
+    
+                    this.artifact_image[id].onclick = function () {
+                        console.log("uhh showing");
+                        // $(this.children[0]).toggleClass("show");
+                        let img_modal = document.getElementById("artifact_image_modal");
+                        let img = document.getElementById(`arti_img_${this.robot_name}_${image_id}`);
+                        let modalImg = document.getElementById("artifact_image");
+                        img_modal.style.display = "block";
+                        console.log(image_id);
+                        try{
+                            modalImg.src = "data:image/jpg;base64," + this.artifactImages[image_id]
+                        }catch{
+                            console.log("error with image");
+                            img_modal.style.display = "none";
+                        }
+                    }
                 }
+
+                
 
             }
 
@@ -249,7 +277,7 @@ class Artifact {
             if(this.savedArtifacts.includes(type) == false){
                 var position_string = `${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}`;
 
-                log_robot_artifacts(this.robot_name, type, position_string);
+                log_robot_artifacts(this.robot_name, this.artifactsList);
                 this.savedArtifacts.push(type)
                 console.log(`saved artifact ${type}`)
             }
@@ -263,6 +291,7 @@ class Artifact {
     // Use this to save the image received from ROS
     save_image(msg) {
         this.artifactImages[msg.image_id] = msg.artifact_img.data;
+        console.log("got an image");
         // this.save_file();
         this.updateDisplay();
     }
@@ -539,21 +568,16 @@ class Artifact {
         return this.artifactsList;
     }
 
-    // save_file(data) {
-    //    fs.writeFileSync(`js/${this.robot_name}_reported.txt`, `${data}\n`, "utf-8");
-
-    // }
-
     read_file() {
-        var robot_reported = `js/${this.robot_name}_reported.txt`;
-        if(fs.existsSync(robot_reported)){
-            var reported_artifact_file = fs.readFileSync(robot_reported, "utf-8");
-            this.reportedArtifacts = artifact_file.split("\n");
-            console.log("recovered artifacts");
-        }else{
-            fs.openSync(robot_reported, "w");
-            console.log("made a recovery file for " + this.robot_name);
-        }
+        // var robot_reported = `js/${this.robot_name}_reported.txt`;
+        // if(fs.existsSync(robot_reported)){
+        //     var reported_artifact_file = fs.readFileSync(robot_reported, "utf-8");
+        //     this.reportedArtifacts = artifact_file.split("\n");
+        //     console.log("recovered artifacts");
+        // }else{
+        //     fs.openSync(robot_reported, "w");
+        //     console.log("made a recovery file for " + this.robot_name);
+        // }
     }
 
     // Function for determining color id of artifacts in Artifact list

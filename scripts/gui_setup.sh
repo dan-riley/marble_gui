@@ -10,6 +10,9 @@ cd ~/catkin_ws/src/
 # Boost libraries 
 sudo apt-get -y install libboost-all-dev
 
+# Catkin Build
+sudo apt-get install python-catkin-tools
+
 # git clone https://github.com/RobotWebTools/tf2_web_republisher 
 
 git clone https://github.com/RobotWebTools/rosbridge_suite.git -b release_0.11.5
@@ -25,7 +28,7 @@ catkin build tf2_web_republisher
 # INSTALL ELECTRON AND nodejs IN GENERAL
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
-sudo apt -y install nodejs
+# sudo apt -y install nodejs
 
 sudo apt install ros-melodic-teleop-twist-joy
 
@@ -42,9 +45,9 @@ cd ~/catkin_ws/src/marble_gui/src
 sudo bower install --save jstnhuang/ros-websocket --allow-root
 echo 3.0.2
 
+# pymongo is very important for bson
 pip install pymongo twisted tornado
 
-# echo -e "\e[31mPLEASE OPEN THE 'rosbridge_packages' FOLDER AND INSTALL THEM THROUGH EDDY\
-# THESE ARE THE ROSBRIDGE PACKAGES THAT WORK AND EDDY IS ANNOYING BUT WORKS FOR INSTALLING THEM"
+cd ~/catkin_ws/src/marble_gui/
+catkin build marble_gui
 
-# nautilus ~/catkin_ws/src/marble_gui/rosbridge_packages
