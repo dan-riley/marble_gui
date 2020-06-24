@@ -114,10 +114,13 @@ function teleop_route(){
     });
 }
 
-function pubTask(task_dom, task) {
-    setTimeout(function() {
-        task_dom.html('<font color="red">' + task + '</font>');
-    }, 1000);
+function pubTask(task_dom, tasks, i) {
+    if (i < tasks.length) {
+        setTimeout(function() {
+            task_dom.html('<font color="red">' + tasks[i] + '</font>');
+            pubTask(task_dom, tasks, i+1);
+        }, 1000);
+    }
 }
 
 // This sends kyle's transform to the correct robot
@@ -265,13 +268,12 @@ class TabManager {
             }
 
             var task = '';
-            var task2;
             var task_dom = $('#task_status_' + _this.robot_name[i]);
             var full_task = global_tabManager.tasks[i];
             if (full_task) {
               var tasks = full_task.split('+++');
               task = tasks[0];
-              task2 = tasks[1];
+              pubTask(task_dom, tasks, 1);
             }
             if (task == "Home") {
                 task_dom.html('<font color="yellow">Going Home</font>');
@@ -289,11 +291,6 @@ class TabManager {
                 if (task == undefined) task = '';
                 task_dom.html('<font color="red">' + task + '</font>');
             }
-
-            if (task2) {
-              pubTask(task_dom, task2);
-            }
-
         }
 
         for (_this.i; _this.i < curr_robot_length; _this.i++) {
@@ -535,7 +532,7 @@ class TabManager {
         let ArtifactImgTopic = {
             // topic: "/artifact_record",  // For use to save images on ground station
             // topic: "/" + this.robot_name[n] + "/located_artifact_img",
-            topic: "/" + robot + "/artifact_image_to_base",
+            topic: "/Base/neighbors/" + robot + "/image",
             // topic: "/disabled3",
             messageType: "marble_artifact_detection_msgs/ArtifactImg"
         };
