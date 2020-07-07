@@ -139,6 +139,18 @@ function pubTask(task_dom, tasks, i) {
 // This sends kyle's transform to the correct robot
 function send_tf_to(){
     var robot = document.getElementById("select_robot_transform").value;
+    // get data from the modal
+    robot_transform.transform.translation.x = parseFloat(document.getElementById("x_translation").value);
+    robot_transform.transform.translation.y = parseFloat(document.getElementById("y_translation").value);
+    robot_transform.transform.translation.z = parseFloat(document.getElementById("z_translation").value);
+
+    robot_transform.transform.rotation.x = parseFloat(document.getElementById("x_rotation").value);
+    robot_transform.transform.rotation.y = parseFloat(document.getElementById("y_rotation").value);
+    robot_transform.transform.rotation.z = parseFloat(document.getElementById("z_rotation").value);
+    robot_transform.transform.rotation.w = parseFloat(document.getElementById("w_rotation").value);
+    
+    console.log("sending tf");
+    
     var tf_publisher = new ROSLIB.Topic({
         ros: ros,
         name: `${comms_prefix}${robot}/origin_from_base`,
