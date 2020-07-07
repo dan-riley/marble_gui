@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <ros/console.h>
 #include "marble_artifact_detection_msgs/ArtifactImg.h"
+#include <image_transport/image_transport.h>
 
 #include <vector>
 #include <string>

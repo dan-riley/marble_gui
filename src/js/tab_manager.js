@@ -7,13 +7,23 @@ ros = new ROSLIB.Ros({
 
 var comm_prefix_param = '';
 
+var mesh_comm = '';
+
 var comms_param = new ROSLIB.Param({
     ros: ros,
     name: "comms_prefix"
 });
+var mesh_param = new ROSLIB.Param({
+    ros: ros,
+    name: "mesh_comm"
+});
 
 comms_param.get(function(param){
     comm_prefix_param = param;
+    console.log(param);
+});
+mesh_param.get(function(param){
+    mesh_comm = param;
     console.log(param);
 });
 

@@ -24,6 +24,9 @@
     <!-- This is the prefix used for multiagent or local tests "/Base/neighbors/" or "/" -->
     <param name="comms_prefix" type="string" value="/Base/neighbors/"/>
 
+    <!--  -->
+    <param name="mesh_comm" type="string" value="/Base/mesh_comm/"/>
+    
     <!-- get the names of each robot in play from dan's config file -->
     <param name="robot_names_config" type="string" value="$(find marble_gui)/src/js/robots.txt"/>
 

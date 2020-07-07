@@ -37,6 +37,7 @@ class Artifact {
         this.n = n;
         this.artifact_All = [];
         this.artifactsList = recover_artifacts(name);
+        // This only has image ids, image data is saved with the image_listener node to files
         this.artifactImages = [];
         this.reportedArtifacts = [];
         this.savedArtifacts = recover_artifacts(name);
@@ -59,8 +60,7 @@ class Artifact {
         // this.artifact_num_seen = [];
         this.artifact_seen_by = [];
         this.artifact_confidence = [];
-        this.artifact_image = [];
-        this.artifact_image_id = [];
+        // his.artifact_image = [];
 
         this.updateDisplay();
     }
@@ -154,9 +154,8 @@ class Artifact {
         robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-2");
         robot_artifact_image_container.setAttribute("id", "image");
 
-
         let robot_artifact_image_button = document.createElement("BUTTON");
-        robot_artifact_image_button.setAttribute("class", "btn btn-primary");
+        robot_artifact_image_button.setAttribute("class", "btn btn-secondary");
         robot_artifact_image_button.id = `arti_img_${this.robot_name}_${id}`;
         robot_artifact_image_button.innerHTML = "No Image";
 
@@ -205,7 +204,7 @@ class Artifact {
                 this.artifact_type[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_confidence[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_position[id].style.backgroundColor = "#aaaaaa";
-                this.artifact_image[id].style.backgroundColor = "#aaaaaa";
+                // this.artifact_image[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").style.backgroundColor = "#aaaaaa";
 
             }
@@ -226,14 +225,15 @@ class Artifact {
             if (position != undefined) {
                 this.artifact_position[id].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
             }
-            if (this.artifactImages[image_id] != null) {
+            if (this.artifactImages.includes(image_id)){
                 // console.log(`arti_img_${this.robot_name}_${id}`);
                 var img_btn = document.getElementById(`arti_img_${this.robot_name}_${id}`);
-                // console.log(this.artifact_image);
-                if (this.artifact_image.length != 0) {
-                    // img_btn.onclick = this.show_image(image_id);
-                    img_btn.innerHTML = "View Image";
-                }
+                console.log(this.robot_name + " has an image");
+                let name = this.robot_name;
+                img_btn.onclick = function(){show_image(name, image_id);};
+                img_btn.innerHTML = "View Image";
+                img_btn.setAttribute("data-toggle", "modal");
+                img_btn.setAttribute("data-target", "#artifact_image_modal");
             }
 
             let color = this.color_artifacts(type);
@@ -248,30 +248,16 @@ class Artifact {
             }
         }
     }
-
-    show_image(id){
-        console.log("uhh showing");
-        // $(this.children[0]).toggleClass("show");
-        let img_modal = document.getElementById("artifact_image_modal");
-        let modalImg = document.getElementById("artifact_image");
-        img_modal.style.display = "block";
-        console.log(id);
-        try{
-            // modalImg.src = "data:image/jpg;base64," + this.artifactImages[id]
-            console.log("image show not working now");
-        }catch{
-            console.log("error with image");
-            img_modal.style.display = "none";
-        }
-    }
+    
+    
 
     add_array(array) {
         this.artifact_All.push(array);
     }
 
-    // Use this to save the image received from ROS
+    // this svaes the image id for display purpouses
     save_image(msg) {
-        this.artifactImages[msg.image_id] = msg.artifact_img.data;
+        this.artifactImages.push(msg.image_id);
         console.log("got an image");
         this.updateDisplay();
     }
@@ -513,7 +499,7 @@ class Artifact {
         delete this.artifact_type[id];
         delete this.artifact_seen_by[id];
         delete this.artifact_confidence[id];
-        delete this.artifact_image[id];
+        // delete this.artifact_image[id];
     }
 
     open_edit_submit_modal(id){
@@ -761,3 +747,4 @@ function custom_submission(){
     $('#NewReportModal').modal({backdrop: 'static', keyboard: false});
     $('#NewReportModal').modal("show");
 }
+

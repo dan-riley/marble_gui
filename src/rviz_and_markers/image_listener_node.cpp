@@ -43,6 +43,7 @@ int main(int argc, char **argv){
     for(string robot : mission_robots){
         ImageSaver *new_listener = new ImageSaver(&nh, robot, prefix);
         image_savings.push_back(new_listener);
+        cout << "made image listener" << endl;
     }
 
     ros::spin();

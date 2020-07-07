@@ -7,7 +7,7 @@ ImageSaver::ImageSaver(ros::NodeHandle* nh, string robot_name, string comms_pref
         nh_.getParam("image_dir", img_dir_);
         name_ = robot_name;
 
-        img_sub = nh_.subscribe(prefix_ + robot_name + "/artifact_image_to_base", 1000, &ImageSaver::imageWriter, this);
+        img_sub = nh_.subscribe(prefix_ + robot_name + "/artifact_image_to_base", 100, &ImageSaver::imageWriter, this);
         
 
     }catch(const std::exception& e){
@@ -27,12 +27,13 @@ bool ImageSaver::imageExists(float id){
     return false;
 }
 
-void ImageSaver::imageWriter(marble_artifact_detection_msgs::ArtifactImg image){
+void ImageSaver::imageWriter(const marble_artifact_detection_msgs::ArtifactImg image){
     float img_id = image.image_id;
     if(!imageExists(img_id)){
-        std::ofstream fout(img_dir_ + name_ + "/" + to_string(img_id) + ".png", std::ios::binary);
+        std::ofstream fout(img_dir_ + name_ + "/" + to_string(img_id) + ".jpg", std::ios::binary);
         fout << image.artifact_img;
         fout.close();
         images.push_back(img_id);
     }
+    cout << "wrote image" << endl;
 }

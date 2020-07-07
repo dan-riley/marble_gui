@@ -111,7 +111,7 @@ def main(robot_name):
 	    '/Base/neighbors/' + robot_name + '/artifacts', ArtifactArray, queue_size=10)
 	img_pub = rospy.Publisher(
 	    '/Base/neighbors/' + robot_name + '/artifact_image_to_base', ArtifactImg, queue_size=10)
-	rqt_img_pub = rospy.Publisher('/' + robot_name + '/' + str(
+	rqt_img_pub = rospy.Publisher('/Base/neighbors/' + robot_name + '/' + str(
 	    ARTIFACT_IMG_ID) + '/artifact_img/compressed', CompressedImage, queue_size=10)
 
 	array_msg, compressed_img_msg, artifact_img_msg = get_messages_filled_with_data(robot_name)

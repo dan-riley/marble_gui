@@ -32,3 +32,19 @@ function teleop_toII(){
         robot_ctrl_card.style.backgroundColor = "darkgrey";
     }
 }
+
+// This shows an artifact image
+function show_image(robot_name, id){
+    // console.log(`uhh showing ${robot_name}`);
+    // $(this.children[0]).toggleClass("show");
+    let img_modal = document.getElementById("artifact_image_modal");
+    let modalImg = document.getElementById("artifact_image");
+    // console.log(id);
+    try{
+        modalImg.src = `js/mission_imgs/${robot_name}/${id}.jpg`;
+        // img_modal.modal('show');
+        // console.log("image show not working now");
+    }catch{
+        console.log("error with image");
+    } 
+}
