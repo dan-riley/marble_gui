@@ -40,7 +40,7 @@ if __name__ == '__main__':
     try:
         rospy.init_node('optimus_prime', anonymous=True)
         talker()
-        rospy.Subscriber("/X1/origin_from_dan", TransformStamped, listener)
+        rospy.Subscriber("/Base/neighbors/X1/origin_from_dan", TransformStamped, listener)
         rospy.spin()
     except rospy.ROSInterruptException:
         pass

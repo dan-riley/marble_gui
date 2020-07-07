@@ -1,4 +1,5 @@
 var fs = require("fs");
+const { join } = require('path')
 
 // Robots that are allowed to be displayed in the GUI
 // Leave the file blank to display any that match
@@ -6,6 +7,18 @@ function get_mission_robots() {
     var robots_file = fs.readFileSync("js/robots.txt", "utf-8");
     var robots_disp = robots_file.split("\n");
     return robots_disp;
+}
+
+function populateTFRobot(){
+    var robots = get_mission_robots();
+    var modal_options = document.getElementById("select_robot_transform");
+    for (var i = 0; i < robots.length; i++) {
+        var robot = robots[i];
+        var option = document.createElement("option");
+        option.text = robot;
+        option.value = robot;
+        modal_options.add(option);
+    }
 }
 
 
@@ -202,4 +215,28 @@ function clear_mission() {
         });
     }
     $('#EndMissionModal').modal('hide');
+    location.reload();
+}
+
+
+function image_saver(robot_name, msg){
+    let path = `js/mission_imgs/`;
+    // create the directory if needed
+    var robot_folders = [];
+    var files = fs.readdirSync(path);
+    for (f = 0; f < files.length; f++) {
+        let dirPath = path + files[f];
+        if(fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
+            robot_folders.push(files[f]);
+        }
+    }
+    console.log(robot_folders);
+    if(robot_folders.indexOf(robot_name) == -1){
+        fs.mkdirSync(path + robot_name);
+    }
+    // write the image to file
+    fs.writeFileSync(`${path}${robot_name}/${msg.image_id}.png`, msg.artifact_img.data, 'binary', function(err){
+        if (err) throw err
+        console.log('File saved.')
+    })
 }

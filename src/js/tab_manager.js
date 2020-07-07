@@ -5,12 +5,15 @@ ros = new ROSLIB.Ros({
     url: "ws://localhost:9090"
 });
 
+var comm_prefix_param = '';
+
 var comms_param = new ROSLIB.Param({
     ros: ros,
     name: "comms_prefix"
 });
 
 comms_param.get(function(param){
+    comm_prefix_param = param;
     console.log(param);
 });
 
@@ -125,7 +128,7 @@ function send_tf_to(){
     var robot = document.getElementById("select_robot_transform").value;
     var tf_publisher = new ROSLIB.Topic({
         ros: ros,
-        name: `/${robot}/origin_from_dan`,
+        name: `${comm_prefix_param}${robot}/origin_from_dan`,
         messageType: "geometry_msgs/TransformStamped"
     });
     tf_publisher.publish(robot_transform);
@@ -515,12 +518,12 @@ class TabManager {
     listen_to_robot_topics(n, robot){
         let TaskTopic = {
             // topic: "/" + robot + "/task_update",
-            topic: "/Base/neighbors/" + robot + "/status",
+            topic: comm_prefix_param + robot + "/status",
             // topic: "/Anchor/neighbors/" + robot + "/status",
             messageType: "std_msgs/String"
         };
         let CommTopic = {
-            topic: "/Base/neighbors/" + robot + "/incomm",
+            topic: comm_prefix_param + robot + "/incomm",
             // topic: "/Anchor/neighbors/" + robot + "/incomm",
             messageType: "std_msgs/Bool"
         };
@@ -529,13 +532,14 @@ class TabManager {
             // topic: "/" + this.robot_name[n] + "/artifact_record",
             // topic: "/" + robot + "/artifact_array/relay",
             // topic: "/Anchor/neighbors/" + robot + "/artifacts",
-            topic: "/Base/neighbors/" + robot + "/artifacts",
+            topic: comm_prefix_param + robot + "/artifacts",
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
         let ArtifactImgTopic = {
             // topic: "/artifact_record",  // For use to save images on ground station
             // topic: "/" + this.robot_name[n] + "/located_artifact_img",
-            topic: "/" + robot + "/artifact_image_to_base",
+            // THIS MAY BE WRONG AND THE PREFIX MAY JUST BE "/"
+            topic: comm_prefix_param + robot + "/artifact_image_to_base",
             // topic: "/disabled3",
             messageType: "marble_artifact_detection_msgs/ArtifactImg"
         };
@@ -618,13 +622,5 @@ class TabManager {
         update_topics_list(global_tabManager.search_robots);
     }
 
-    // this adds robots to the options in the teleop control card3
-    add_robot_to_teleop(robot_name){
-        var teleop_options = document.getElementById("teleop_robot_select");
-        var option = document.createElement("option");
-        option.text = robot_name;
-        option.value = robot_name;
-        teleop_options.add(option);
-    }
 }
 

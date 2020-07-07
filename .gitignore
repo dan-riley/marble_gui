@@ -5,3 +5,4 @@ src/bower_components
 tags
 src/js/*.txt
 *_reported.json
+src/js/mission_imgs/*/*.png

@@ -8,6 +8,10 @@
     <node name="marker_server" pkg="marble_gui" type="marker_server" output="screen">
     </node>
 
+    <node name="image_listener_node" pkg="marble_gui" type="image_listener_node" output="screen">
+    </node>
+    <param name="image_dir" value="~/catkin_ws/src/marble_gui/src/js/mission_imgs/"/>
+
     <param name="frame" type="string" value="world"/>
     <!-- The submitted artifact text offsets. change these for better text placement with regard to the sphere marker-->
     <param name="sub_offset_text_x" type="double" value="0.0"/>

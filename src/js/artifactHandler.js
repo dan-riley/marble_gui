@@ -72,7 +72,7 @@ class Artifact {
         // this.artifact_num_seen[id] = this.artifact_tracker[id].querySelector("[id = 'num_seen'");
         this.artifact_seen_by[id] = this.artifact_tracker[id].querySelector("[id = 'seen_by']");
         this.artifact_confidence[id] = this.artifact_tracker[id].querySelector("[id = 'confidence']");
-        this.artifact_image[id] = this.artifact_tracker[id].querySelector("[id = image]");
+        // this.artifact_image[id] = this.artifact_tracker[id].querySelector(`[id = arti_img_${this.robot_name}_${id}]`);
     }
 
     // Add artifact to page
@@ -151,12 +151,18 @@ class Artifact {
 
         // CHNAGE TO BE A BUTTON THAT ACTIVATES A FUNCTION THAT PASSES ROBOT AND IMAGE ID SO IT CAN BE DISPLAYED IN THE IMAGE MODAL
         let robot_artifact_image_container = document.createElement("DIV");
-        robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-2 popup");
+        robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-2");
         robot_artifact_image_container.setAttribute("id", "image");
-        robot_artifact_image_container.innerText = "No Image";
+
+
+        let robot_artifact_image_button = document.createElement("BUTTON");
+        robot_artifact_image_button.setAttribute("class", "btn btn-primary");
+        robot_artifact_image_button.id = `arti_img_${this.robot_name}_${id}`;
+        robot_artifact_image_button.innerHTML = "No Image";
 
         robot_artifact_tracker.appendChild(robot_artifact_tracker_yes_container);
         robot_artifact_tracker.appendChild(robot_artifact_image_container);
+        robot_artifact_image_container.appendChild(robot_artifact_image_button);
         // robot_artifact_tracker.appendChild(robot_artifact_tracker_no);
 
         return robot_artifact_tracker;
@@ -220,55 +226,14 @@ class Artifact {
             if (position != undefined) {
                 this.artifact_position[id].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
             }
-            if (this.artifactImages[image_id] == null) {
-                this.artifact_image[id].innerText = "No Image";
-            }else{
-                if (this.robot_name == 'Base') {
-                    if (this.artifact_image[id].children.length == 0) {
-                        this.artifact_image[id].innerText = "View Image";
-                        let robot_artifact_image = document.createElement("IMG");
-                        robot_artifact_image.setAttribute("id", "myPopup");
-                        robot_artifact_image.setAttribute("class", "popuptext");
-                        this.artifact_image[id].appendChild(robot_artifact_image);
-                    }
-                    this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
-
-                    this.artifact_image[id].onclick = function () {
-                        $(this.children[0]).toggleClass("show");
-                    }
-
-                } else {
-                    if (this.artifact_image[id].children.length == 0) {
-                        console.log("image things");
-                        this.artifact_image[id].innerText = "View Image" + id;
-                        this.artifact_image[id].id = image_id;
-                        let robot_artifact_image = document.createElement("IMG");
-                        robot_artifact_image.setAttribute("id", `arti_img_${this.robot_name}_${image_id}`);
-                        // "popuptext" is really important to keep the images hidden
-                        robot_artifact_image.setAttribute("class", "popuptext");
-                        this.artifact_image[id].appendChild(robot_artifact_image);
-                    }
-                    // this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
-    
-                    this.artifact_image[id].onclick = function () {
-                        console.log("uhh showing");
-                        // $(this.children[0]).toggleClass("show");
-                        let img_modal = document.getElementById("artifact_image_modal");
-                        let img = document.getElementById(`arti_img_${this.robot_name}_${image_id}`);
-                        let modalImg = document.getElementById("artifact_image");
-                        img_modal.style.display = "block";
-                        console.log(image_id);
-                        try{
-                            modalImg.src = "data:image/jpg;base64," + this.artifactImages[image_id]
-                        }catch{
-                            console.log("error with image");
-                            img_modal.style.display = "none";
-                        }
-                    }
+            if (this.artifactImages[image_id] != null) {
+                // console.log(`arti_img_${this.robot_name}_${id}`);
+                var img_btn = document.getElementById(`arti_img_${this.robot_name}_${id}`);
+                // console.log(this.artifact_image);
+                if (this.artifact_image.length != 0) {
+                    // img_btn.onclick = this.show_image(image_id);
+                    img_btn.innerHTML = "View Image";
                 }
-
-                
-
             }
 
             let color = this.color_artifacts(type);
@@ -284,6 +249,22 @@ class Artifact {
         }
     }
 
+    show_image(id){
+        console.log("uhh showing");
+        // $(this.children[0]).toggleClass("show");
+        let img_modal = document.getElementById("artifact_image_modal");
+        let modalImg = document.getElementById("artifact_image");
+        img_modal.style.display = "block";
+        console.log(id);
+        try{
+            // modalImg.src = "data:image/jpg;base64," + this.artifactImages[id]
+            console.log("image show not working now");
+        }catch{
+            console.log("error with image");
+            img_modal.style.display = "none";
+        }
+    }
+
     add_array(array) {
         this.artifact_All.push(array);
     }
@@ -292,7 +273,6 @@ class Artifact {
     save_image(msg) {
         this.artifactImages[msg.image_id] = msg.artifact_img.data;
         console.log("got an image");
-        // this.save_file();
         this.updateDisplay();
     }
 

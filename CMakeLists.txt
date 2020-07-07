@@ -91,6 +91,13 @@ target_link_libraries(Robot ${catkin_LIBRARIES})
 add_library(utilities src/rviz_and_markers/utilities.cpp)
 target_link_libraries(utilities ${catkin_LIBRARIES})
 
+add_executable(image_listener_node src/rviz_and_markers/image_listener_node.cpp)
+target_link_libraries(image_listener_node 
+                      image_saver 
+                      ${catkin_LIBRARIES})
+
+add_library(image_saver src/rviz_and_markers/image_saver.cpp)
+target_link_libraries(image_saver ${catkin_LIBRARIES})
 
 
 #############
