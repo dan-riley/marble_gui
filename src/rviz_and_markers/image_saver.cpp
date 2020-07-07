@@ -1,13 +1,13 @@
 #include "image_saver.hpp"
 
-ImageSaver::ImageSaver(ros::NodeHandle* nh, string robot_name, string comms_prefix){
+ImageSaver::ImageSaver(ros::NodeHandle* nh, string robot_name, string prefix){
     try{
         nh_ = *nh;
-        prefix_ = comms_prefix;
+        prefix_ = prefix;
         nh_.getParam("image_dir", img_dir_);
         name_ = robot_name;
 
-        img_sub = nh_.subscribe(prefix_ + robot_name + "/artifact_image_to_base", 100, &ImageSaver::imageWriter, this);
+        img_sub = nh_.subscribe(prefix_ + robot_name + "/image", 100, &ImageSaver::imageWriter, this);
         
 
     }catch(const std::exception& e){

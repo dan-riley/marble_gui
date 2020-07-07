@@ -30,7 +30,7 @@ int main(int argc, char **argv){
 
     ros::NodeHandle nh;
     string prefix;
-    nh.getParam("comms_prefix", prefix);
+    nh.getParam("ma_prefix", prefix);
 
     // get mission robots
     vector<string> mission_robots = getMissionRobots();

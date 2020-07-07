@@ -24,7 +24,7 @@ Robot::Robot(ros::NodeHandle* nh, std::string robot_name, float scale, boost::sh
         server_ = server;
 
         string prefix;
-        nh_.getParam("comms_prefix", prefix);
+        nh_.getParam("ma_prefix", prefix);
         odom_sub = nh_.subscribe(prefix + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);    
 
         // Decide wether to use robot mesh. use of meshes has a performance penalty

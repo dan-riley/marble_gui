@@ -5,25 +5,25 @@ ros = new ROSLIB.Ros({
     url: "ws://localhost:9090"
 });
 
-var comm_prefix_param = '';
+var ma_prefix = '';
 
-var mesh_comm = '';
+var comms_prefix = '';
 
+var ma_param = new ROSLIB.Param({
+    ros: ros,
+    name: "ma_prefix"
+});
 var comms_param = new ROSLIB.Param({
     ros: ros,
     name: "comms_prefix"
 });
-var mesh_param = new ROSLIB.Param({
-    ros: ros,
-    name: "mesh_comm"
-});
 
-comms_param.get(function(param){
-    comm_prefix_param = param;
+ma_param.get(function(param){
+    ma_prefix = param;
     console.log(param);
 });
-mesh_param.get(function(param){
-    mesh_comm = param;
+comms_param.get(function(param){
+    comms_prefix = param;
     console.log(param);
 });
 
@@ -31,7 +31,7 @@ function send_ma_task(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
         // name: `/Anchor/neighbors/${robot_name}/guiTaskName`,
-        name: `/Base/neighbors/${robot_name}/guiTaskName`,
+        name: `${ma_prefix}${robot_name}/guiTaskName`,
         messageType: "std_msgs/String"
     });
     var msg = new ROSLIB.Message({
@@ -42,7 +42,7 @@ function send_ma_task(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
         // name: `/Anchor/neighbors/${robot_name}/guiTaskValue`,
-        name: `/Base/neighbors/${robot_name}/guiTaskValue`,
+        name: `${ma_prefix}${robot_name}/guiTaskValue`,
         messageType: "std_msgs/String"
     });
     var msg = new ROSLIB.Message({
@@ -54,7 +54,7 @@ function send_ma_task(robot_name, signal, value) {
 function send_signal_to(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: `/${robot_name}/${signal}`,
+        name: `${comms_prefix}${robot_name}/${signal}`,
         messageType: "std_msgs/Bool"
     });
     var msg = new ROSLIB.Message({
@@ -69,7 +69,7 @@ function send_signal_to(robot_name, signal, value) {
 function send_string_to(robot_name, signal, text) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: `/${robot_name}/${signal}`,
+        name: `${comms_prefix}${robot_name}/${signal}`,
         messageType: "std_msgs/String"
     });
     var msg = new ROSLIB.Message({
@@ -109,14 +109,14 @@ function teleop_route(){
     });
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: `/${teleop_robot}/joy_base`,
+        name: `${comms_prefix}${teleop_robot}/joy_base`,
         messageType: "sensor_msgs/Joy"
     })
     // create a publisher
     var last_robot = "Base"
     teleop_listener.subscribe(function (message){
         if(teleop_robot != last_robot){
-            Topic.name = `/${teleop_robot}/joy_base`;
+            Topic.name = `${comms_prefix}/${teleop_robot}/joy_base`;
             last_robot = teleop_robot;
             console.log("changed target robot")
         }
@@ -141,7 +141,7 @@ function send_tf_to(){
     var robot = document.getElementById("select_robot_transform").value;
     var tf_publisher = new ROSLIB.Topic({
         ros: ros,
-        name: `${comm_prefix_param}${robot}/origin_from_dan`,
+        name: `${comms_prefix}${robot}/origin_from_base`,
         messageType: "geometry_msgs/TransformStamped"
     });
     tf_publisher.publish(robot_transform);
@@ -172,7 +172,7 @@ function listen_for_tf(){
         $('#x_translation').val(robot_transform.transform.translation.x);
         $('#y_translation').val(robot_transform.transform.translation.y);
         $('#z_translation').val(robot_transform.transform.translation.z);
-        
+
         $('#x_rotation').val(robot_transform.transform.rotation.x);
         $('#y_rotation').val(robot_transform.transform.rotation.y);
         $('#z_rotation').val(robot_transform.transform.rotation.z);
@@ -525,12 +525,12 @@ class TabManager {
     listen_to_robot_topics(n, robot){
         let TaskTopic = {
             // topic: "/" + robot + "/task_update",
-            topic: comm_prefix_param + robot + "/status",
+            topic: ma_prefix + robot + "/status",
             // topic: "/Anchor/neighbors/" + robot + "/status",
             messageType: "std_msgs/String"
         };
         let CommTopic = {
-            topic: comm_prefix_param + robot + "/incomm",
+            topic: ma_prefix + robot + "/incomm",
             // topic: "/Anchor/neighbors/" + robot + "/incomm",
             messageType: "std_msgs/Bool"
         };
@@ -539,14 +539,14 @@ class TabManager {
             // topic: "/" + this.robot_name[n] + "/artifact_record",
             // topic: "/" + robot + "/artifact_array/relay",
             // topic: "/Anchor/neighbors/" + robot + "/artifacts",
-            topic: comm_prefix_param + robot + "/artifacts",
+            topic: ma_prefix + robot + "/artifacts",
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
         let ArtifactImgTopic = {
             // topic: "/artifact_record",  // For use to save images on ground station
             // topic: "/" + this.robot_name[n] + "/located_artifact_img",
             // THIS MAY BE WRONG AND THE PREFIX MAY JUST BE "/"
-            topic: comm_prefix_param + robot + "/artifact_image_to_base",
+            topic: ma_prefix + robot + "/image",
             // topic: "/disabled3",
             messageType: "marble_artifact_detection_msgs/ArtifactImg"
         };
