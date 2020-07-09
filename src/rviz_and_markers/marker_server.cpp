@@ -247,6 +247,17 @@ void preview_tf(const std_msgs::String::ConstPtr& robot_name){
     }
 }
 
+// This removes all artifact markers from rviz
+void clearMarkers(const std_msgs::String::ConstPtr& msg){
+    for(string marker : logged_artifacts){
+        deleteMarker(marker);
+    }
+    for(int i = 0; i < num_submitted; i++){
+        submitted_markers.markers[i].action = visualization_msgs::Marker::DELETE;
+    }
+    sub_mkr_pub.publish(submitted_markers);
+}
+
 
 //=======================================================
 // MAIN
@@ -291,6 +302,9 @@ int main(int argc, char **argv) {
     ros::Subscriber goal_sub = nh.subscribe("/gui/goal_to_robot", 10, goal_to_robot);
     // subscribe to the submitted artifact topic from the gui
     ros::Subscriber submitted_sub = nh.subscribe("/gui/submitted", 10, submittedMarkerCallback);
+
+    // subscribe to the gui for clearing rviz markers
+    ros::Subscriber clear_sub = nh.subscribe("/gui/clear_markers", 10, clearMarkers);
 
     // Use this to activate the transform preview
     ros::Subscriber transform_preview = nh.subscribe("/gui/transform_preview", 10, preview_tf);

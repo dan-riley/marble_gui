@@ -1,3 +1,6 @@
+// THIS IS SOME FUTURE REFACTORING WORK
+
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -29,71 +32,54 @@ async function update_fused_artifact(msg){
 /**
  * Artifact class for handling, sending, and checking known artifacts
  */
-
-
-class Artifact {
+class ArtifactII {
     constructor(name, n) {
         this.robot_name = name;
         this.n = n;
-        this.artifact_All = [];
+        this.artifacts = {};
         this.artifactsList = recover_artifacts(name);
         // This only has image ids, image data is saved with the image_listener node to files
-        this.artifactImages = [];
+        this.artifactImageIds = [];
         this.reportedArtifacts = [];
         this.savedArtifacts = recover_artifacts(name);
-
-        if (!this.read_file()) {
-            for (let i = 0; i < ARTIFACT_ARR_LEN; i++) {
-                this.reportedArtifacts[i] = [i, false];
-            }
-        };
-
-        this.dist_threshhold = 1.0;
-        console.log("artifact handler: " + name);
-
-        this.location_all = 0; // Int to keep track of location in all artifact arrays stored by callback function
-        this.location_array = 0; // Int to keep track of location in artifact array message
-
-        this.artifact_tracker = [];
-        this.artifact_position = [];
-	    this.artifact_type = [];
-        // this.artifact_num_seen = [];
-        this.artifact_seen_by = [];
-        this.artifact_confidence = [];
-        this.artifact_image = [];
 
         this.updateDisplay();
     }
 
-    set_artifact_tracker(robot_artifacts, id) {
-        this.artifact_tracker[id] = robot_artifacts.querySelector("[artifact_id = '" + id + "']");
-        this.artifact_position[id] = this.artifact_tracker[id].querySelector("[id = 'position']");
-        this.artifact_type[id] = this.artifact_tracker[id].querySelector("[id = 'type']");
-        // this.artifact_num_seen[id] = this.artifact_tracker[id].querySelector("[id = 'num_seen'");
-        this.artifact_seen_by[id] = this.artifact_tracker[id].querySelector("[id = 'seen_by']");
-        this.artifact_confidence[id] = this.artifact_tracker[id].querySelector("[id = 'confidence']");
-        // this.artifact_image[id] = this.artifact_tracker[id].querySelector(`[id = arti_img_${this.robot_name}_${id}]`);
+    hash(string) {
+        const H   = 37;
+        let total = 0;
+    
+        for (var i = 0; i < string.length; i++) {
+          total += H * total + string.charCodeAt(i);
+        }
+        total %= this.table.length;
+        if (total < 1) {
+          this.table.length -1
+        }
+        return parseInt(total);
     }
 
     // Add artifact to page
     add_artifact(id) {
         // Add artifact to page
-        console.log("adding artifact")
+        console.log("adding artifact" + id)
         let robot_artifact_tracker = document.createElement("DIV");
         robot_artifact_tracker.setAttribute("class", "row");
         robot_artifact_tracker.setAttribute("artifact_id", id);
+        robot_artifact_tracker.id = `${id}_artifact_div`;
         let align = '';
-        // This is used in place of actual alignment to center the robot artifacts
         if (this.robot_name != 'Base') {
             align = '<span class="col-sm-1">  </span>';
         }
-        robot_artifact_tracker.innerHTML = align + '<span contenteditable="false" id="type" class="badge badge-secondary col-sm-2" style="text-align: center; min-height: 1px;" value="undefined"> undefined </span>';
+        robot_artifact_tracker.innerHTML = align + `<span name="${id}" contenteditable="false" id="${id}_type" class="badge badge-secondary align-bottom col-sm-2" style="text-align: center; min-height: 1px;" value="undefined"> undefined </span>`;
         if (this.robot_name == 'Base') {
-            robot_artifact_tracker.innerHTML += '<span contenteditable="false" id="seen_by" class="badge badge-secondary col-sm-2" style="text-align: center; min-height: 1px;" value="undefined">unknown</span>';
+            // robot_artifact_tracker.innerHTML += '<span contenteditable="false" id="num_seen" class="badge badge-secondary col-sm-1" style="text-align: center; min-height: 1px;" value="0">0</span>' +
+            robot_artifact_tracker.innerHTML += `<span name="${id}" contenteditable="false" id="${id}_seen_by" class="badge badge-secondary align-bottom col-sm-2" style="text-align: center; min-height: 1px;" value="undefined">???</span>`;
         }
 
-        robot_artifact_tracker.innerHTML += '<span contenteditable="false" id="confidence" class="badge badge-secondary col-sm-1" style="text-align: center" value="0.00">0.00</span>' +
-            "<span contenteditable='false' id='position' class='badge badge-secondary col-sm-3' style='text-align: center' value='" + JSON.stringify({ x: 0.00, y: 0.00, z: 0.00 }) + "'>{x: 0.00 y: 0.00 z: 0.00}</span>";
+        robot_artifact_tracker.innerHTML += `<span name="${id}" contenteditable="false" id="${id}_confidence" class="badge badge-secondary align-bottom col-sm-1" style="text-align: center; " value="0.00">0.00</span>` +
+            `<span name="${id}" contenteditable='false' id='${id}_position' class='badge badge-secondary align-bottom col-sm-3' style='text-align: center;' value='${JSON.stringify({ x: 0.00, y: 0.00, z: 0.00 })}'>{x: 0.00 y: 0.00 z: 0.00}</span>`;
 
         let robot_artifact_tracker_yes_container = document.createElement("DIV");
         robot_artifact_tracker_yes_container.setAttribute("class", "badge badge-secondary col-sm-2");
@@ -150,7 +136,7 @@ class Artifact {
         // CHNAGE TO BE A BUTTON THAT ACTIVATES A FUNCTION THAT PASSES ROBOT AND IMAGE ID SO IT CAN BE DISPLAYED IN THE IMAGE MODAL
         let robot_artifact_image_container = document.createElement("DIV");
         robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-2");
-        robot_artifact_image_container.id = `img_cont_${this.robot_name}_${id}`;
+        robot_artifact_image_container.id = `img_${this.robot_name}_${id}_cont`;
 
         let robot_artifact_image_button = document.createElement("BUTTON");
         robot_artifact_image_button.setAttribute("class", "btn btn-secondary btn-sm");
@@ -174,10 +160,6 @@ class Artifact {
             let artifact = this.artifactsList[id];
             let type = artifact.obj_class;
             let confidence = artifact.obj_prob;
-            // This is to just not show artifacts that are mysteriousely added through the recovery mechanism
-            if(confidence == 0.00){
-                break;
-            }
             let position = artifact.position;
             let image_id = artifact.image_id;
 
@@ -189,29 +171,28 @@ class Artifact {
 
             // When artifact class value has not been set, allow for code to set the class
             type == "" ? type = "undefined" : false;
-            if (this.artifact_type[id].getAttribute("value") == "undefined") {
-                this.artifact_type[id].innerText = type;
+            if (document.getElementById(`${id}_type`).value == "undefined") {
+                document.getElementById(`${id}_type`).value = type;
+                document.getElementById(`${id}_type`).innerText = type;
             }
-            this.artifact_type[id].setAttribute("value", type);
+            // this.artifact_type[id].setAttribute("value", type);
 
             if (this.robot_name == 'Base') {
                 // let num_seen = seen_by.split(',').length;
                 // this.artifact_num_seen[id].innerText = num_seen;
                 let seen_by = '';
                 for (let robot in artifact.robots) {
-
                     seen_by += robot + ',';
                 }
-                if(seen_by != ""){
-                    this.artifact_seen_by[id].innerText = seen_by.slice(0, -1);
+                if(this.artifact_seen_by.length != 0){
+                    document.getElementById(`${id}_seen_by`).innerText = seen_by.slice(0, -1);
                 }
             } else if (artifact.fused) {
-                this.artifact_type[id].style.backgroundColor = "#aaaaaa";
-                this.artifact_confidence[id].style.backgroundColor = "#aaaaaa";
-                this.artifact_position[id].style.backgroundColor = "#aaaaaa";
-                console.log(id);
-                document.getElementById(`img_cont_${this.robot_name}_${id}`).style.backgroundColor = "#aaaaaa";
-                this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").style.backgroundColor = "#aaaaaa";
+                document.getElementsByName(id).style.backgroundColor = "#aaaaaa";
+                // this.artifact_confidence[id].style.backgroundColor = "#aaaaaa";
+                // this.artifact_position[id].style.backgroundColor = "#aaaaaa";
+                // document.getElementById(`img_${this.robot_name}_${id}_cont`).style.backgroundColor = "#aaaaaa";
+                // this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").style.backgroundColor = "#aaaaaa";
 
             }
 
@@ -222,14 +203,14 @@ class Artifact {
                 if (delButton) delButton.remove();
             }
 
-            this.artifact_confidence[id].setAttribute("value", toString(confidence));
-            this.artifact_position[id].setAttribute("value", JSON.stringify(position));
+            // document.getElementById(`${id}_confidence`).innerText = toString(confidence);
+            // document.getElementById(`${id}_position`).value = JSON.stringify(position);
 
             if (confidence != undefined) {
-                this.artifact_confidence[id].innerText = confidence.toFixed(2);
+                document.getElementById(`${id}_confidence`).innerText = confidence.toFixed(2);
             }
             if (position != undefined) {
-                this.artifact_position[id].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
+                document.getElementById(`${id}_position`).innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
             }
             if (this.artifactImages.includes(image_id)){
                 // console.log(`arti_img_${this.robot_name}_${id}`);
@@ -243,7 +224,7 @@ class Artifact {
             }
 
             let color = this.color_artifacts(type);
-            this.artifact_type[id].style.color = color;
+            document.getElementById(`${id}_type`).style.color = color;
 
             if(this.savedArtifacts.includes(type) == false){
                 var position_string = `${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}`;
@@ -282,118 +263,30 @@ class Artifact {
 
 
     // THIS FUSES ARTIFACTS AND SEND THE FUSED ARTIFACT TO THE MARKER SERVER
-    fuse_artifacts(id, useFusedArtifact) {
-        let artifact;
-        let fusedArtifacts = global_tabManager.fusedArtifacts.artifactsList;
-        if (useFusedArtifact) {
-            artifact = fusedArtifacts[id];
-        } else {
-            artifact = this.artifactsList[id];
-        }
-        let fuse = false;
-        let new_ids = [];
-        let remove_ids = [];
-
-
-        // Compare to all of the other artifacts in the fuse array
-        for (let id2 in fusedArtifacts) {
-            // If the id's are the same then it's the same artifact
-            // Note that if by some miracle multiple vehicles get the exact same position
-            // then some of this may break!
-            if (id2 != id) {
-                let artifact2 = fusedArtifacts[id2];
-                let dist = this.getDist(artifact, artifact2);
-
-                if ((dist < 3) && (artifact.obj_class == artifact2.obj_class)) {
-                    console.log("fusing", id, id2);
-                    fuse = true;
-
-                    if (useFusedArtifact) {
-                        for (let id3 in artifact.originals) {
-                            if (artifact2.originals[id3] == undefined) {
-                                artifact2.originals[id3] = Object.assign({}, artifact.originals[id3]);
-                                artifact2.originals[id3].position = Object.assign({}, artifact.originals[id3].position);
-                            }
-                        }
-                    } else {
-                        if (artifact2.originals[id] == undefined) {
-                            artifact2.originals[id] = Object.assign({}, this.artifactsList[id]);
-                            artifact2.originals[id].position = Object.assign({}, this.artifactsList[id].position);
-                        }
-                    }
-
-                    let newArtifact = artifact2;
-                    let x = 0;
-                    let y = 0;
-                    let z = 0;
-                    let obj_prob = 0;
-                    let robots = [];
-                    let result = 0;
-                    let submitted = false;
-
-                    for (let id3 in artifact2.originals) {
-                        let artifact3 = artifact2.originals[id3];
-                        x += artifact3.position.x;
-                        y += artifact3.position.y;
-                        z += artifact3.position.z;
-                        obj_prob += artifact3.obj_prob;
-                        robots[artifact3.vehicle_reporter] = artifact3.vehicle_reporter;
-
-                        global_tabManager.global_vehicleArtifactsList[artifact3.n].artifactsList[id3].fused = true;
-                        if (global_tabManager.global_vehicleArtifactsList[artifact3.n].artifactsList[id3].submitted) {
-                            submitted = true;
-                            result += global_tabManager.global_vehicleArtifactsList[artifact3.n].artifactsList[id3].result;
-                        }
-                    }
-
-                    length = Object.keys(artifact2.originals).length;
-                    newArtifact.position.x = x / length;
-                    newArtifact.position.y = y / length;
-                    newArtifact.position.z = z / length;
-                    newArtifact.obj_prob = obj_prob / length;
-                    let new_x = Math.round((newArtifact.position.x + Number.EPSILON) * 100) / 100
-                    let new_y = Math.round((newArtifact.position.y + Number.EPSILON) * 100) / 100
-                    let new_z = Math.round((newArtifact.position.z + Number.EPSILON) * 100) / 100
-                    let newid = new_x + '-' + new_y + '-' + new_z;
-                    // old way
-                    // let newid = newArtifact.position.x + '-' + newArtifact.position.y + '-' + newArtifact.position.z;
-
-                    fusedArtifacts[newid] = newArtifact;
-                    fusedArtifacts[newid].id = newid;
-                    fusedArtifacts[newid].robots = robots;
-                    if (submitted) {
-                        fusedArtifacts[newid].submitted = true;
-                        fusedArtifacts[newid].result = result;
-                    }
-                    new_ids.push(newid);
-                    remove_ids.push(id2);
-
-                    // Move the marker
-                    send_fused_update(fusedArtifacts[newid], newid, id2);
-                }
+    fuse_artifacts(id) {
+        let fusedArtifacts = global_tabManager.fusedArtifacts.artifacts;
+        let artifact = this.artifacts[id].data;
+        
+        let fused_keys = Object.keys(fusedArtifacts);
+        let added = false;
+        // Look for artifacts of the same type in the fused list
+        for(const key of fused_keys){
+            // if this type of artifact 
+            if(fusedArtifacts[key].data.obj_class = artifact.data.obj_class && this.getDist(fusedArtifacts[key].data, artifact) <= 5){
+                // This artifact is getting fused
+                added = true;
+                // do a fuse
             }
         }
 
-        for (let i in remove_ids) {
-            delete fusedArtifacts[remove_ids[i]];
-            let elem = document.getElementById("Artifact_Page").querySelector("[robot_name = 'Base']").querySelector("[artifact_id = '" + remove_ids[i] + "']");
-            if (elem != null)
-                elem.parentNode.removeChild(elem);
+        if(added == false){
+            // add the artifact to the fused list for future corroboration
         }
 
-        if (new_ids.length > 1) {
-            for (let i in new_ids) {
-                if (fusedArtifacts[new_ids[i]] != undefined) {
-                    if (this.fuse_artifacts(new_ids[i], true)) {
-                        delete fusedArtifacts[new_ids[i]];
-                        let elem = document.getElementById("Artifact_Page").querySelector("[robot_name = 'Base']").querySelector("[artifact_id = '" + new_ids[i] + "']");
-                        if (elem != null)
-                            elem.parentNode.removeChild(elem);
+        // Move the marker
+        send_fused_update(fusedArtifacts[newid], newid, id2);
+ 
 
-                    }
-                }
-            }
-        }
 
         if (!useFusedArtifact && !fuse) {
             fusedArtifacts[id] = Object.assign({}, this.artifactsList[id]);
@@ -419,78 +312,30 @@ class Artifact {
         return fuse;
     }
 
-    // THIS IS SUPER IMPORTANT AND ACTUALLY WHERE THE ARTIFACTS COME IN
+    // THIS IS HOW THE ATRIFACTS GET IN
     set_artifacts(msg) {
-        // console.log("begining of setting artifact")
+        console.log("begining of setting artifact")
         let update = false;
         for (let i = 0; i < msg.length; i++) {
             // Remap the artifacts to the DARPA required names
             // SHOULD BE CHANGED BY MIKE ON A ROBOT LEVEL SO TRANSLATION DOESN'T NEED TO HAPPEN
             let obj_class = msg[i].obj_class;
-            switch(msg[i].obj_class) {
-                case "person":
-                    obj_class = "Survivor";
-                    break;
-                case "cellphone":
-                    obj_class = "Cell Phone";
-                    break;
-                case "backpack":
-                    obj_class = "Backpack";
-                    break;
-                case "drill":
-                    obj_class = "Drill";
-                    break;
-                case "extinguisher":
-                    obj_class = "Fire Extinguisher";
-                    break;
-                case "gas":
-                    obj_class = "Gas";
-                    break;
-                case "vent":
-                    obj_class = "Vent";
-                    break;
-            }
+            
+            // This is used for the hashing process so there is only ever 1 id
+            let id_string = JSON.stringify(msg[i]);
+            let id = this.hash(id_string);
 
-            // console.log(typeof msg[i])
-
-            // Set a unique id.  Position never changes, but index can
-            // Only update the list if it's a new artifact
-            var id_x = Math.round((msg[i].position.x + Number.EPSILON) * 100) / 100
-            var id_y = Math.round((msg[i].position.y + Number.EPSILON) * 100) / 100
-            var id_z = Math.round((msg[i].position.z + Number.EPSILON) * 100) / 100
-            let id = id_x + '-' + id_y + '-' + id_z;
-            // The old way to do IDs
-            // let id = msg[i].position.x + '-' + msg[i].position.y + '-' + msg[i].position.z;
-
-            if (this.artifactsList[id] == undefined) {
+            // check if the artifact exists
+            if(this.artifacts[id] == undefined) {
                 update = true;
-                this.artifactsList[id] = {}
-                this.artifactsList[id].id = id;
-                this.artifactsList[id].n = this.n;
-                this.artifactsList[id].fused = false;
-                this.artifactsList[id].submitted = false;
 
-                // When there is not an artifact class declared, set all properties of the artifact
-                if (this.artifactsList[id].obj_class == undefined || this.artifactsList[i].obj_class == "") {
-                    this.artifactsList[id].obj_class = obj_class;
-                    this.artifactsList[id].obj_prob = msg[i].obj_prob;
-                    this.artifactsList[id].has_been_reported = msg[i].has_been_reported;
-                    this.artifactsList[id].header = msg[i].header;
-                    this.artifactsList[id].position = msg[i].position;
-                    this.artifactsList[id].image_id = msg[i].image_id;
-                    this.artifactsList[id].vehicle_reporter = this.robot_name;
-                }
-                // When there is an artifact class declared, only set certain properties of the artifact
-                // this logic allows for the user to change the name of artifact class from the gui
-                else {
-                    this.artifactsList[id].obj_prob = msg[i].obj_prob;
-                    this.artifactsList[id].has_been_reported = msg[i].has_been_reported;
-                    this.artifactsList[id].header = msg[i].header;
-                    this.artifactsList[id].position = msg[i].position;
-                }
+                this.artifacts[id] = {}
+                this.artifacts[id].data = msg[i];
+                this.artifacts[id].submitted = false;
+                this.artifacts[id].fused = false;
 
                 // Check if we need to fuse this with another artifact
-                this.fuse_artifacts(id, false);
+                this.fuse_artifacts(id);
             }
         }
         // console.log("set artifacts")
@@ -501,19 +346,12 @@ class Artifact {
     }
 
     deleteArtifact(id) {
-        this.artifact_tracker[id].remove();
-        delete this.artifactsList[id];
-        delete this.artifact_tracker[id];
-        delete this.artifact_position[id];
-        delete this.artifact_type[id];
-        delete this.artifact_seen_by[id];
-        delete this.artifact_confidence[id];
-        // delete this.artifact_image[id];
+        this.artifacts[id].remove();
     }
 
     open_edit_submit_modal(id){
         console.log("inside the submit modal");
-        $('#edit_x_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).x.toFixed(2));
+        $('#edit_x_pos').val(JSON.parse(this.artifacts[id].data.position.getAttribute("value")).x.toFixed(2));
         $('#edit_y_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).y.toFixed(2));
         $('#edit_z_pos').val(JSON.parse(this.artifact_position[id].getAttribute("value")).z.toFixed(2));
         $("#edit_type").val(this.artifact_type[id].innerText).change();
@@ -541,18 +379,6 @@ class Artifact {
 
     get_artifactsList() {
         return this.artifactsList;
-    }
-
-    read_file() {
-        // var robot_reported = `js/${this.robot_name}_reported.txt`;
-        // if(fs.existsSync(robot_reported)){
-        //     var reported_artifact_file = fs.readFileSync(robot_reported, "utf-8");
-        //     this.reportedArtifacts = artifact_file.split("\n");
-        //     console.log("recovered artifacts");
-        // }else{
-        //     fs.openSync(robot_reported, "w");
-        //     console.log("made a recovery file for " + this.robot_name);
-        // }
     }
 
     // Function for determining color id of artifacts in Artifact list

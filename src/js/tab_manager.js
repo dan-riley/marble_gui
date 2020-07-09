@@ -173,8 +173,13 @@ function send_tf_to(){
         name: `${comms_prefix}${robot}/origin_from_base`,
         messageType: "geometry_msgs/TransformStamped"
     });
-    tf_publisher.publish(robot_transform);
+
     $('#TFModal').modal('hide');
+
+    for(let i = 0; i < 3; i++){
+        tf_publisher.publish(robot_transform);
+        sleep(50);
+    }
 }
 
 // This listens for kyle's tf message to pass to a robot
@@ -532,6 +537,7 @@ class TabManager {
 
         // Subscribes to artifact messages
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
+            console.log("get some artifacts");
             // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
             global_tabManager.global_vehicleArtifactsList[n].set_artifacts(msg.artifacts);
             // }

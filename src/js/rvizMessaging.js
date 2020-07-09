@@ -77,6 +77,18 @@ function goal_to_robotII(robot){
     Topic.publish(msg);
 }
 
+function clear_rviz(){
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: `/gui/clear_markers`,
+        messageType: "std_msgs/String"
+    });
+    var msg = new ROSLIB.Message({
+        data: "clear"
+    });
+    Topic.publish(msg);
+}
+
 
 // This sends a fused artifact to the marker server
 function send_fused_update(artifact, id, old_id) {
