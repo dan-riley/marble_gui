@@ -42,14 +42,14 @@ void ImageSaver::imageWriter(const marble_artifact_detection_msgs::ArtifactImg i
         // image.artifact_img.data
         try{
             cv::Mat conv_img = cv::imdecode(cv::Mat(image.artifact_img.data),1);//convert compressed image data to cv::Mat
-            cv::imwrite(img_path, conv_img);            
+            cv::imwrite(img_path, conv_img);
+            cout << "wrote image" << endl;        
 
         }catch (cv_bridge::Exception& e){
             ROS_ERROR("Could not convert to image!");
         }
         
         images.push_back(img_id);
-        
     }
-    cout << "wrote image" << endl;
+    
 }

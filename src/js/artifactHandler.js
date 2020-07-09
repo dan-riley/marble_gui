@@ -13,7 +13,7 @@ async function update_fused_artifact(msg){
     fa.artifact_seen_by[id].style.backgroundColor = "#dca200";
     fa.artifact_confidence[id].style.backgroundColor = "#dca200";
     fa.artifact_position[id].style.backgroundColor = "#dca200";
-    fa.artifact_image[id].style.backgroundColor = "#dca200";
+    // document.getElementById(`img_cont_${this.robot_name}_${id}`).style.backgroundColor = "#dca200";
     fa.artifact_tracker[id].querySelector("[id = 'Base_" + id + "']").style.backgroundColor = "#dca200";
 
     await sleep(5000);
@@ -21,7 +21,7 @@ async function update_fused_artifact(msg){
     fa.artifact_seen_by[id].style.backgroundColor = "#6c757d";
     fa.artifact_confidence[id].style.backgroundColor = "#6c757d";
     fa.artifact_position[id].style.backgroundColor = "#6c757d";
-    fa.artifact_image[id].style.backgroundColor = "#6c757d";
+    // document.getElementById(`img_cont_${this.robot_name}_${id}`).style.backgroundColor = "#6c757d";
     fa.artifact_tracker[id].querySelector("[id = 'Base_" + id + "']").style.backgroundColor = "#6c757d";
 }
 
@@ -174,10 +174,6 @@ class Artifact {
             let artifact = this.artifactsList[id];
             let type = artifact.obj_class;
             let confidence = artifact.obj_prob;
-            // This is to just not show artifacts that are mysteriousely added through the recovery mechanism
-            if(confidence == 0.00){
-                break;
-            }
             let position = artifact.position;
             let image_id = artifact.image_id;
 
@@ -209,7 +205,7 @@ class Artifact {
                 this.artifact_type[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_confidence[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_position[id].style.backgroundColor = "#aaaaaa";
-                console.log(id);
+                // console.log(id);
                 document.getElementById(`img_cont_${this.robot_name}_${id}`).style.backgroundColor = "#aaaaaa";
                 this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").style.backgroundColor = "#aaaaaa";
 

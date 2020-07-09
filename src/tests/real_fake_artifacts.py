@@ -117,7 +117,7 @@ def main(robot_name):
 	array_msg, compressed_img_msg, artifact_img_msg = get_messages_filled_with_data(robot_name)
 
 	for i in range(10):
-		rate = rospy.Rate(0.5)
+		rate = rospy.Rate(10)
 		array_pub.publish(array_msg)
 		img_pub.publish(artifact_img_msg)
 		rqt_img_pub.publish(compressed_img_msg)
