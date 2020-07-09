@@ -8,6 +8,14 @@ ImageSaver::ImageSaver(ros::NodeHandle* nh, string robot_name, string prefix){
         name_ = robot_name;
 
         img_sub = nh_.subscribe(prefix_ + robot_name + "/image", 100, &ImageSaver::imageWriter, this);
+
+        // make the necessary folder
+        string dir = img_dir_ + name_;
+        std::string path(dir);
+        if(!boost::filesystem::exists(path)){
+            boost::filesystem::create_directory(path);
+        }
+        
         
 
     }catch(const std::exception& e){
@@ -28,12 +36,20 @@ bool ImageSaver::imageExists(float id){
 }
 
 void ImageSaver::imageWriter(const marble_artifact_detection_msgs::ArtifactImg image){
-    float img_id = image.image_id;
+    int img_id = image.image_id;
     if(!imageExists(img_id)){
-        std::ofstream fout(img_dir_ + name_ + "/" + to_string(img_id) + ".jpg", std::ios::binary);
-        fout << image.artifact_img;
-        fout.close();
+        string img_path = img_dir_ + name_ + "/" + to_string(img_id) + ".jpg";
+        // image.artifact_img.data
+        try{
+            cv::Mat conv_img = cv::imdecode(cv::Mat(image.artifact_img.data),1);//convert compressed image data to cv::Mat
+            cv::imwrite(img_path, conv_img);            
+
+        }catch (cv_bridge::Exception& e){
+            ROS_ERROR("Could not convert to image!");
+        }
+        
         images.push_back(img_id);
+        
     }
     cout << "wrote image" << endl;
 }

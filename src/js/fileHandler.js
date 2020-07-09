@@ -96,22 +96,22 @@ function log_robot_artifacts(robot_name, artifacts) {
 // This is for recovering aftifacts from the _reported files for each robot so duplicates arent made in the reported files
 function recover_artifacts(name) {
     console.log(`Recovering artifacts for ${name}`);
-    // see what report files exist
-    let existing_logs = what_logs();
-    var robot_file_name = `js/${name}_reported.json`;
-    // if the log exists, recover the reports
-    if(existing_logs.indexOf(name) >= 0) {
-        console.log(`recovring artifacts from ${name}`);
-        try{
-            var content = fs.readFileSync(robot_file_name, "utf8");
-            var ret = JSON.parse(content);
-            // console.log(ret.data);
-            return ret.data;
-        }catch{
-            console.log("whoops, cant read that file");
-        }
-        console.log("wtf are you doing?");
-    }
+    // // see what report files exist
+    // let existing_logs = what_logs();
+    // var robot_file_name = `js/${name}_reported.json`;
+    // // if the log exists, recover the reports
+    // if(existing_logs.indexOf(name) >= 0) {
+    //     console.log(`recovring artifacts from ${name}`);
+    //     try{
+    //         var content = fs.readFileSync(robot_file_name, "utf8");
+    //         var ret = JSON.parse(content);
+    //         // console.log(ret.data);
+    //         return ret.data;
+    //     }catch{
+    //         console.log("whoops, cant read that file");
+    //     }
+    //     console.log("wtf are you doing?");
+    // }
     // if there was an error, just return an empty array
     console.log("returning empty array");
     return [];

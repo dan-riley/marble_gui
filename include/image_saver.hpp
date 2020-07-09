@@ -1,6 +1,11 @@
 #ifndef IMAGESAVER
 #define IMAGESAVER
 #include <fstream>
+#include <iostream>
+#include <stdio.h>
+#include <boost/filesystem.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <cv_bridge/cv_bridge.h>
 #include <ros/ros.h>
 #include <ros/console.h>
 #include "marble_artifact_detection_msgs/ArtifactImg.h"

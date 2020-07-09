@@ -537,7 +537,7 @@ class TabManager {
 
         // Subscribes to artifact messages
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
-            console.log("get some artifacts");
+            // console.log("get some artifacts");
             // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
             global_tabManager.global_vehicleArtifactsList[n].set_artifacts(msg.artifacts);
             // }
