@@ -249,6 +249,7 @@ void preview_tf(const std_msgs::String::ConstPtr& robot_name){
 
 // This removes all artifact markers from rviz
 void clearMarkers(const std_msgs::String::ConstPtr& msg){
+    cout << "clearing markers" << msg->data << endl;
     for(string marker : logged_artifacts){
         deleteMarker(marker);
     }
