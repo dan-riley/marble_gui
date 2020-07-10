@@ -13,7 +13,8 @@ async function update_fused_artifact(msg){
     fa.artifact_seen_by[id].style.backgroundColor = "#dca200";
     fa.artifact_confidence[id].style.backgroundColor = "#dca200";
     fa.artifact_position[id].style.backgroundColor = "#dca200";
-    // document.getElementById(`img_cont_${this.robot_name}_${id}`).style.backgroundColor = "#dca200";
+    fa.artifact_image[id].style.backgroundColor = "#dca200";
+    fa.artifact_image[id].firstChild.style.backgroundColor = "#dca200";
     fa.artifact_tracker[id].querySelector("[id = 'Base_" + id + "']").style.backgroundColor = "#dca200";
 
     await sleep(5000);
@@ -21,7 +22,8 @@ async function update_fused_artifact(msg){
     fa.artifact_seen_by[id].style.backgroundColor = "#6c757d";
     fa.artifact_confidence[id].style.backgroundColor = "#6c757d";
     fa.artifact_position[id].style.backgroundColor = "#6c757d";
-    // document.getElementById(`img_cont_${this.robot_name}_${id}`).style.backgroundColor = "#6c757d";
+    fa.artifact_image[id].style.backgroundColor = "#6c757d";
+    fa.artifact_image[id].firstChild.style.backgroundColor = "#6c757d";
     fa.artifact_tracker[id].querySelector("[id = 'Base_" + id + "']").style.backgroundColor = "#6c757d";
 }
 
@@ -72,7 +74,7 @@ class Artifact {
         // this.artifact_num_seen[id] = this.artifact_tracker[id].querySelector("[id = 'num_seen'");
         this.artifact_seen_by[id] = this.artifact_tracker[id].querySelector("[id = 'seen_by']");
         this.artifact_confidence[id] = this.artifact_tracker[id].querySelector("[id = 'confidence']");
-        // this.artifact_image[id] = this.artifact_tracker[id].querySelector(`[id = arti_img_${this.robot_name}_${id}]`);
+        this.artifact_image[id] = this.artifact_tracker[id].querySelector(`[id = "img_cont_${this.robot_name}_${id}"]`);
     }
 
     // Add artifact to page
@@ -154,6 +156,9 @@ class Artifact {
 
         let robot_artifact_image_button = document.createElement("BUTTON");
         robot_artifact_image_button.setAttribute("class", "btn btn-secondary btn-sm");
+        robot_artifact_image_button.style.border = 0;
+        robot_artifact_image_button.style.fontSize = '0.79rem';
+        robot_artifact_image_button.style.fontWeight = 'bold';
         robot_artifact_image_button.id = `arti_img_${this.robot_name}_${id}`;
         robot_artifact_image_button.innerHTML = "No Image";
 
@@ -205,8 +210,10 @@ class Artifact {
                 this.artifact_type[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_confidence[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_position[id].style.backgroundColor = "#aaaaaa";
-                // console.log(id);
-                document.getElementById(`img_cont_${this.robot_name}_${id}`).style.backgroundColor = "#aaaaaa";
+                this.artifact_image[id].style.backgroundColor = "#aaaaaa";
+                // Button styling.  Can't change hover unless we swap classes.
+                this.artifact_image[id].firstChild.style.backgroundColor = "#aaaaaa";
+                this.artifact_image[id].firstChild.style.color = "#000000";
                 this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").style.backgroundColor = "#aaaaaa";
 
             }
@@ -228,8 +235,7 @@ class Artifact {
                 this.artifact_position[id].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
             }
             if (this.artifactImages.includes(image_id)){
-                // console.log(`arti_img_${this.robot_name}_${id}`);
-                var img_btn = document.getElementById(`arti_img_${this.robot_name}_${id}`);
+                var img_btn = this.artifact_image[id].firstChild;
                 console.log(this.robot_name + " has an image");
                 let name = this.robot_name;
                 img_btn.onclick = function(){show_image(name, image_id);};

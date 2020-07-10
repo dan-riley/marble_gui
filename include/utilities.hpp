@@ -26,7 +26,7 @@ using namespace std;
 string* getIdFromName(string glob);
 
 // This checks for the existance ofan artifact in the logged artifact vector  9135-
-bool check_for_artifact(string &name, vector<string> logged_artifacts);
+bool check_for_artifact(string &name, vector<string> &logged_artifacts);
 
 // This reads the config used for the js to get the robot names in play
 vector<string> get_config_robots( ros::NodeHandle* nh );
