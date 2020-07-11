@@ -3,6 +3,7 @@ project(marble_gui)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra")
 
 find_package(catkin REQUIRED
   COMPONENTS
@@ -75,7 +76,11 @@ include_directories(
 ##############################################
 
 add_executable(marker_server src/rviz_and_markers/marker_server.cpp)
-target_link_libraries(marker_server markers Robot ${catkin_LIBRARIES})
+target_link_libraries(marker_server 
+                      markers 
+                      Robot 
+                      utilities 
+                      ${catkin_LIBRARIES})
 
 add_library(markers src/rviz_and_markers/markers.cpp)
 target_link_libraries(markers ${catkin_LIBRARIES})
@@ -83,6 +88,16 @@ target_link_libraries(markers ${catkin_LIBRARIES})
 add_library(Robot src/rviz_and_markers/Robot.cpp)
 target_link_libraries(Robot ${catkin_LIBRARIES})
 
+add_library(utilities src/rviz_and_markers/utilities.cpp)
+target_link_libraries(utilities ${catkin_LIBRARIES})
+
+add_executable(image_listener_node src/rviz_and_markers/image_listener_node.cpp)
+target_link_libraries(image_listener_node 
+                      image_saver 
+                      ${catkin_LIBRARIES})
+
+add_library(image_saver src/rviz_and_markers/image_saver.cpp)
+target_link_libraries(image_saver ${catkin_LIBRARIES})
 
 
 #############

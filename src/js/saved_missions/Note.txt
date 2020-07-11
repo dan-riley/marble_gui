@@ -1,0 +1,2 @@
+This is where all of the saved missions will go.
+This note also functions as a way to keep the "saved_missions" directory in git

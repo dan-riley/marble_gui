@@ -1,7 +1,9 @@
-.vscode/
+*.vscode/
 src/node_modules/
 *.pyc
 src/bower_components
 tags
 src/js/*.txt
-*.STL
+*_reported.json
+src/js/mission_imgs/*/*.png
+src/js/mission_imgs/*/*.jpg

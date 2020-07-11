@@ -1,0 +1,25 @@
+<div class="modal" id="EndMissionModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">End Mission</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <h2>Are you sure you want to end mission?</h2>
+            </div>
+
+            <!-- Modal footer -->
+            <div>
+                <button id="edit_submit" type="button" class="btn btn-warning" style="float: left;" onclick="end_mission(); clear_rviz();">YES (end mission)</button>
+                <button id="edit_submit" type="button" class="btn btn-warning" style="float: center;" onclick="clear_mission(); clear_rviz();">CLEAR MISSION</button>
+                <button id="edit_submit" type="button" class="btn btn-warning" style="float: center;" onclick="clear_rviz();">CLEAR RVIZ</button>
+                <button id="edit_submit" type="button" class="btn btn-primary" style="float: right;">NO (keep the mission going)</button>
+            </div>
+        </div>
+    </div>
+</div>

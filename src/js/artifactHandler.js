@@ -14,6 +14,7 @@ async function update_fused_artifact(msg){
     fa.artifact_confidence[id].style.backgroundColor = "#dca200";
     fa.artifact_position[id].style.backgroundColor = "#dca200";
     fa.artifact_image[id].style.backgroundColor = "#dca200";
+    fa.artifact_image[id].firstChild.style.backgroundColor = "#dca200";
     fa.artifact_tracker[id].querySelector("[id = 'Base_" + id + "']").style.backgroundColor = "#dca200";
 
     await sleep(5000);
@@ -22,6 +23,7 @@ async function update_fused_artifact(msg){
     fa.artifact_confidence[id].style.backgroundColor = "#6c757d";
     fa.artifact_position[id].style.backgroundColor = "#6c757d";
     fa.artifact_image[id].style.backgroundColor = "#6c757d";
+    fa.artifact_image[id].firstChild.style.backgroundColor = "#6c757d";
     fa.artifact_tracker[id].querySelector("[id = 'Base_" + id + "']").style.backgroundColor = "#6c757d";
 }
 
@@ -36,7 +38,8 @@ class Artifact {
         this.robot_name = name;
         this.n = n;
         this.artifact_All = [];
-        this.artifactsList = [];
+        this.artifactsList = recover_artifacts(name);
+        // This only has image ids, image data is saved with the image_listener node to files
         this.artifactImages = [];
         this.reportedArtifacts = [];
         this.savedArtifacts = recover_artifacts(name);
@@ -60,7 +63,8 @@ class Artifact {
         this.artifact_seen_by = [];
         this.artifact_confidence = [];
         this.artifact_image = [];
-        this.artifact_image_id = [];
+
+        this.updateDisplay();
     }
 
     set_artifact_tracker(robot_artifacts, id) {
@@ -70,7 +74,7 @@ class Artifact {
         // this.artifact_num_seen[id] = this.artifact_tracker[id].querySelector("[id = 'num_seen'");
         this.artifact_seen_by[id] = this.artifact_tracker[id].querySelector("[id = 'seen_by']");
         this.artifact_confidence[id] = this.artifact_tracker[id].querySelector("[id = 'confidence']");
-        this.artifact_image[id] = this.artifact_tracker[id].querySelector("[id = image]");
+        this.artifact_image[id] = this.artifact_tracker[id].querySelector(`[id = "img_cont_${this.robot_name}_${id}"]`);
     }
 
     // Add artifact to page
@@ -81,19 +85,17 @@ class Artifact {
         robot_artifact_tracker.setAttribute("class", "row");
         robot_artifact_tracker.setAttribute("artifact_id", id);
         let align = '';
+        // This is used in place of actual alignment to center the robot artifacts
         if (this.robot_name != 'Base') {
             align = '<span class="col-sm-1">  </span>';
         }
-        robot_artifact_tracker.innerHTML = align + '<span contenteditable="true" id="type" class="badge badge-secondary col-sm-2" style="text-align: center; min-height: 1px;" value="undefined"> undefined </span>';
+        robot_artifact_tracker.innerHTML = align + '<span contenteditable="false" id="type" class="badge badge-secondary col-sm-2" style="text-align: center; min-height: 1px;" value="undefined"> undefined </span>';
         if (this.robot_name == 'Base') {
-            // robot_artifact_tracker.innerHTML += '<span contenteditable="false" id="num_seen" class="badge badge-secondary col-sm-1" style="text-align: center; min-height: 1px;" value="0">0</span>' +
-            robot_artifact_tracker.innerHTML += '<span contenteditable="false" id="seen_by" class="badge badge-secondary col-sm-2" style="text-align: center; min-height: 1px;" value="undefined">&nbsp;</span>';
+            robot_artifact_tracker.innerHTML += '<span contenteditable="false" id="seen_by" class="badge badge-secondary col-sm-2" style="text-align: center; min-height: 1px;" value="undefined">unknown</span>';
         }
 
         robot_artifact_tracker.innerHTML += '<span contenteditable="false" id="confidence" class="badge badge-secondary col-sm-1" style="text-align: center" value="0.00">0.00</span>' +
-            "<span contenteditable='true' id='position' class='badge badge-secondary col-sm-3' style='text-align: center' value='" + JSON.stringify({ x: 0.00, y: 0.00, z: 0.00 }) + "'>{x: 0.00 y: 0.00 z: 0.00}</span>";
-        // '<button class="col-sm-1">Yes</button>' +
-        // '<button class="col-sm-1">No</button>';
+            "<span contenteditable='false' id='position' class='badge badge-secondary col-sm-3' style='text-align: center' value='" + JSON.stringify({ x: 0.00, y: 0.00, z: 0.00 }) + "'>{x: 0.00 y: 0.00 z: 0.00}</span>";
 
         let robot_artifact_tracker_yes_container = document.createElement("DIV");
         robot_artifact_tracker_yes_container.setAttribute("class", "badge badge-secondary col-sm-2");
@@ -147,13 +149,22 @@ class Artifact {
         }
         robot_artifact_tracker_yes_container.appendChild(robot_artifact_tracker_reset);
 
+        // CHNAGE TO BE A BUTTON THAT ACTIVATES A FUNCTION THAT PASSES ROBOT AND IMAGE ID SO IT CAN BE DISPLAYED IN THE IMAGE MODAL
         let robot_artifact_image_container = document.createElement("DIV");
-        robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-2 popup");
-        robot_artifact_image_container.setAttribute("id", "image");
-        robot_artifact_image_container.innerText = "No Image";
+        robot_artifact_image_container.setAttribute("class", "badge badge-secondary col-sm-2");
+        robot_artifact_image_container.id = `img_cont_${this.robot_name}_${id}`;
+
+        let robot_artifact_image_button = document.createElement("BUTTON");
+        robot_artifact_image_button.setAttribute("class", "btn btn-secondary btn-sm");
+        robot_artifact_image_button.style.border = 0;
+        robot_artifact_image_button.style.fontSize = '0.79rem';
+        robot_artifact_image_button.style.fontWeight = 'bold';
+        robot_artifact_image_button.id = `arti_img_${this.robot_name}_${id}`;
+        robot_artifact_image_button.innerHTML = "No Image";
 
         robot_artifact_tracker.appendChild(robot_artifact_tracker_yes_container);
         robot_artifact_tracker.appendChild(robot_artifact_image_container);
+        robot_artifact_image_container.appendChild(robot_artifact_image_button);
         // robot_artifact_tracker.appendChild(robot_artifact_tracker_no);
 
         return robot_artifact_tracker;
@@ -189,14 +200,20 @@ class Artifact {
                 // this.artifact_num_seen[id].innerText = num_seen;
                 let seen_by = '';
                 for (let robot in artifact.robots) {
+
                     seen_by += robot + ',';
                 }
-                this.artifact_seen_by[id].innerText = seen_by.slice(0, -1);
+                if(seen_by != ""){
+                    this.artifact_seen_by[id].innerText = seen_by.slice(0, -1);
+                }
             } else if (artifact.fused) {
                 this.artifact_type[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_confidence[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_position[id].style.backgroundColor = "#aaaaaa";
                 this.artifact_image[id].style.backgroundColor = "#aaaaaa";
+                // Button styling.  Can't change hover unless we swap classes.
+                this.artifact_image[id].firstChild.style.backgroundColor = "#aaaaaa";
+                this.artifact_image[id].firstChild.style.color = "#000000";
                 this.artifact_tracker[id].querySelector("[id = '" + this.robot_name + "_" + id + "']").style.backgroundColor = "#aaaaaa";
 
             }
@@ -217,41 +234,14 @@ class Artifact {
             if (position != undefined) {
                 this.artifact_position[id].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
             }
-            if (this.artifactImages[image_id] == null) {
-                this.artifact_image[id].innerText = "No Image";
-            }
-            else {
-                if (this.robot_name == 'Base') {
-                    if (this.artifact_image[id].children.length == 0) {
-                        this.artifact_image[id].innerText = "View Image";
-                        let robot_artifact_image = document.createElement("IMG");
-                        robot_artifact_image.setAttribute("id", "myPopup");
-                        robot_artifact_image.setAttribute("class", "popuptext");
-                        this.artifact_image[id].appendChild(robot_artifact_image);
-                    }
-                    this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
-
-                    this.artifact_image[id].onclick = function () {
-                        $(this.children[0]).toggleClass("show");
-                    }
-                } else {
-                    if (this.artifact_image[id].children.length == 0) {
-                        this.artifact_image[id].innerText = "View Image";
-                        let robot_artifact_image = document.createElement("IMG");
-                        robot_artifact_image.setAttribute("id", "myPopup");
-                        robot_artifact_image.setAttribute("class", "popuptext");
-                        robot_artifact_image.style.height = '480px';
-                        robot_artifact_image.style.width = '640px';
-                        robot_artifact_image.style.left = '-300px';
-                        robot_artifact_image.style.top = '-300px';
-                        this.artifact_image[id].appendChild(robot_artifact_image);
-                    }
-                    this.artifact_image[id].children[0].setAttribute("src", "data:image/jpg;base64," + this.artifactImages[image_id]);
-
-                    this.artifact_image[id].onclick = function () {
-                        $(this.children[0]).toggleClass("show");
-                    }
-                }
+            if (this.artifactImages.includes(image_id)){
+                var img_btn = this.artifact_image[id].firstChild;
+                console.log(this.robot_name + " has an image");
+                let name = this.robot_name;
+                img_btn.onclick = function(){show_image(name, image_id);};
+                img_btn.innerHTML = "View Image";
+                img_btn.setAttribute("data-toggle", "modal");
+                img_btn.setAttribute("data-target", "#artifact_image_modal");
             }
 
             let color = this.color_artifacts(type);
@@ -260,21 +250,23 @@ class Artifact {
             if(this.savedArtifacts.includes(type) == false){
                 var position_string = `${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}`;
 
-                log_robot_artifacts(this.robot_name, type, position_string);
+                log_robot_artifacts(this.robot_name, this.artifactsList);
                 this.savedArtifacts.push(type)
                 console.log(`saved artifact ${type}`)
             }
         }
     }
+    
+    
 
     add_array(array) {
         this.artifact_All.push(array);
     }
 
-    // Use this to save the image received from ROS
+    // this svaes the image id for display purpouses
     save_image(msg) {
-        this.artifactImages[msg.image_id] = msg.artifact_img.data;
-        // this.save_file();
+        this.artifactImages.push(msg.image_id);
+        console.log("got an image");
         this.updateDisplay();
     }
 
@@ -429,6 +421,7 @@ class Artifact {
         return fuse;
     }
 
+    // THIS IS SUPER IMPORTANT AND ACTUALLY WHERE THE ARTIFACTS COME IN
     set_artifacts(msg) {
         // console.log("begining of setting artifact")
         let update = false;
@@ -459,6 +452,8 @@ class Artifact {
                     obj_class = "Vent";
                     break;
             }
+
+            // console.log(typeof msg[i])
 
             // Set a unique id.  Position never changes, but index can
             // Only update the list if it's a new artifact
@@ -515,7 +510,7 @@ class Artifact {
         delete this.artifact_type[id];
         delete this.artifact_seen_by[id];
         delete this.artifact_confidence[id];
-        delete this.artifact_image[id];
+        // delete this.artifact_image[id];
     }
 
     open_edit_submit_modal(id){
@@ -550,21 +545,16 @@ class Artifact {
         return this.artifactsList;
     }
 
-    // save_file(data) {
-    //    fs.writeFileSync(`js/${this.robot_name}_reported.txt`, `${data}\n`, "utf-8");
-
-    // }
-
     read_file() {
-        var robot_reported = `js/${this.robot_name}_reported.txt`;
-        if(fs.existsSync(robot_reported)){
-            var reported_artifact_file = fs.readFileSync(robot_reported, "utf-8");
-            this.reportedArtifacts = artifact_file.split("\n");
-            console.log("recovered artifacts");
-        }else{
-            fs.openSync(robot_reported, "w");
-            console.log("made a recovery file for " + this.robot_name);
-        }
+        // var robot_reported = `js/${this.robot_name}_reported.txt`;
+        // if(fs.existsSync(robot_reported)){
+        //     var reported_artifact_file = fs.readFileSync(robot_reported, "utf-8");
+        //     this.reportedArtifacts = artifact_file.split("\n");
+        //     console.log("recovered artifacts");
+        // }else{
+        //     fs.openSync(robot_reported, "w");
+        //     console.log("made a recovery file for " + this.robot_name);
+        // }
     }
 
     // Function for determining color id of artifacts in Artifact list
@@ -768,3 +758,4 @@ function custom_submission(){
     $('#NewReportModal').modal({backdrop: 'static', keyboard: false});
     $('#NewReportModal').modal("show");
 }
+

@@ -5,11 +5,33 @@ ros = new ROSLIB.Ros({
     url: "ws://localhost:9090"
 });
 
+var ma_prefix = '';
+
+var comms_prefix = '';
+
+var ma_param = new ROSLIB.Param({
+    ros: ros,
+    name: "ma_prefix"
+});
+var comms_param = new ROSLIB.Param({
+    ros: ros,
+    name: "comms_prefix"
+});
+
+ma_param.get(function(param){
+    ma_prefix = param;
+    console.log(param);
+});
+comms_param.get(function(param){
+    comms_prefix = param;
+    console.log(param);
+});
+
 function send_ma_task(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
         // name: `/Anchor/neighbors/${robot_name}/guiTaskName`,
-        name: `/Base/neighbors/${robot_name}/guiTaskName`,
+        name: `${ma_prefix}${robot_name}/guiTaskName`,
         messageType: "std_msgs/String"
     });
     var msg = new ROSLIB.Message({
@@ -20,7 +42,7 @@ function send_ma_task(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
         // name: `/Anchor/neighbors/${robot_name}/guiTaskValue`,
-        name: `/Base/neighbors/${robot_name}/guiTaskValue`,
+        name: `${ma_prefix}${robot_name}/guiTaskValue`,
         messageType: "std_msgs/String"
     });
     var msg = new ROSLIB.Message({
@@ -32,7 +54,7 @@ function send_ma_task(robot_name, signal, value) {
 function send_signal_to(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: `/${robot_name}/${signal}`,
+        name: `${comms_prefix}${robot_name}/${signal}`,
         messageType: "std_msgs/Bool"
     });
     var msg = new ROSLIB.Message({
@@ -47,7 +69,7 @@ function send_signal_to(robot_name, signal, value) {
 function send_string_to(robot_name, signal, text) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: `/${robot_name}/${signal}`,
+        name: `${comms_prefix}${robot_name}/${signal}`,
         messageType: "std_msgs/String"
     });
     var msg = new ROSLIB.Message({
@@ -87,14 +109,14 @@ function teleop_route(){
     });
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: `/${teleop_robot}/joy_base`,
+        name: `${comms_prefix}${teleop_robot}/joy_base`,
         messageType: "sensor_msgs/Joy"
     })
     // create a publisher
     var last_robot = "Base"
     teleop_listener.subscribe(function (message){
         if(teleop_robot != last_robot){
-            Topic.name = `/${teleop_robot}/joy_base`;
+            Topic.name = `${comms_prefix}/${teleop_robot}/joy_base`;
             last_robot = teleop_robot;
             console.log("changed target robot")
         }
@@ -105,10 +127,88 @@ function teleop_route(){
     });
 }
 
-function pubTask(task_dom, task) {
-    setTimeout(function() {
-        task_dom.html('<font color="red">' + task + '</font>');
-    }, 1000);
+function pubTask(task_dom, tasks, i) {
+    if (i < tasks.length) {
+        setTimeout(function() {
+            task_dom.html('<font color="red">' + tasks[i] + '</font>');
+            pubTask(task_dom, tasks, i+1);
+        }, 1000);
+    }
+}
+
+// This stores the transform to get it from the subscriber to the publisher to the correct robot
+var robot_transform = new ROSLIB.Message({
+    transform : {
+        translation : {
+            x : 0,
+            y : 0,
+            z : 0
+        },
+        rotation : {
+            x : 0,
+            y : 0,
+            z : 0,
+            w : 0
+        }
+    }
+});
+
+// This sends kyle's transform to the correct robot
+function send_tf_to(){
+    var robot = document.getElementById("select_robot_transform").value;
+    // get data from the modal
+    robot_transform.transform.translation.x = parseFloat(document.getElementById("x_translation").value);
+    robot_transform.transform.translation.y = parseFloat(document.getElementById("y_translation").value);
+    robot_transform.transform.translation.z = parseFloat(document.getElementById("z_translation").value);
+
+    robot_transform.transform.rotation.x = parseFloat(document.getElementById("x_rotation").value);
+    robot_transform.transform.rotation.y = parseFloat(document.getElementById("y_rotation").value);
+    robot_transform.transform.rotation.z = parseFloat(document.getElementById("z_rotation").value);
+    robot_transform.transform.rotation.w = parseFloat(document.getElementById("w_rotation").value);
+    
+    console.log("sending tf");
+    
+    var tf_publisher = new ROSLIB.Topic({
+        ros: ros,
+        name: `${comms_prefix}${robot}/origin_from_base`,
+        messageType: "geometry_msgs/TransformStamped"
+    });
+
+    $('#TFModal').modal('hide');
+
+    for(let i = 0; i < 3; i++){
+        tf_publisher.publish(robot_transform);
+        sleep(50);
+    }
+}
+
+// This listens for kyle's tf message to pass to a robot
+function listen_for_tf(){
+    // This is verrified with two messages at 1hz
+    //roslibjs seems to lose the first message but recieves everyone after that
+    console.log("listening for the tf");
+    // Listen to the transform that kyle sends over
+    var tf_listener = new ROSLIB.Topic({
+        ros: ros,
+        name: "/leica/robot_to_origin_transform",
+        messageType: "geometry_msgs/TransformStamped"
+    });
+    // update the tf variable to be sent to a robot
+    // console.log("maybe its subscribed");
+    tf_listener.subscribe(function (message){
+        console.log("got transform");
+        robot_transform = message;
+
+        // update the modal with message data
+        $('#x_translation').val(robot_transform.transform.translation.x);
+        $('#y_translation').val(robot_transform.transform.translation.y);
+        $('#z_translation').val(robot_transform.transform.translation.z);
+
+        $('#x_rotation').val(robot_transform.transform.rotation.x);
+        $('#y_rotation').val(robot_transform.transform.rotation.y);
+        $('#z_rotation').val(robot_transform.transform.rotation.z);
+        $('#w_rotation').val(robot_transform.transform.rotation.w);
+    });
 }
 
 
@@ -166,7 +266,7 @@ class TabManager {
     // list if they are not there already
     search_robots() {
         var _this = global_tabManager;
-
+        let robots_disp = get_mission_robots();
         if (robots_disp.length == 1) {
             // This is where robots and beacons are filtered
             var patt = /^((?!B).)\d{1,2}(?!_)/;
@@ -212,13 +312,12 @@ class TabManager {
             }
 
             var task = '';
-            var task2;
             var task_dom = $('#task_status_' + _this.robot_name[i]);
             var full_task = global_tabManager.tasks[i];
             if (full_task) {
               var tasks = full_task.split('+++');
               task = tasks[0];
-              task2 = tasks[1];
+              pubTask(task_dom, tasks, 1);
             }
             if (task == "Home") {
                 task_dom.html('<font color="yellow">Going Home</font>');
@@ -236,11 +335,6 @@ class TabManager {
                 if (task == undefined) task = '';
                 task_dom.html('<font color="red">' + task + '</font>');
             }
-
-            if (task2) {
-              pubTask(task_dom, task2);
-            }
-
         }
 
         for (_this.i; _this.i < curr_robot_length; _this.i++) {
@@ -291,8 +385,6 @@ class TabManager {
                 </a>
             </li>`);
 
-        // add robot to possible robots to teleop
-        this.add_robot_to_teleop(this.robot_name[n]);
 
         var disarmBtn = '';
         if (this.robot_name[n].includes('A'))
@@ -302,60 +394,56 @@ class TabManager {
                 Disarm
             </button><br>`;
 
-        // This is for creatiung the control card for each robot on the sidebar
-        $('#controls_bar_inner').append(`
-        <li id="${this.robot_name[n]}_control_card" class="quick_control">
-            <h4>${this.robot_name[n]}</h4>
-            ${disarmBtn}
-            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
-                onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)">
-                Start
-            </button>
-            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop"
-                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Stop')">
-                Stop
-            </button>
-            <br>
-            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_explore"
-                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Explore')">
-                Explore
-            </button>
-            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home"
-                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Home')">
-                Go Home
-            </button>
-            <br>
-            <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_deploy"
-                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')">
-                Deploy Beacon
-            </button>
-            <br>
-            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_toggle"
-                onclick="estop_toggle('${this.robot_name[n]}')">
-                E-Stop
-            </button>
-            <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_radio"
-                onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)">
-                Radio Reset
-            </button>
-            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
-                onclick="teleop_to('${this.robot_name[n]}')" value="Teleop"></input>
-            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
-                onclick="publish_goal('${this.robot_name[n]}')" value="Go to Goal"></input>
-            <input type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
-                onclick="goal_to_robotII('${this.robot_name[n]}')" value="Goal to Robot"></input></br>
-        </li>`)
+            $('#controls_bar_inner').append(`
+            <li id="${this.robot_name[n]}_control_card" class="quick_control">
+                <h4>${this.robot_name[n]}</h4>
+                ${disarmBtn}
+                <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
+                    onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)" title="Start">
+                    <img src="./images/start.png" class="control-icons">
+                </button>
+                <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop"
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Stop')" title="Stop">
+                    <img src="./images/Stop_sign.png" class="control-icons">
+                </button>
+                <br>
+                <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_explore"
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Explore')" title="Explore">
+                    <img src="./images/enterprise.png" class="control-icons">
+                </button>
+                <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home"
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Home')" title="Go Home">
+                    <img src="./images/go_home.png" class="control-icons">
+                </button>
+                <br>
+                <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_deploy"
+                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')" title="Deploy Beacon">
+                    <img src="./images/deploy_beacon.png" class="control-icons">
+                </button>
+                <br>
+                <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_toggle"
+                    onclick="estop_toggle('${this.robot_name[n]}')" title="Estop">
+                    E-Stop
+                </button>
+                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_radio"
+                    onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)" title="Radio Reset">
+                    <img src="./images/radio_reset.png" class="control-icons">
+                </button>
+                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
+                    onclick="teleop_to('${this.robot_name[n]}')" value="Teleop" title="Teleop">
+                    <img src="./images/teleop.png" class="control-icons">
+                </button>
+                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
+                    onclick="publish_goal('${this.robot_name[n]}')" value="Go to Goal" title="Go To Goal">
+                    <img src="./images/go_to_goal.png" class="control-icons">
+                </button>
+                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
+                    onclick="goal_to_robotII('${this.robot_name[n]}')" value="Goal to Robot" title="Goal To Robot">
+                    <img src="./images/goal_to_robot.png" class="control-icons">
+                </button></br>
+            </li>`)
 
-        // this is some legacy code for the old way of starting teleop
-        //     <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_off"
-        //         onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', false)">
-        //         E-Stop Disabled
-        //     </button>
-        //     <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_estop"
-        //         onclick="send_signal_to('${this.robot_name[n]}', 'estop_cmd', true)">
-        //         E-Stop
-        //     </button>
-
+        
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");
         tab_content.setAttribute("id", this.robot_name[n]);
@@ -449,6 +537,7 @@ class TabManager {
 
         // Subscribes to artifact messages
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
+            // console.log("get some artifacts");
             // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
             global_tabManager.global_vehicleArtifactsList[n].set_artifacts(msg.artifacts);
             // }
@@ -468,12 +557,12 @@ class TabManager {
     listen_to_robot_topics(n, robot){
         let TaskTopic = {
             // topic: "/" + robot + "/task_update",
-            topic: "/Base/neighbors/" + robot + "/status",
+            topic: ma_prefix + robot + "/status",
             // topic: "/Anchor/neighbors/" + robot + "/status",
             messageType: "std_msgs/String"
         };
         let CommTopic = {
-            topic: "/Base/neighbors/" + robot + "/incomm",
+            topic: ma_prefix + robot + "/incomm",
             // topic: "/Anchor/neighbors/" + robot + "/incomm",
             messageType: "std_msgs/Bool"
         };
@@ -482,13 +571,14 @@ class TabManager {
             // topic: "/" + this.robot_name[n] + "/artifact_record",
             // topic: "/" + robot + "/artifact_array/relay",
             // topic: "/Anchor/neighbors/" + robot + "/artifacts",
-            topic: "/Base/neighbors/" + robot + "/artifacts",
+            topic: ma_prefix + robot + "/artifacts",
             messageType: "marble_artifact_detection_msgs/ArtifactArray"
         };
         let ArtifactImgTopic = {
             // topic: "/artifact_record",  // For use to save images on ground station
             // topic: "/" + this.robot_name[n] + "/located_artifact_img",
-            topic: "/" + robot + "/artifact_image_to_base",
+            // THIS MAY BE WRONG AND THE PREFIX MAY JUST BE "/"
+            topic: ma_prefix + robot + "/image",
             // topic: "/disabled3",
             messageType: "marble_artifact_detection_msgs/ArtifactImg"
         };
@@ -571,26 +661,5 @@ class TabManager {
         update_topics_list(global_tabManager.search_robots);
     }
 
-    // this adds robots to the options in the teleop control card3
-    add_robot_to_teleop(robot_name){
-        var teleop_options = document.getElementById("teleop_robot_select");
-        var option = document.createElement("option");
-        option.text = robot_name;
-        option.value = robot_name;
-        teleop_options.add(option);
-    }
 }
-/* Plugin designed to fill the chart with white */
-Chart.pluginService.register({
-    beforeDraw: function (chart, easing) {
-        if (chart.config.options.chartArea && chart.config.options.chartArea.backgroundColor) {
-            var ctx = chart.chart.ctx;
-            var chartArea = chart.chartArea;
 
-            ctx.save();
-            ctx.fillStyle = chart.config.options.chartArea.backgroundColor;
-            ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
-            ctx.restore();
-        }
-    }
-});

@@ -63,6 +63,12 @@
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>opencv2</exec_depend>
   <exec_depend>marble_artifact_detection_msgs</exec_depend>
+  <exec_depend>rosbridge_server</exec_depend>
+  <exec_depend>rosbridge_library</exec_depend>
+  <exec_depend>rosbridge_msgs</exec_depend>
+  <exec_depend>rosapi</exec_depend>
+  <exec_depend>tf2_web_repiblisher</exec_depend>
+  <exec_depend>rosauth</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
@@ -87,7 +93,6 @@
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
-
+    
   </export>
 </package>

@@ -1,0 +1,14 @@
+These are the ros bridge packages that work with the gui.
+Errors have occured when using ros bridge 0.11.4 with this gui.
+Use this repo for the most up to date rosbridge software: https://github.com/RobotWebTools/rosbridge_suite.git
+rosbridge_suite 0.11.5 works and can be installed in the catkin src. make sure to build it before use.
+
+also install rosauth
+
+make sure to pip install
+tornado
+twisted
+pymongo
+
+
+These packages are a backup in case something goes wrong and we need to roll back.
