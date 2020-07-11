@@ -28,7 +28,7 @@ import cv2
 from cv_bridge import CvBridge
 import numpy as np
 
-ROBOT_NAMES = ['X1', 'X2', 'H01', 'H02', 'H03']
+ROBOT_NAMES = ['H01', 'T02']
 ARTIFACT_IMG_ID = 0
 ARTIFACT_IMG_PATH = 'test_img.jpg'
 
@@ -80,7 +80,7 @@ def get_messages_filled_with_data(robot_name):
     array_msg.artifacts[2].position.x = 60.0 + np.random.uniform(-3, 3.1, 1)[0]
     array_msg.artifacts[2].position.y = -2 + np.random.uniform(-3, 3.1, 1)[0]
     array_msg.artifacts[2].position.z = 0.2 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[2].obj_class = 'person'
+    array_msg.artifacts[2].obj_class = 'survivor'
     array_msg.artifacts[2].obj_prob = 0.154
     # array_msg.artifacts[2].has_been_reported = False
     #

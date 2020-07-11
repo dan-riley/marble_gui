@@ -62,29 +62,34 @@ vector<Robot*> robots;
 
 // This publishes the marker position when its moved in rviz
 void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback){
-    // std::ostringstream s;
-    // s << "Feedback from marker '" << feedback->marker_name << "' "
-    //   << " / control '" << feedback->control_name << "'";
 
-    if (feedback->event_type == InteractiveMarkerFeedback::POSE_UPDATE) {
-        if (feedback->marker_name == "GOAL") {
-            robot_goal.position = feedback->pose.position;
-            robot_goal.orientation = feedback->pose.orientation;
-        } else {
-            string* identifiers = getIdFromName(feedback->marker_name);
-            // cout << identifiers << endl;
-            marble_gui::ArtifactTransport updated_artifact;
-            updated_artifact.position.x = feedback->pose.position.x;
-            updated_artifact.position.y = feedback->pose.position.y;
-            updated_artifact.position.z = feedback->pose.position.z;
-            updated_artifact.object_class = identifiers[0];
-            updated_artifact.id = identifiers[1];
-            updated_artifact.origin = "mkr_srvr";
-            pub.publish(updated_artifact);
-            delete[] identifiers;
-            // cout << "you moved " << identifiers[0] << endl;
+    try{
+        if (feedback->event_type == InteractiveMarkerFeedback::POSE_UPDATE) {
+            if (feedback->marker_name == "GOAL") {
+                robot_goal.position = feedback->pose.position;
+                robot_goal.orientation = feedback->pose.orientation;
+            } else {
+                string* identifiers = getIdFromName(feedback->marker_name);
+                // cout << identifiers << endl;
+                marble_gui::ArtifactTransport updated_artifact;
+                updated_artifact.position.x = feedback->pose.position.x;
+                updated_artifact.position.y = feedback->pose.position.y;
+                updated_artifact.position.z = feedback->pose.position.z;
+                updated_artifact.object_class = identifiers[0];
+                updated_artifact.id = identifiers[1];
+                updated_artifact.origin = "mkr_srvr";
+                pub.publish(updated_artifact);
+                delete[] identifiers;
+                // cout << "you moved " << identifiers[0] << endl;
+            }
         }
     }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
+   
 }
 
 // This deals with marker messages
@@ -174,7 +179,9 @@ void deleteMarker(string marker_name){
         // remove it from the server
         server->erase(marker_name);
         server->applyChanges();
+        cout << "deleted " << marker_name << endl;
     }
+    cout << "finished delete marker" << endl;
 }
 
 // This makes then publishes the non-interactive markers for the submitted artifacts
@@ -251,8 +258,12 @@ void preview_tf(const std_msgs::String::ConstPtr& robot_name){
 void clearMarkers(const std_msgs::String::ConstPtr& msg){
     cout << "clearing markers" << msg->data << endl;
     for(string marker : logged_artifacts){
-        deleteMarker(marker);
+        cout << "deleting " << marker << " from marker server" << endl;
+        // remove it from the server
+        server->erase(marker);
+        server->applyChanges();
     }
+    logged_artifacts.clear();
     for(int i = 0; i < num_submitted; i++){
         submitted_markers.markers[i].action = visualization_msgs::Marker::DELETE;
     }

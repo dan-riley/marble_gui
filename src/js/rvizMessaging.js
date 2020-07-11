@@ -86,10 +86,8 @@ function clear_rviz(){
     var msg = new ROSLIB.Message({
         data: "clear"
     });
-    for(let i = 0; i < 100; i++){
-        Topic.publish(msg);
-        sleep(50);
-    }
+    Topic.publish(msg);
+    
 }
 
 
