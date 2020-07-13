@@ -1,4 +1,5 @@
 <launch>
+    <arg name="robots" default="" />
     <node name="rosbridge" pkg="rosbridge_server" type="rosbridge_websocket" output="screen">
     </node>
     <node name="rosapi" pkg="rosapi" type="rosapi_node" output="screen">
@@ -24,11 +25,13 @@
     <!-- This is the prefix used for multiagent or local tests "/Base/neighbors/" or "/" -->
     <param name="ma_prefix" type="string" value="/Base/neighbors/"/>
 
-    <!--  -->
+    <!-- Prefix for the topic for direct comms -->
     <param name="comms_prefix" type="string" value="/Base/mesh_comm/"/>
 
     <!-- get the names of each robot in play from dan's config file -->
     <param name="robot_names_config" type="string" value="$(find marble_gui)/src/js/robots.txt"/>
+    <!-- Robots to create listeners for -->
+    <param name="robots" value="$(arg robots)" />
 
     <!-- mesh scaling for each robot -->
     <!-- <param name="x_scale" type="double" value=""/>

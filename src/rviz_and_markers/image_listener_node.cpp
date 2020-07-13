@@ -3,35 +3,13 @@
 #include <ros/console.h>
 #include "marble_artifact_detection_msgs/ArtifactImg.h"
 #include "image_saver.hpp"
+#include "utilities.hpp"
 #include <boost/filesystem.hpp>
 
 #include <vector>
 #include <string>
 
 using namespace std;
-
-vector<string> getMissionRobots(string robots_file){
-    vector<string> mission_robots;
-    std::string path(robots_file);
-    cout << path << endl;
-    if (!boost::filesystem::exists(path))
-    {
-        std::cout << "Can't find robots.txt!" << std::endl;
-    }
-    string line;
-    ifstream file(robots_file);
-    if(file.is_open()){
-        cout << "opened robots.txt" << endl;
-        while(getline(file, line)){
-            cout << line << endl;
-            mission_robots.push_back(line);
-        }
-        file.close();
-    }
-    else cout << "Unable to open file"; 
-
-    return mission_robots;
-}
 
 int main(int argc, char **argv){
     cout << "listening for images" << endl;
@@ -40,11 +18,9 @@ int main(int argc, char **argv){
     ros::NodeHandle nh;
     string prefix;
     nh.getParam("ma_prefix", prefix);
-    string robots;
-    nh.getParam("robot_names_config", robots);
 
     // get mission robots
-    vector<string> mission_robots = getMissionRobots(robots);
+    vector<string> mission_robots = get_config_robots(&nh);
 
     vector<ImageSaver*> image_savings;
 
@@ -61,6 +37,3 @@ int main(int argc, char **argv){
 
     return 0;
 }
-
-
-

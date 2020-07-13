@@ -8,7 +8,7 @@
 
 <!-- <body onload="window.setTimeout(function(){window.setSpeed(1000);},1000);"> -->
 
-<body onload="populateOpts(), teleop_route(), get_darpa_artifacts(), what_logs(), listen_to_markers(), listen_to_pose(), get_mission_robots(), listen_for_tf(), populateTFRobot()" style="overflow: hidden;">
+<body onload="initialize();" style="overflow: hidden;">
     <!-- <div class="container"> -->
     <!--! Tab bar at the top of web page that displays all vehicles and default tabs -->
     <%- include ../src/ejs_modules/nav_bars/connections_bar.ejs %>

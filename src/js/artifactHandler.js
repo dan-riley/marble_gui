@@ -431,6 +431,7 @@ class Artifact {
             let obj_class = msg[i].obj_class;
             switch(msg[i].obj_class) {
                 case "person":
+                case "survivor":
                     obj_class = "Survivor";
                     break;
                 case "cellphone":
