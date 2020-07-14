@@ -6,7 +6,7 @@ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main
 sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 sudo apt update
 
-sudo apt -y install ros-melodic-desktop-full python-rosinstall python-rosinstall-generator python-wstool build-essential python-catkin-tools ros-melodic-rosbridge-server ros-melodic-tf2-web-republisher ros-melodic-rosapi
+sudo apt -y install ros-melodic-desktop-full python-rosinstall python-rosinstall-generator python-wstool build-essential python-catkin-tools ros-melodic-rosbridge-server ros-melodic-tf2-web-republisher ros-melodic-rosapi ros-melodic-joy
 sudo apt-get -y install libboost-all-dev
 
 

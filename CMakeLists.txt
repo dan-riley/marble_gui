@@ -29,6 +29,7 @@ add_message_files(
   FILES
   Point.msg
   ArtifactTransport.msg
+  TransformPreview.msg
 )
 
 generate_messages(

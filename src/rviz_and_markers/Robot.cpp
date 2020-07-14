@@ -28,10 +28,11 @@ Robot::Robot(ros::NodeHandle* nh, std::string robot_name, float scale, boost::sh
         odom_sub = nh_.subscribe(prefix + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);    
 
         // Decide wether to use robot mesh. use of meshes has a performance penalty
-        bool to_show = false;
+        bool to_show;
         // This actually gets the option from the launch file
         nh_.getParam("show_robot_mesh", to_show);
         if(to_show){
+            cout << "showing robot mesh" << endl;
             makeRobotMarker();
         }
         
@@ -148,24 +149,26 @@ void Robot::processFeedback(const visualization_msgs::InteractiveMarkerFeedbackC
 
 
 // this temporarily changes the robot pose (just its marker) to preview incoming transform
-void Robot::PreviewTF(const geometry_msgs::TransformStamped tf){
+void Robot::PreviewTF(const geometry_msgs::Transform tf){
 
     listen_to_odom_ = false;
 
     // get the robot pose from the odom
     geometry_msgs::Pose preview;
     // This is stupid because point is the same as vector3 but we'll roll with it
-    preview.position.x = tf.transform.translation.x;
-    preview.position.y = tf.transform.translation.y;
-    preview.position.z = tf.transform.translation.z;
-    preview.orientation.x = tf.transform.rotation.x;
-    preview.orientation.y = tf.transform.rotation.y;
-    preview.orientation.z = tf.transform.rotation.z;
-    preview.orientation.w = tf.transform.rotation.w;
+    preview.position.x = tf.translation.x;
+    preview.position.y = tf.translation.y;
+    preview.position.z = tf.translation.z;
+    preview.orientation.x = tf.rotation.x;
+    preview.orientation.y = tf.rotation.y;
+    preview.orientation.z = tf.rotation.z;
+    preview.orientation.w = tf.rotation.w;
 
     // This is where the inteactive marker server updates the robot pose
     server_->setPose(name, preview);
     server_->applyChanges();
+
+    cout << "previewing transform" << endl;
 
     return;
 }
@@ -179,4 +182,9 @@ void Robot::TurnOffTFPreview(){
     server_->applyChanges();
 
     return;
+}
+
+
+bool Robot::PreviewState(){
+    return !listen_to_odom_;
 }

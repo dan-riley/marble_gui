@@ -25,8 +25,9 @@ class Robot{
         Robot(ros::NodeHandle* nodehandle, std::string robot_name, float scale, boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server);
         void update_robot_callback(const nav_msgs::Odometry odom);
         geometry_msgs::Pose getPose();
-        void PreviewTF(const geometry_msgs::TransformStamped tf);
+        void PreviewTF(const geometry_msgs::Transform tf);
         void TurnOffTFPreview();
+        bool PreviewState();
 
         // Robot class destructor
         ~Robot();

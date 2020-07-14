@@ -54,12 +54,16 @@
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
+  <build_depend>tf2_web_repiblisher</build_depend>
+  
   <build_export_depend>cv_bridge</build_export_depend>
   <build_export_depend>opencv2</build_export_depend>
   <build_export_depend>marble_artifact_detection_msgs</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>tf2_web_repiblisher</build_export_depend>
+
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>opencv2</exec_depend>
   <exec_depend>marble_artifact_detection_msgs</exec_depend>

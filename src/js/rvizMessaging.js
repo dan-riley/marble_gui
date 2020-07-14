@@ -164,3 +164,30 @@ function submitted_marker(artifact, success) {
         fused_pub.publish(pose);
     }
 }
+
+
+function previewTransform(){
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: `/gui/transform_preview`,
+        messageType: "marble_gui/TransformPreview"
+    });
+    var msg = new ROSLIB.Message({
+        robot_name : document.getElementById("select_robot_transform").value,
+        transform : {
+            translation : {
+                x : parseFloat(document.getElementById("x_translation").value),
+                y : parseFloat(document.getElementById("y_translation").value),
+                z : parseFloat(document.getElementById("z_translation").value)
+            },
+            rotation : {
+                x : parseFloat(document.getElementById("x_rotation").value),
+                y : parseFloat(document.getElementById("y_rotation").value),
+                z : parseFloat(document.getElementById("z_rotation").value),
+                w : parseFloat(document.getElementById("w_rotation").value)
+            }
+
+        }
+    });
+    Topic.publish(msg);
+}

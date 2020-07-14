@@ -17,6 +17,7 @@
 #include "std_msgs/String.h"
 #include "marble_artifact_detection_msgs/Artifact.h"
 #include "marble_gui/ArtifactTransport.h"
+#include "marble_gui/TransformPreview.h"
 
 #include "markers.hpp"
 #include "Robot.hpp"
@@ -245,13 +246,19 @@ void goal_to_robot(const std_msgs::String& robot_name) {
 
 
 // This applies a preview of the transform kyle sends
-void preview_tf(const std_msgs::String::ConstPtr& robot_name){
+void preview_tf(const marble_gui::TransformPreview &msg){
+    cout << "preview hit" << endl;
     // look for robot with name
     for(auto robot : robots){
-        if(robot->name == robot_name->data.c_str()){
-            robot->PreviewTF(kylePreviewTF);
+        if(robot->name == msg.robot_name.c_str()){
+            if(robot->PreviewState()){
+                robot->TurnOffTFPreview();
+            }else{
+                robot->PreviewTF(msg.transform);
+            }
         }
     }
+    cout << "previewing" << endl;
 }
 
 // This removes all artifact markers from rviz
