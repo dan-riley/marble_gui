@@ -230,6 +230,7 @@ function initialize() {
     listen_to_markers();
     listen_to_pose();
     listen_for_tf();
+    init_reset();
 }
 
 class TabManager {
@@ -482,6 +483,7 @@ class TabManager {
 
         $('#Robot_Pages').prepend(tab_content);
 
+        // Build the artifacts section for this robot
         var robot_artifact_container = document.createElement("DIV");
         robot_artifact_container.setAttribute("class", "col-sm-12 artifact_table");
         robot_artifact_container.setAttribute("robot_name", this.robot_name[n]);
@@ -573,6 +575,39 @@ class TabManager {
         option.text = robot;
         option.value = robot;
         modal_options.add(option);
+
+        // Build the reset section for this robot
+        let robot_reset = document.createElement("DIV");
+        robot_reset.setAttribute("id", this.robot_name[n]);
+        robot_reset.setAttribute("class", "row");
+        robot_reset.innerHTML = `
+                <div class="col-auto"><H3>${this.robot_name[n]}</H3></div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="reset_agent" title="Resets multi-agent and mapping like a fresh start (affects all robots including this one)">
+                  <label for="reset_agent"><b>Reset Agent</b><label>
+                </div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="clear_map" name="clear" title="Clears the current map for this robot but continues from current position">
+                  <label for="clear_map">Clear Map<label>
+                </div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="reset_map" title="Resets the current map for this robot like a fresh start">
+                  <label for="reset_map">Reset Map<label>
+                </div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="hard_reset" title="Resets the current map for this robot like a fresh start, including on the robot itself">
+                  <label for="hard_reset">Hard Reset Map<label>
+                </div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="ma_reset" title="Resets multi-agent for this robot like a fresh start, except for maps">
+                  <label for="ma_reset">Reset Multi-Agent<label>
+                </div>
+                 <div class="col-auto">
+                  <input type="text" class="form-control" name="diff_reset" title="Removes map diffs from everyone else's merged map.  Use comma-separated list (1,3,6,8) OR range (0-8), but not both!">
+                  <label for="diff_reset">Reset Map Diffs<label>
+                </div>`;
+        let reset_tracker = document.getElementById("robot_reset_tables");
+        reset_tracker.appendChild(robot_reset);
     }
 
     // This is used by "add_tab" above
