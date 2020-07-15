@@ -17,8 +17,11 @@ function init_reset_msg(robot_name) {
         seqs: [],
         clear: false,
         reset: false,
+        ignore: false,
         hardReset: false,
         ma_reset: false,
+        base: document.getElementById('apply_base').checked,
+        robots: document.getElementById('apply_robots').checked
     });
 
     return robot;
@@ -42,6 +45,8 @@ function init_reset() {
                 input.checked = true;
             });
         }
+        document.getElementById('apply_base').checked = true;
+        document.getElementById('apply_robots').checked = true;
     });
 
     var seq = 0;
@@ -85,6 +90,7 @@ function init_reset() {
                     // Otherwise just use the checkboxes
                     if (input.name == 'clear_map') msg.clear = true;
                     if (input.name == 'reset_map') msg.reset = true;
+                    if (input.name == 'ignore_map') msg.ignore = true;
                     if (input.name == 'hard_reset') msg.hardReset = true;
                     if (input.name == 'ma_reset') msg.ma_reset = true;
                 }

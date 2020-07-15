@@ -587,6 +587,10 @@ class TabManager {
                   <label for="reset_agent"><b>Reset Agent</b><label>
                 </div>
                 <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="hard_reset" title="Resets the current map for this robot like a fresh start, including on the robot itself">
+                  <label for="hard_reset">Hard Reset Map<label>
+                </div>
+                <div class="col-auto">
                   <input type="checkbox" class="form-control reset-check" name="clear_map" name="clear" title="Clears the current map for this robot but continues from current position">
                   <label for="clear_map">Clear Map<label>
                 </div>
@@ -595,8 +599,8 @@ class TabManager {
                   <label for="reset_map">Reset Map<label>
                 </div>
                 <div class="col-auto">
-                  <input type="checkbox" class="form-control reset-check" name="hard_reset" title="Resets the current map for this robot like a fresh start, including on the robot itself">
-                  <label for="hard_reset">Hard Reset Map<label>
+                  <input type="checkbox" class="form-control reset-check" name="ignore_map" title="Ignores map from this agent until reset (does not clear the map by itself!)">
+                  <label for="ignore_map">Ignore Map<label>
                 </div>
                 <div class="col-auto">
                   <input type="checkbox" class="form-control reset-check" name="ma_reset" title="Resets multi-agent for this robot like a fresh start, except for maps">
