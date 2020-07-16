@@ -305,6 +305,8 @@ int main(int argc, char **argv) {
     // Make a new robot and add it to the robots vector
     vector<string> robot_names = get_config_robots(&nh);
     for (auto i = 0; i < robot_names.size(); i++) {
+        // get the scale for the type of robot
+        nh.getParam(robot_names[i][0] + "_scale", robot_scale);
         Robot *new_robot = new Robot(&nh, robot_names[i], robot_scale, server);
         robots.push_back(new_robot);
     }

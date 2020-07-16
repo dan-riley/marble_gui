@@ -177,12 +177,19 @@ function send_tf_to(){
         messageType: "marble_gui/TransformPreview"
     });
 
+    // This is to deactivate the transform preview in rviz when sending thetransform to the robot
+    var preview_button = document.getElementById("transform_preview_button");
+    if(preview_button.innerText != "Preview TF"){
+        previewTransform();
+    }
+
     $('#TFModal').modal('hide');
 
     for(let i = 0; i < 3; i++){
         tf_publisher.publish(robot_transform);
         sleep(50);
     }
+
 }
 
 // This listens for kyle's tf message to pass to a robot

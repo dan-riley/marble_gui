@@ -79,15 +79,20 @@ Marker Robot::makeModel(){
     // match robot to its virtual mesh
     if(name.find('H') != std::string::npos){
         marker.mesh_resource = "package://marble_gui/src/meshes/H01.STL";
+        cout << "H01 mesh" << endl;
     }else if(name.find('T') != std::string::npos){
         marker.mesh_resource = "package://marble_gui/src/meshes/T01.STL";
+        cout << "T01 mesh" << endl;
     }else if(name.find('A') != std::string::npos){
         marker.mesh_resource = "package://marble_gui/src/meshes/A01.STL";
+        cout << "A01 mesh" << endl;
     }else if(name.find('L') != std::string::npos){
         marker.mesh_resource = "package://marble_gui/src/meshes/L01.STL";
+        cout << "L01 mesh" << endl;
     }else{
         // Backup resopurce for unknown robots
         marker.mesh_resource = "package://marble_gui/src/meshes/wheatley.STL";
+        cout << "wheatley mesh" << endl;
     }
     
     marker.scale.x = scale_ * 0.45;
