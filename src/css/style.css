@@ -312,6 +312,12 @@ button {
   padding-bottom: 0px;
 }
 
+.reset-check {
+  display: inline;
+  width: 1.5em;
+  vertical-align: bottom;
+}
+
 .section_div{
   border: solid black 4px;
 }

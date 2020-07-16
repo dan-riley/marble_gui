@@ -5,27 +5,37 @@ ros = new ROSLIB.Ros({
     url: "ws://localhost:9090"
 });
 
-var ma_prefix = '';
+var robots_disp, ma_prefix, comms_prefix;
+function load_params() {
+    var robots_param = new ROSLIB.Param({
+        ros: ros,
+        name: "robots"
+    });
+    console.log('calling robots');
+    robots_param.get(function(param){
+        console.log('got robots');
+        robots_disp = param.split(',');
+        console.log(param);
+        robots_init = true;
+    });
+    var ma_param = new ROSLIB.Param({
+        ros: ros,
+        name: "ma_prefix"
+    });
+    ma_param.get(function(param){
+        ma_prefix = param;
+        console.log(param);
+    });
 
-var comms_prefix = '';
-
-var ma_param = new ROSLIB.Param({
-    ros: ros,
-    name: "ma_prefix"
-});
-var comms_param = new ROSLIB.Param({
-    ros: ros,
-    name: "comms_prefix"
-});
-
-ma_param.get(function(param){
-    ma_prefix = param;
-    console.log(param);
-});
-comms_param.get(function(param){
-    comms_prefix = param;
-    console.log(param);
-});
+    var comms_param = new ROSLIB.Param({
+        ros: ros,
+        name: "comms_prefix"
+    });
+    comms_param.get(function(param){
+        comms_prefix = param;
+        console.log(param);
+    });
+}
 
 function send_ma_task(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
@@ -167,10 +177,10 @@ function send_tf_to(){
     robot_transform.transform.rotation.z = parseFloat(document.getElementById("z_rotation").value);
     robot_transform.transform.rotation.w = parseFloat(document.getElementById("w_rotation").value);
 
+
     robot_transform.robot_name = robot;
-    
+
     console.log("sending tf");
-    
     var tf_publisher = new ROSLIB.Topic({
         ros: ros,
         name: `${comms_prefix}${robot}/origin_from_base`,
@@ -221,7 +231,18 @@ function listen_for_tf(){
     });
 }
 
-
+// Initialize the whole gui
+function initialize() {
+    load_params();
+    populateOpts();
+    teleop_route();
+    get_darpa_artifacts();
+    what_logs();
+    listen_to_markers();
+    listen_to_pose();
+    listen_for_tf();
+    init_reset();
+}
 
 class TabManager {
     constructor() {
@@ -276,7 +297,6 @@ class TabManager {
     // list if they are not there already
     search_robots() {
         var _this = global_tabManager;
-        let robots_disp = get_mission_robots();
         if (robots_disp.length == 1) {
             // This is where robots and beacons are filtered
             var patt = /^((?!B).)\d{1,2}(?!_)/;
@@ -297,7 +317,7 @@ class TabManager {
                 }
             }
         } else {
-          for (let i = 0; i < robots_disp.length - 1; i++) {
+          for (let i = 0; i < robots_disp.length; i++) {
               name = robots_disp[i];
               if (_this.robot_name.indexOf(name) == -1) {
                 _this.robot_name.push(name);
@@ -453,7 +473,6 @@ class TabManager {
                 </button></br>
             </li>`)
 
-        
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");
         tab_content.setAttribute("id", this.robot_name[n]);
@@ -475,6 +494,7 @@ class TabManager {
 
         $('#Robot_Pages').prepend(tab_content);
 
+        // Build the artifacts section for this robot
         var robot_artifact_container = document.createElement("DIV");
         robot_artifact_container.setAttribute("class", "col-sm-12 artifact_table");
         robot_artifact_container.setAttribute("robot_name", this.robot_name[n]);
@@ -560,7 +580,49 @@ class TabManager {
 
         });
 
+        // Add to the Transform Transport dropdown
+        var modal_options = document.getElementById("select_robot_transform");
+        var option = document.createElement("option");
+        option.text = robot;
+        option.value = robot;
+        modal_options.add(option);
 
+        // Build the reset section for this robot
+        let robot_reset = document.createElement("DIV");
+        robot_reset.setAttribute("id", this.robot_name[n]);
+        robot_reset.setAttribute("class", "row");
+        robot_reset.innerHTML = `
+                <div class="col-auto"><H3>${this.robot_name[n]}</H3></div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="reset_agent" title="Resets multi-agent and mapping like a fresh start (affects all robots including this one)">
+                  <label for="reset_agent"><b>Reset Agent</b><label>
+                </div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="hard_reset" title="Resets the current map for this robot like a fresh start, including on the robot itself">
+                  <label for="hard_reset">Hard Reset Map<label>
+                </div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="clear_map" name="clear" title="Clears the current map for this robot but continues from current position">
+                  <label for="clear_map">Clear Map<label>
+                </div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="reset_map" title="Resets the current map for this robot like a fresh start">
+                  <label for="reset_map">Reset Map<label>
+                </div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="ignore_map" title="Ignores map from this agent until reset (does not clear the map by itself!)">
+                  <label for="ignore_map">Ignore Map<label>
+                </div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-control reset-check" name="ma_reset" title="Resets multi-agent for this robot like a fresh start, except for maps">
+                  <label for="ma_reset">Reset Multi-Agent<label>
+                </div>
+                 <div class="col-auto">
+                  <input type="text" class="form-control" name="diff_reset" title="Removes map diffs from everyone else's merged map.  Use comma-separated list (1,3,6,8) OR range (0-8), but not both!">
+                  <label for="diff_reset">Reset Map Diffs<label>
+                </div>`;
+        let reset_tracker = document.getElementById("robot_reset_tables");
+        reset_tracker.appendChild(robot_reset);
     }
 
     // This is used by "add_tab" above
@@ -632,7 +694,7 @@ class TabManager {
     add_beacon(beacon_name){
         // Listen for activation, may be atena up msg
         // Creates a card for each beacon
-        var beaconcard = 
+        var beaconcard =
         `<div class="card" id="${beacon_name}_card" beacon="${beacon_name}">
                 ${this.robot_name[n]}
                 <br><span id="connection_status_${beacon_name}"></span>
@@ -672,4 +734,3 @@ class TabManager {
     }
 
 }
-

@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <math.h>
 #include <vector>
 #include <algorithm>
@@ -66,21 +67,17 @@ bool check_for_artifact(string &name, vector<string> &logged_artifacts){
 }
 
 // This reads the config used for the js to get the robot names in play
-vector<string> get_config_robots( ros::NodeHandle* nh ){
+vector<string> get_config_robots(ros::NodeHandle* nh) {
+    string robots;
     vector<string> robot_names;
-    string new_robot;
-    string config_name;
 
-    nh->getParam("robot_names_config", config_name);
-
-    ifstream config_file(config_name);
-    if (config_file.is_open()){
-        while(getline(config_file, new_robot)){
-            robot_names.push_back(new_robot);
-        }
-        config_file.close();
-    }else{
-        cout << "Unable to open robots config file" << endl;
+    nh->getParam("robots", robots);
+    stringstream s_stream(robots);
+    while (s_stream.good()) {
+        string substr;
+        getline(s_stream, substr, ',');
+        robot_names.push_back(substr);
     }
+
     return robot_names;
 }

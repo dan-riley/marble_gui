@@ -1,27 +1,6 @@
 var fs = require("fs");
 const { join } = require('path')
 
-// Robots that are allowed to be displayed in the GUI
-// Leave the file blank to display any that match
-function get_mission_robots() {
-    var robots_file = fs.readFileSync("js/robots.txt", "utf-8");
-    var robots_disp = robots_file.split("\n");
-    return robots_disp;
-}
-
-function populateTFRobot(){
-    var robots = get_mission_robots();
-    var modal_options = document.getElementById("select_robot_transform");
-    for (var i = 0; i < robots.length; i++) {
-        var robot = robots[i];
-        var option = document.createElement("option");
-        option.text = robot;
-        option.value = robot;
-        modal_options.add(option);
-    }
-}
-
-
 // you might wnat to change where the artifact file is
 // It works by putting each artifact on a new line
 var artifact_file = fs.readFileSync("js/artifacts.txt", "utf-8");
