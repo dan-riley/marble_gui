@@ -34,10 +34,10 @@
     <param name="robots" value="$(arg robots)" />
 
     <!-- mesh scaling for each robot -->
-    <param name="x_scale" type="double" value="0.3"/>
-    <param name="h_scale" type="double" value="0.3"/>
-    <param name="t_scale" type="double" value="0.3"/>
-    <param name="a_scale" type="double" value="0.3"/>
+    <param name="X_scale" type="double" value="0.3"/>
+    <param name="H_scale" type="double" value="0.3"/>
+    <param name="T_scale" type="double" value="0.3"/>
+    <param name="A_scale" type="double" value="0.3"/>
     
     <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen" args="$(find marble_gui)/src">
     </node>

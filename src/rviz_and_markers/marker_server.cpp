@@ -306,7 +306,18 @@ int main(int argc, char **argv) {
     vector<string> robot_names = get_config_robots(&nh);
     for (auto i = 0; i < robot_names.size(); i++) {
         // get the scale for the type of robot
-        nh.getParam(robot_names[i][0] + "_scale", robot_scale);
+        if(tolower(robot_names[i][0]) == 'a'){
+            nh.getParam("A_scale", robot_scale);
+        }else if(tolower(robot_names[i][0]) == 't'){
+            nh.getParam("T_scale", robot_scale);
+        }else if(tolower(robot_names[i][0]) == 'l'){
+            nh.getParam("L_scale", robot_scale);
+        }else if(tolower(robot_names[i][0]) == 'h'){
+            nh.getParam("H_scale", robot_scale);
+        }else{
+            nh.getParam("X_scale", robot_scale);            
+        }
+            
         Robot *new_robot = new Robot(&nh, robot_names[i], robot_scale, server);
         robots.push_back(new_robot);
     }
