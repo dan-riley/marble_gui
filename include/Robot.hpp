@@ -20,9 +20,9 @@ using namespace visualization_msgs;
 class Robot{
     public:
         std::string name;
-        geometry_msgs::Pose pose_;
+       
 
-        Robot(ros::NodeHandle* nodehandle, std::string robot_name, float scale, boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server);
+        Robot(ros::NodeHandle* nodehandle, std::string robot_name, float scale);
         void update_robot_callback(const nav_msgs::Odometry odom);
         geometry_msgs::Pose getPose();
         void PreviewTF(const geometry_msgs::Transform tf);
@@ -33,27 +33,17 @@ class Robot{
         ~Robot();
 
     private:
-        boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server_;
-        interactive_markers::MenuHandler menu_handler_;
+        geometry_msgs::Pose pose_;
 
-        Marker makeModel();
-
-        void makeRobotMarker();
-
-        void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
+        ros::Publisher tf_pub_;
 
         bool listen_to_odom_ = true;
 
         ros::NodeHandle nh_;
+
         // Fix the topic string
         ros::Subscriber odom_sub;
         ros::Publisher pub;
-
-        std::string world_frame_;
-        // for scaling the marker 
-        float scale_;
-
-       
 
 };
 
@@ -62,7 +52,6 @@ class Robot{
 Robot::~Robot(){
     std::cout << "destroy" << std::endl;
     delete &nh_;
-    delete &server_;
     delete &pub;
     delete &odom_sub;
     delete &name;

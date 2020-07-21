@@ -1,5 +1,5 @@
 <launch>
-    <arg name="robots" default="" />
+    <arg name="robots" default="H01,T01" />
     <node name="rosbridge" pkg="rosbridge_server" type="rosbridge_websocket" output="screen">
     </node>
     <node name="rosapi" pkg="rosapi" type="rosapi_node" output="screen">
@@ -35,8 +35,8 @@
 
     <!-- mesh scaling for each robot -->
     <param name="X_scale" type="double" value="0.3"/>
-    <param name="H_scale" type="double" value="0.3"/>
-    <param name="T_scale" type="double" value="0.3"/>
+    <param name="H_scale" type="double" value="0.1"/>
+    <param name="T_scale" type="double" value="0.05"/>
     <param name="A_scale" type="double" value="0.3"/>
     
     <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen" args="$(find marble_gui)/src">
