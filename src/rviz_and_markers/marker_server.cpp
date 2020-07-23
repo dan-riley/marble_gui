@@ -304,24 +304,11 @@ int main(int argc, char **argv) {
 
     // initialize robots vector for goal to robot functionality
     // Make a new robot and add it to the robots vector
-    vector<string> robot_names = get_config_robots(&nh);
-    for (auto i = 0; i < robot_names.size(); i++) {
-        // get the scale for the type of robot
-        if(tolower(robot_names[i][0]) == 'a'){
-            nh.getParam("A_scale", robot_scale);
-        }else if(tolower(robot_names[i][0]) == 't'){
-            nh.getParam("T_scale", robot_scale);
-        }else if(tolower(robot_names[i][0]) == 'l'){
-            nh.getParam("L_scale", robot_scale);
-        }else if(tolower(robot_names[i][0]) == 'h'){
-            nh.getParam("H_scale", robot_scale);
-        }else{
-            nh.getParam("X_scale", robot_scale);            
-        }
-            
-        Robot *new_robot = new Robot(&nh, robot_names[i], robot_scale, server);
-        robots.push_back(new_robot);
-    }
+    // vector<string> robot_names = get_config_robots(&nh);
+    // for (auto i = 0; i < robot_names.size(); i++) {
+    //     Robot *new_robot = new Robot(&nh, robot_names[i]);
+    //     robots.push_back(new_robot);
+    // }
 
     // Read in the robot names from the config
     vector<string> config_robots = get_config_robots(&nh);
@@ -358,28 +345,30 @@ int main(int argc, char **argv) {
 
 
     // The "main" loop
-    ros::Rate loop_rate(10);
-    while(true){
-        if(ros::ok()){
-            ros::spinOnce();
-            cout << "heart beat" << endl;
-            loop_rate.sleep();
-        }else{
-            cout << "server reset" << endl;
-            // server.reset();
+    // ros::Rate loop_rate(10);
+    // while(true){
+    //     if(ros::ok()){
+    //         ros::spinOnce();
+    //         cout << "heart beat" << endl;
+    //         loop_rate.sleep();
+    //     }else{
+    //         cout << "server reset" << endl;
+    //         // server.reset();
 
-            for(int i = 0; i < robots.size(); i++)
-                delete robots[i];
+    //         for(int i = 0; i < robots.size(); i++)
+    //             delete robots[i];
 
-            // delete the server
-            server.reset();
+    //         // delete the server
+    //         server.reset();
             
-            return 0;
-            // exit(0);
+    //         return 0;
+    //         // exit(0);
             
-        }
+    //     }
         
-    }
+    // }
+
+    ros::spin();
 
     return 0;
     

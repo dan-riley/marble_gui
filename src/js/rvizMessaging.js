@@ -166,28 +166,57 @@ function submitted_marker(artifact, success) {
 }
 
 
-function previewTransform(){
+// Send an odom message do the urdf can show the tf
+function previewTransform(onoff){
+    let robot_name = document.getElementById("select_robot_transform").value;
+
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: `/gui/transform_preview`,
-        messageType: "marble_gui/TransformPreview"
+        name: `${ma_prefix}${robot_name}_base/base_link`,
+        messageType: "odometry_msgs/Pose"
     });
-    var msg = new ROSLIB.Message({
-        robot_name : document.getElementById("select_robot_transform").value,
-        transform : {
-            translation : {
-                x : parseFloat(document.getElementById("x_translation").value),
-                y : parseFloat(document.getElementById("y_translation").value),
-                z : parseFloat(document.getElementById("z_translation").value)
-            },
-            rotation : {
-                x : parseFloat(document.getElementById("x_rotation").value),
-                y : parseFloat(document.getElementById("y_rotation").value),
-                z : parseFloat(document.getElementById("z_rotation").value),
-                w : parseFloat(document.getElementById("w_rotation").value)
-            }
 
-        }
-    });
+    if(onoff){
+        var msg = new ROSLIB.Message({
+            pose : {
+                pose : {
+                    position : {
+                        x : parseFloat(document.getElementById("x_translation").value),
+                        y : parseFloat(document.getElementById("y_translation").value),
+                        z : parseFloat(document.getElementById("z_translation").value)
+                    },
+                    orientation : {
+                        x : parseFloat(document.getElementById("x_rotation").value),
+                        y : parseFloat(document.getElementById("y_rotation").value),
+                        z : parseFloat(document.getElementById("z_rotation").value),
+                        w : parseFloat(document.getElementById("w_rotation").value)
+                    }
+                }
+                
+    
+            }
+        });
+    }else{
+        var msg = new ROSLIB.Message({
+            pose : {
+                pose : {
+                    position : {
+                        x : 0,
+                        y : 0,
+                        z : 0
+                    },
+                    orientation : {
+                        x : 0,
+                        y : 0,
+                        z : 0,
+                        w : 0
+                    }
+                }
+                
+    
+            }
+        });
+    }
+    
     Topic.publish(msg);
 }

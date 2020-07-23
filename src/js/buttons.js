@@ -54,14 +54,17 @@ function show_image(robot_name, id){
 function transform_preview(){
     var preview_button = document.getElementById("transform_preview_button");
 
-    // Call over to the rvizMessaging file to send the preview
-    previewTransform();
+
 
     // switch button color when activated
     if(preview_button.innerText == "Preview TF"){
+        // Call over to the rvizMessaging file to send the preview
+        previewTransform(true);
         preview_button.innerText = "Turn Off Preview";
         preview_button.className = "btn btn-danger";
     }else{
+        // Call over to the rvizMessaging file to send the preview
+        previewTransform(false);
         preview_button.innerText = "Preview TF";
         preview_button.className = "btn btn-success";
     }

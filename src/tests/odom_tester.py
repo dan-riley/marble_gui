@@ -2,11 +2,11 @@ import roslib
 import rospy
 import time
 
-from nav_msgs.msg import Odometry
+import tf
 
 
 def fakeOdometry():
-    odom = Odometry()
+    trans = Odometry()
     odom.pose.pose.orientation.x = 1
     odom.pose.pose.orientation.y = 0 
     odom.pose.pose.orientation.z = 0
@@ -20,6 +20,7 @@ def fakeOdometry():
 
 def odometryCb(odometry):
     print odometry
+
 
 if __name__ == "__main__":
     rospy.init_node('odom_tester', anonymous=True) #make node 
