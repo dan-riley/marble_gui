@@ -1,7 +1,7 @@
-*.vscode/
-src/node_modules/
+*.vscode
+*node_modules*
 *.pyc
-src/bower_components
+*bower_components*
 tags
 src/js/*.txt
 *_reported.json

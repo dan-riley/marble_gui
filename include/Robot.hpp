@@ -22,7 +22,7 @@ class Robot{
         std::string name;
        
 
-        Robot(ros::NodeHandle* nodehandle, std::string robot_name, float scale);
+        Robot(ros::NodeHandle* nodehandle, std::string robot_name);
         void update_robot_callback(const nav_msgs::Odometry odom);
         geometry_msgs::Pose getPose();
         void PreviewTF(const geometry_msgs::Transform tf);

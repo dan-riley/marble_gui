@@ -3,51 +3,64 @@
 # I ASSUME THERE IS ALREADY A catkin_ws IN PLACE
 # ALSO ASSUMING THE INSTALL IS MELODIC
 
-source ~/catkin_ws/devel/setup.bash
+if [ "$1" == "" ]; then
+    echo "please specify your workspace (ex: gui_setup.sh catkin_ws)"
+    exit 1 # terminate and indicate error
+else
+    echo "$1 is the workspace specified"
+fi
 
-cd ~/catkin_ws/src/
+source ~/$1/devel/setup.bash
+
+cd ~/$1/src/
 
 # Boost libraries 
+printf "++++++++++++++++++++++++++++ \n INSTALLING BOOST LIBRARIES \n++++++++++++++++++++++++++++\n"
 sudo apt-get -y install libboost-all-dev
 
 # Catkin Build
-sudo apt-get install python-catkin-tools
+printf "++++++++++++++++++++++++++++ \n INSTALLING CATKIN TOOLS, NODEjs, AND JOYSTICK THINGS \n++++++++++++++++++++++++++++\n"
+sudo apt -y install python-catkin-tools ros-melodic-teleop-twist-joy ros-melodic-joy nodejs
 
-# git clone https://github.com/RobotWebTools/tf2_web_republisher 
-
+printf "++++++++++++++++++++++++++++ \n DOWNLOADING ROSBRIDGE_SUITE \n++++++++++++++++++++++++++++\n"
 git clone https://github.com/RobotWebTools/rosbridge_suite.git -b release_0.11.5
 
-git cone https://github.com/GT-RAIL/rosauth.git -b master
+printf "++++++++++++++++++++++++++++ \n DOWNLOADING ROSAUTH \n++++++++++++++++++++++++++++\n"
+git clone https://github.com/GT-RAIL/rosauth.git -b master
 
 cd ~/catkin_ws
 
-catkin build marble_gui
+# echo "++++++++++++++++++++++++++++ \n BUILDING GUI \n++++++++++++++++++++++++++++"
+# catkin build marble_gui
 
-catkin build tf2_web_republisher
+# catkin build tf2_web_republisher
 
 # INSTALL ELECTRON AND nodejs IN GENERAL
-curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+# curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
 # sudo apt -y install nodejs
 
-sudo apt install ros-melodic-teleop-twist-joy ros-melodic-joy
-
+printf "++++++++++++++++++++++++++++ \n INSTALLING ELECTRON \n++++++++++++++++++++++++++++\n"
 npm install electron -g
 
-cd ~/catkin_ws/src/marble_gui/src
-
+printf "++++++++++++++++++++++++++++ \n NPM INSTALL THE GUI \n++++++++++++++++++++++++++++\n"
+cd ~/$1/src/marble_base_station/marble_gui/src
 npm install
 
-sudo npm install fs jquery path polymer-cli ejs-electron
-sudo npm install -g bower
+printf "++++++++++++++++++++++++++++ \n NPM INSTALL EJS, JQUERY, FS, PATH, AND ROS-WEBSOCKET  \n++++++++++++++++++++++++++++\n"
+sudo npm install fs jquery path ejs-electron @justinhuang/ros-websocket
+# sudo npm install -g bower
 
-cd ~/catkin_ws/src/marble_gui/src
-sudo bower install --save jstnhuang/ros-websocket --allow-root
-echo 3.0.2
+# cd ~/$1/src/marble_base_station/marble_gui/src
+# sudo bower install --save jstnhuang/ros-websocket --allow-root
+# echo 3.0.2
 
 # pymongo is very important for bson
+printf "++++++++++++++++++++++++++++ \n INSTALLING PYMONGO \n++++++++++++++++++++++++++++\n"
 pip install pymongo twisted tornado
 
-cd ~/catkin_ws/src/marble_gui/
+printf "++++++++++++++++++++++++++++ \n FINAL BUILD \n++++++++++++++++++++++++++++\n"
+cd ~/$1/src/marble_base_station/marble_gui/
 catkin build marble_gui
+printf "++++++++++++++++++++++++++++ \n DONE \n++++++++++++++++++++++++++++\n"
 

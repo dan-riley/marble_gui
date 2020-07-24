@@ -14,8 +14,10 @@
   "author": "Blake McHale",
   "license": "ISC",
   "dependencies": {
+    "@justinhuang/ros-websocket": "^4.0.0",
     "csv-parser": "^2.3.2",
     "csv-writer": "^1.6.0",
+    "ejs-electron": "^2.1.0",
     "electron": "^4.2.8",
     "fs": "0.0.1-security",
     "jquery": "^3.5.1",
