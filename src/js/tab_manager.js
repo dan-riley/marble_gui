@@ -195,8 +195,6 @@ function send_tf_to(){
         tf_publisher.publish(robot_transform);
         sleep(50);
     }
-    // This resets this for the preview
-    tf_published_before = false;
 
 }
 

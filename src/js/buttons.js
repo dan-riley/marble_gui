@@ -54,17 +54,16 @@ var tf_published_before = false;
 
 // this sends the 
 function transform_preview(){
-    var preview_button = document.getElementById("transform_preview_button");
+    // var preview_button = document.getElementById("transform_preview_button");
     previewTransform(true);
     // It takes a few publish attempts to get the urdf to show the tf
-    if(!tf_published_before){
-        for(var i = 0; i < 3; i++){
-            setTimeout(function(){ 
-                previewTransform(true);
-            }, i*500);
-        }
-        tf_published_before = true;
+    for(var i = 0; i < 3; i++){
+        setTimeout(function(){ 
+            previewTransform(true);
+        }, i*500);
     }
+
+    
 
 
     // MAY REVISIT THIS OR SOMETHING SIMILAR
