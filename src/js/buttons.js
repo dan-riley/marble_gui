@@ -1,17 +1,16 @@
 // switch estop button to be "estop disabled" when pressed
 function estop_toggle(robot_name){
-    var tele_btn = document.getElementById(`${robot_name}_estop_toggle`);
+    var tele_btn = document.getElementById(`${robot_name}_btn_estop_toggle`);
 
     if(tele_btn.innerText == "E-Stop"){
         send_signal_to(robot_name, 'estop_cmd', true)
         tele_btn.innerText = "Disable E-Stop";
-        tele_btn.className = "btn btn-danger   btn-sm";
+        tele_btn.className = "btn btn-danger btn-sm";
     }else{
         send_signal_to(robot_name, 'estop_cmd', false)
         tele_btn.innerText = "E-Stop";
         tele_btn.className = "btn btn-success btn-sm";
     }
-    
 }
 
 // This changes the teleop robot to whatever is selcted by the controls card

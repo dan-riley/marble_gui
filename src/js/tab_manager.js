@@ -40,7 +40,6 @@ function load_params() {
 function send_ma_task(robot_name, signal, value) {
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        // name: `/Anchor/neighbors/${robot_name}/guiTaskName`,
         name: `${ma_prefix}${robot_name}/guiTaskName`,
         messageType: "std_msgs/String"
     });
@@ -51,7 +50,6 @@ function send_ma_task(robot_name, signal, value) {
 
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        // name: `/Anchor/neighbors/${robot_name}/guiTaskValue`,
         name: `${ma_prefix}${robot_name}/guiTaskValue`,
         messageType: "std_msgs/String"
     });
@@ -244,13 +242,16 @@ class TabManager {
     constructor() {
         // Permanent subscribers for all vehicle tabs
         this.Tab_TaskSub = [];
+        this.Tab_TaskNameSub = [];
+        this.Tab_TaskValueSub = [];
         this.Tab_CommSub = [];
         this.Tab_ArtifactSub = [];
         this.Tab_ArtifactImgSub = [];
-        this.Tab_CmdVelSub = [];
 
         this.global_vehicleType = [];
         this.tasks = [];
+        this.task_names = [];
+        this.task_values = [];
         this.global_vehicleArtifactsList = [];
         this.fusedArtifacts = new Artifact('Base', 0);
 
@@ -392,7 +393,41 @@ class TabManager {
         var last_cloud_report_success = "never";
 
         global_tabManager.Tab_TaskSub[n].subscribe(function (msg) {
-            global_tabManager.tasks[n] = msg.data
+            global_tabManager.tasks[n] = msg.data;
+        });
+
+        global_tabManager.Tab_TaskNameSub[n].subscribe(function (msg) {
+            global_tabManager.task_names[n] = msg.data;
+        });
+
+        // Add highlighting to buttons when we get updated info from the multi-agent base
+        global_tabManager.Tab_TaskValueSub[n].subscribe(function (msg) {
+            let robot = global_tabManager.robot_name[n];
+            let task = msg.data.toLowerCase();
+            if ((task == 'true') || (task == 'false')) {
+                switch (global_tabManager.task_names[n]) {
+                    case 'estop_cmd':
+                        task = 'estop_toggle';
+                        break;
+                    case 'radio_reset_cmd':
+                        task = 'radio';
+                        break;
+                }
+            }
+            global_tabManager.task_values[n] = task;
+
+            // Set highlighting for the currently pressed button
+            let btns = document.querySelectorAll([`button[id^="${robot}_btn_"]`]);
+            btns.forEach((btn) => {
+                if (btn.id == `${robot}_btn_${task}`) {
+                    if (!btn.classList.contains('highlight')) {
+                        btn.classList.add('highlight');
+                        btn.blur();
+                    }
+                } else if (btn.classList.contains('highlight')) {
+                    btn.classList.remove('highlight');
+                }
+            });
         });
 
         global_tabManager.Tab_CommSub[n].subscribe(function (msg) {
@@ -411,63 +446,63 @@ class TabManager {
                 </a>
             </li>`);
 
-
+        // Create sidebar buttons
         var disarmBtn = '';
         if (this.robot_name[n].includes('A'))
             disarmBtn = `
-            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_disarm"
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_btn_disarm"
                 onclick="send_signal_to('${this.robot_name[n]}', 'disarm', true)">
                 Disarm
             </button><br>`;
 
-            $('#controls_bar_inner').append(`
-            <li id="${this.robot_name[n]}_control_card" class="quick_control">
-                <h4>${this.robot_name[n]}</h4>
-                ${disarmBtn}
-                <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_startup"
-                    onclick="send_signal_to('${this.robot_name[n]}', 'estop', false)" title="Start">
-                    <img src="./images/start.png" class="control-icons">
-                </button>
-                <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_stop"
-                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Stop')" title="Stop">
-                    <img src="./images/Stop_sign.png" class="control-icons">
-                </button>
-                <br>
-                <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_explore"
-                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Explore')" title="Explore">
-                    <img src="./images/enterprise.png" class="control-icons">
-                </button>
-                <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_home"
-                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Home')" title="Go Home">
-                    <img src="./images/go_home.png" class="control-icons">
-                </button>
-                <br>
-                <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_deploy"
-                    onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')" title="Deploy Beacon">
-                    <img src="./images/deploy_beacon.png" class="control-icons">
-                </button>
-                <br>
-                <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_estop_toggle"
-                    onclick="estop_toggle('${this.robot_name[n]}')" title="Estop">
-                    E-Stop
-                </button>
-                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_radio"
-                    onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)" title="Radio Reset">
-                    <img src="./images/radio_reset.png" class="control-icons">
-                </button>
-                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
-                    onclick="teleop_to('${this.robot_name[n]}')" value="Teleop" title="Teleop">
-                    <img src="./images/teleop.png" class="control-icons">
-                </button>
-                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
-                    onclick="publish_goal('${this.robot_name[n]}')" value="Go to Goal" title="Go To Goal">
-                    <img src="./images/go_to_goal.png" class="control-icons">
-                </button>
-                <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
-                    onclick="goal_to_robotII('${this.robot_name[n]}')" value="Goal to Robot" title="Goal To Robot">
-                    <img src="./images/goal_to_robot.png" class="control-icons">
-                </button></br>
-            </li>`)
+        $('#controls_bar_inner').append(`
+        <li id="${this.robot_name[n]}_control_card" class="quick_control">
+            <h4>${this.robot_name[n]}</h4>
+            ${disarmBtn}
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_btn_start"
+                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Start')" title="Start">
+                <img src="./images/start.png" class="control-icons">
+            </button>
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_btn_stop"
+                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Stop')" title="Stop">
+                <img src="./images/Stop_sign.png" class="control-icons">
+            </button>
+            <br>
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_btn_explore"
+                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Explore')" title="Explore">
+                <img src="./images/enterprise.png" class="control-icons">
+            </button>
+            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_btn_home"
+                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Home')" title="Go Home">
+                <img src="./images/go_home.png" class="control-icons">
+            </button>
+            <br>
+            <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_btn_deploy"
+                onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')" title="Deploy Beacon">
+                <img src="./images/deploy_beacon.png" class="control-icons">
+            </button>
+            <br>
+            <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_btn_estop_toggle"
+                onclick="estop_toggle('${this.robot_name[n]}')" title="Estop">
+                E-Stop
+            </button>
+            <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_btn_radio"
+                onclick="send_signal_to('${this.robot_name[n]}', 'radio_reset_cmd', true)" title="Radio Reset">
+                <img src="./images/radio_reset.png" class="control-icons">
+            </button>
+            <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_teleop"
+                onclick="teleop_to('${this.robot_name[n]}')" value="Teleop" title="Teleop">
+                <img src="./images/teleop.png" class="control-icons">
+            </button>
+            <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_btn_goal"
+                onclick="publish_goal('${this.robot_name[n]}')" value="Go to Goal" title="Go To Goal">
+                <img src="./images/go_to_goal.png" class="control-icons">
+            </button>
+            <button type='button' class="btn btn-warning btn-sm" id="${this.robot_name[n]}_goal"
+                onclick="goal_to_robotII('${this.robot_name[n]}')" value="Goal to Robot" title="Goal To Robot">
+                <img src="./images/goal_to_robot.png" class="control-icons">
+            </button></br>
+        </li>`)
 
         // Creating information stored within the tab
         var tab_content = document.createElement("DIV");
@@ -623,52 +658,35 @@ class TabManager {
 
     // This is used by "add_tab" above
     listen_to_robot_topics(n, robot){
-        let TaskTopic = {
-            // topic: "/" + robot + "/task_update",
-            topic: ma_prefix + robot + "/status",
-            // topic: "/Anchor/neighbors/" + robot + "/status",
-            messageType: "std_msgs/String"
-        };
-        let CommTopic = {
-            topic: ma_prefix + robot + "/incomm",
-            // topic: "/Anchor/neighbors/" + robot + "/incomm",
-            messageType: "std_msgs/Bool"
-        };
-        let ArtifactTopic = {
-            // topic: "/artifact_record",  // For use when artifact detection is on ground station
-            // topic: "/" + this.robot_name[n] + "/artifact_record",
-            // topic: "/" + robot + "/artifact_array/relay",
-            // topic: "/Anchor/neighbors/" + robot + "/artifacts",
-            topic: ma_prefix + robot + "/artifacts",
-            messageType: "marble_artifact_detection_msgs/ArtifactArray"
-        };
-        let ArtifactImgTopic = {
-            // topic: "/artifact_record",  // For use to save images on ground station
-            // topic: "/" + this.robot_name[n] + "/located_artifact_img",
-            // THIS MAY BE WRONG AND THE PREFIX MAY JUST BE "/"
-            topic: ma_prefix + robot + "/image",
-            // topic: "/disabled3",
-            messageType: "marble_artifact_detection_msgs/ArtifactImg"
-        };
         this.Tab_TaskSub[n] = new ROSLIB.Topic({
             ros: ros,
-            name: TaskTopic.topic,
-            messageType: TaskTopic.messageType
+            name: ma_prefix + robot + "/status",
+            messageType: "std_msgs/String"
+        });
+        this.Tab_TaskNameSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: ma_prefix + robot + "/guiTaskNameReceived",
+            messageType: "std_msgs/String"
+        });
+        this.Tab_TaskValueSub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: ma_prefix + robot + "/guiTaskValueReceived",
+            messageType: "std_msgs/String"
         });
         this.Tab_CommSub[n] = new ROSLIB.Topic({
             ros: ros,
-            name: CommTopic.topic,
-            messageType: CommTopic.messageType
+            name: ma_prefix + robot + "/incomm",
+            messageType: "std_msgs/Bool"
         });
         this.Tab_ArtifactSub[n] = new ROSLIB.Topic({
             ros: ros,
-            name: ArtifactTopic.topic,
-            messageType: ArtifactTopic.messageType
+            name: ma_prefix + robot + "/artifacts",
+            messageType: "marble_artifact_detection_msgs/ArtifactArray"
         });
         this.Tab_ArtifactImgSub[n] = new ROSLIB.Topic({
             ros: ros,
-            name: ArtifactImgTopic.topic,
-            messageType: ArtifactImgTopic.messageType
+            name: ma_prefix + robot + "/image",
+            messageType: "marble_artifact_detection_msgs/ArtifactImg"
         });
     }
 
