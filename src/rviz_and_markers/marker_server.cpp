@@ -150,7 +150,7 @@ void initGoal(){
     // CHECK TO MAKE SURE THESE ARE IN THE RIGHT PLACES
     pos.position.x = 0;
     pos.position.y = 0;
-    pos.position.z = 0;
+    pos.position.z = 2;
     string name = "GOAL";
     // Note: using "name" twice was to get around the ID thing
     makeMarker(6, pos, name, name);

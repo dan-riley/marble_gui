@@ -168,11 +168,14 @@ function submitted_marker(artifact, success) {
 
 // Send an odom message do the urdf can show the tf
 function previewTransform(onoff){
+
+    console.log("previewing transform");
+
     let robot_name = document.getElementById("select_robot_transform").value;
 
     var Topic = new ROSLIB.Topic({
         ros: ros,
-        name: `${ma_prefix}${robot_name}_base/base_link`,
+        name: `${ma_prefix}${robot_name}/odometry`,
         messageType: "odometry_msgs/Pose"
     });
 
@@ -209,7 +212,7 @@ function previewTransform(onoff){
                         x : 0,
                         y : 0,
                         z : 0,
-                        w : 0
+                        w : 1
                     }
                 }
                 
