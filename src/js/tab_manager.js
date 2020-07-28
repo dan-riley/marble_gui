@@ -148,7 +148,6 @@ function pubTask(task_dom, tasks, i) {
 
 // This stores the transform to get it from the subscriber to the publisher to the correct robot
 var robot_transform = new ROSLIB.Message({
-    robot_name : "",
     transform : {
         translation : {
             x : 0,
@@ -177,14 +176,11 @@ function send_tf_to(){
     robot_transform.transform.rotation.z = parseFloat(document.getElementById("z_rotation").value);
     robot_transform.transform.rotation.w = parseFloat(document.getElementById("w_rotation").value);
 
-
-    robot_transform.robot_name = robot;
-
     console.log("sending tf");
     var tf_publisher = new ROSLIB.Topic({
         ros: ros,
         name: `${comms_prefix}${robot}/origin_from_base`,
-        messageType: "marble_gui/TransformPreview"
+        messageType: "geometry_msgs/Transform"
     });
 
     // This is to deactivate the transform preview in rviz when sending thetransform to the robot
@@ -199,6 +195,8 @@ function send_tf_to(){
         tf_publisher.publish(robot_transform);
         sleep(50);
     }
+    // This resets this for the preview
+    tf_published_before = false;
 
 }
 

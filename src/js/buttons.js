@@ -49,17 +49,27 @@ function show_image(robot_name, id){
     } 
 }
 
+// This is used for determining if we need to publish the odom a few times
+var tf_published_before = false;
 
 // this sends the 
 function transform_preview(){
     var preview_button = document.getElementById("transform_preview_button");
 
 
-
     // switch button color when activated
     if(preview_button.innerText == "Preview TF"){
         // Call over to the rvizMessaging file to send the preview
         previewTransform(true);
+        // It takes a few publish attempts to get the urdf to show the tf
+        if(!tf_published_before){
+            for(var i = 0; i < 3; i++){
+                setTimeout(function(){ 
+                    previewTransform(true);
+                }, i*500);
+            }
+            tf_published_before = true;
+        }
         preview_button.innerText = "Turn Off Preview";
         preview_button.className = "btn btn-danger";
     }else{

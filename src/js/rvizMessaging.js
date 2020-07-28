@@ -165,6 +165,8 @@ function submitted_marker(artifact, success) {
     }
 }
 
+// This is used for determining if we need to publish the odom a few times
+var published_before = false;
 
 // Send an odom message do the urdf can show the tf
 function previewTransform(onoff){
@@ -176,7 +178,7 @@ function previewTransform(onoff){
     var Topic = new ROSLIB.Topic({
         ros: ros,
         name: `${ma_prefix}${robot_name}/odometry`,
-        messageType: "odometry_msgs/Pose"
+        messageType: "nav_msgs/Odometry"
     });
 
     if(onoff){
@@ -220,6 +222,8 @@ function previewTransform(onoff){
             }
         });
     }
-    
+
     Topic.publish(msg);
+    
+    
 }

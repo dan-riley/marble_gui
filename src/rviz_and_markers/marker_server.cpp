@@ -286,7 +286,7 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "int_mkr_srv");
 
     ros::NodeHandle nh;
-    ros::Publisher vis_pub = nh.advertise<visualization_msgs::Marker>("robot_marker", 0);
+    // ros::Publisher vis_pub = nh.advertise<visualization_msgs::Marker>("robot_marker", 0);
 
     // reset the interactive marker server so it works
     server.reset(new interactive_markers::InteractiveMarkerServer("gui_god", "", false));
