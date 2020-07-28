@@ -180,14 +180,14 @@ function send_tf_to(){
     var tf_publisher = new ROSLIB.Topic({
         ros: ros,
         name: `${comms_prefix}${robot}/origin_from_base`,
-        messageType: "geometry_msgs/Transform"
+        messageType: "geometry_msgs/TransformStamped"
     });
 
     // This is to deactivate the transform preview in rviz when sending thetransform to the robot
-    var preview_button = document.getElementById("transform_preview_button");
-    if(preview_button.innerText != "Preview TF"){
-        previewTransform();
-    }
+    // var preview_button = document.getElementById("transform_preview_button");
+    // if(preview_button.innerText != "Preview TF"){
+    //     previewTransform();
+    // }
 
     $('#TFModal').modal('hide');
 

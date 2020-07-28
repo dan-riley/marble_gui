@@ -165,8 +165,7 @@ function submitted_marker(artifact, success) {
     }
 }
 
-// This is used for determining if we need to publish the odom a few times
-var published_before = false;
+
 
 // Send an odom message do the urdf can show the tf
 function previewTransform(onoff){
