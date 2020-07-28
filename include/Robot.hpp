@@ -25,19 +25,12 @@ class Robot{
         Robot(ros::NodeHandle* nodehandle, std::string robot_name);
         void update_robot_callback(const nav_msgs::Odometry odom);
         geometry_msgs::Pose getPose();
-        void PreviewTF(const geometry_msgs::Transform tf);
-        void TurnOffTFPreview();
-        bool PreviewState();
 
         // Robot class destructor
         ~Robot();
 
     private:
         geometry_msgs::Pose pose_;
-
-        ros::Publisher tf_pub_;
-
-        bool listen_to_odom_ = true;
 
         ros::NodeHandle nh_;
 

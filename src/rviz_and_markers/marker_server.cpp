@@ -245,22 +245,6 @@ void goal_to_robot(const std_msgs::String& robot_name) {
 }
 
 
-// This applies a preview of the transform kyle sends
-void preview_tf(const marble_gui::TransformPreview &msg){
-    cout << "preview hit" << endl;
-    // look for robot with name
-    for(auto robot : robots){
-        if(robot->name == msg.robot_name.c_str()){
-            if(robot->PreviewState()){
-                robot->TurnOffTFPreview();
-            }else{
-                robot->PreviewTF(msg.transform);
-            }
-        }
-    }
-    cout << "previewing" << endl;
-}
-
 // This removes all artifact markers from rviz
 void clearMarkers(const std_msgs::String::ConstPtr& msg){
     cout << "clearing markers" << msg->data << endl;
@@ -286,7 +270,6 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "int_mkr_srv");
 
     ros::NodeHandle nh;
-    // ros::Publisher vis_pub = nh.advertise<visualization_msgs::Marker>("robot_marker", 0);
 
     // reset the interactive marker server so it works
     server.reset(new interactive_markers::InteractiveMarkerServer("gui_god", "", false));
@@ -302,17 +285,8 @@ int main(int argc, char **argv) {
     // Get the submitted text marker offsets from the launch file
     setOffsets(&nh);
 
-    // initialize robots vector for goal to robot functionality
-    // Make a new robot and add it to the robots vector
-    // vector<string> robot_names = get_config_robots(&nh);
-    // for (auto i = 0; i < robot_names.size(); i++) {
-    //     Robot *new_robot = new Robot(&nh, robot_names[i]);
-    //     robots.push_back(new_robot);
-    // }
-
     // Read in the robot names from the config
     vector<string> config_robots = get_config_robots(&nh);
-
     
     ros::Duration(0.1).sleep();
 
@@ -342,31 +316,6 @@ int main(int argc, char **argv) {
     initGoal();
 
     cout << "inited goal" << endl;
-
-
-    // The "main" loop
-    // ros::Rate loop_rate(10);
-    // while(true){
-    //     if(ros::ok()){
-    //         ros::spinOnce();
-    //         cout << "heart beat" << endl;
-    //         loop_rate.sleep();
-    //     }else{
-    //         cout << "server reset" << endl;
-    //         // server.reset();
-
-    //         for(int i = 0; i < robots.size(); i++)
-    //             delete robots[i];
-
-    //         // delete the server
-    //         server.reset();
-            
-    //         return 0;
-    //         // exit(0);
-            
-    //     }
-        
-    // }
 
     ros::spin();
 

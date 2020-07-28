@@ -180,47 +180,27 @@ function previewTransform(onoff){
         messageType: "nav_msgs/Odometry"
     });
 
-    if(onoff){
-        var msg = new ROSLIB.Message({
-            pose : {
-                pose : {
-                    position : {
-                        x : parseFloat(document.getElementById("x_translation").value),
-                        y : parseFloat(document.getElementById("y_translation").value),
-                        z : parseFloat(document.getElementById("z_translation").value)
-                    },
-                    orientation : {
-                        x : parseFloat(document.getElementById("x_rotation").value),
-                        y : parseFloat(document.getElementById("y_rotation").value),
-                        z : parseFloat(document.getElementById("z_rotation").value),
-                        w : parseFloat(document.getElementById("w_rotation").value)
-                    }
-                }
-                
     
-            }
-        });
-    }else{
-        var msg = new ROSLIB.Message({
+    var msg = new ROSLIB.Message({
+        pose : {
             pose : {
-                pose : {
-                    position : {
-                        x : 0,
-                        y : 0,
-                        z : 0
-                    },
-                    orientation : {
-                        x : 0,
-                        y : 0,
-                        z : 0,
-                        w : 1
-                    }
+                position : {
+                    x : parseFloat(document.getElementById("x_translation").value),
+                    y : parseFloat(document.getElementById("y_translation").value),
+                    z : parseFloat(document.getElementById("z_translation").value)
+                },
+                orientation : {
+                    x : parseFloat(document.getElementById("x_rotation").value),
+                    y : parseFloat(document.getElementById("y_rotation").value),
+                    z : parseFloat(document.getElementById("z_rotation").value),
+                    w : parseFloat(document.getElementById("w_rotation").value)
                 }
-                
-    
             }
-        });
-    }
+            
+
+        }
+    });
+
 
     Topic.publish(msg);
     

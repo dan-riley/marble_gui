@@ -47,31 +47,3 @@ void Robot::update_robot_callback(const nav_msgs::Odometry odom){
 geometry_msgs::Pose Robot::getPose() {
   return pose_;
 }
-
-
-// this temporarily changes the robot pose (just its marker) to preview incoming transform
-void Robot::PreviewTF(const geometry_msgs::Transform tf){
-
-    listen_to_odom_ = false;
-
-    // publish the tf to the correct topic for the urdf to show up
-    tf_pub_.publish(tf);
-
-
-    cout << "previewing transform" << endl;
-
-    return;
-}
-
-// This just resets the the robot pose to use 
-void Robot::TurnOffTFPreview(){
-
-    listen_to_odom_ = true;
-
-    return;
-}
-
-
-bool Robot::PreviewState(){
-    return !listen_to_odom_;
-}
