@@ -300,9 +300,6 @@ int main(int argc, char **argv) {
     // subscribe to the gui for clearing rviz markers
     ros::Subscriber clear_sub = nh.subscribe("/gui/clear_markers", 10, clearMarkers);
 
-    // Use this to activate the transform preview
-    ros::Subscriber transform_preview = nh.subscribe("/gui/transform_preview", 10, preview_tf);
-
     // updates to gui about fused artifacts
     pub = nh.advertise<marble_gui::ArtifactTransport>("mkr_srv_talkback", 1);
     // sends the goal for the robot to the gui
