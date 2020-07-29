@@ -164,3 +164,45 @@ function submitted_marker(artifact, success) {
         fused_pub.publish(pose);
     }
 }
+
+
+
+// Send an odom message do the urdf can show the tf
+function previewTransform(onoff){
+
+    console.log("previewing transform");
+
+    let robot_name = document.getElementById("select_robot_transform").value;
+
+    var Topic = new ROSLIB.Topic({
+        ros: ros,
+        name: `${ma_prefix}${robot_name}/odometry`,
+        messageType: "nav_msgs/Odometry"
+    });
+
+    
+    var msg = new ROSLIB.Message({
+        pose : {
+            pose : {
+                position : {
+                    x : parseFloat(document.getElementById("x_translation").value),
+                    y : parseFloat(document.getElementById("y_translation").value),
+                    z : parseFloat(document.getElementById("z_translation").value)
+                },
+                orientation : {
+                    x : parseFloat(document.getElementById("x_rotation").value),
+                    y : parseFloat(document.getElementById("y_rotation").value),
+                    z : parseFloat(document.getElementById("z_rotation").value),
+                    w : parseFloat(document.getElementById("w_rotation").value)
+                }
+            }
+            
+
+        }
+    });
+
+
+    Topic.publish(msg);
+    
+    
+}

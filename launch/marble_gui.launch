@@ -19,8 +19,6 @@
     <param name="sub_offset_text_y" type="double" value="0.0"/>
     <param name="sub_offset_text_z" type="double" value="0.0"/>
 
-    <!-- This turns on and off the robot meshes, it helps with performance -->
-    <param name="show_robot_mesh" type="bool" value="false"/>
 
     <!-- This is the prefix used for multiagent or local tests "/Base/neighbors/" or "/" -->
     <param name="ma_prefix" type="string" value="/Base/neighbors/"/>
@@ -32,13 +30,7 @@
     <param name="robot_names_config" type="string" value="$(find marble_gui)/src/js/robots.txt"/>
     <!-- Robots to create listeners for -->
     <param name="robots" value="$(arg robots)" />
-
-    <!-- mesh scaling for each robot -->
-    <!-- <param name="x_scale" type="double" value=""/>
-    <param name="h_scale" type="double" value=""/>
-    <param name="t_scale" type="double" value=""/>
-    <param name="a_scale" type="double" value=""/>
-     -->
+    
     <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen" args="$(find marble_gui)/src">
     </node>
     <include file="$(find marble_gui)/launch/teleop.launch" />

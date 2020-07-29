@@ -43,13 +43,14 @@
                 </div>
                 <div class="form-group form-inline">
                     <label style="width: 125px;">W Rotation:</label>
-                    <input id="w_rotation" type="text" class="form-control" placeholder="Quaternion rotation" value="0.0" required>
+                    <input id="w_rotation" type="text" class="form-control" placeholder="Quaternion rotation" value="1.0" required>
                 </div>
             </div>
 
             <!-- Modal footer -->
             <div>
                 <button id="dont_send_tf" type="button" class="btn btn-warning" style="float: left;" onclick="close_tf_modal()">DO NOT SEND</button>
+                <button id="transform_preview_button" type="button" class="btn btn-success" style="float: left;" onclick="transform_preview()">Preview TF</button>
                 <button id="send_tf" type="button" class="btn btn-primary" style="float: right;" onclick="send_tf_to()">SEND TO ROBOT</button>
             </div>
         </div>

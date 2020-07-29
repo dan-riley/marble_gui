@@ -17,6 +17,7 @@
 #include "std_msgs/String.h"
 #include "marble_artifact_detection_msgs/Artifact.h"
 #include "marble_gui/ArtifactTransport.h"
+#include "marble_gui/TransformPreview.h"
 
 #include "markers.hpp"
 #include "Robot.hpp"
@@ -149,7 +150,7 @@ void initGoal(){
     // CHECK TO MAKE SURE THESE ARE IN THE RIGHT PLACES
     pos.position.x = 0;
     pos.position.y = 0;
-    pos.position.z = 0;
+    pos.position.z = 2;
     string name = "GOAL";
     // Note: using "name" twice was to get around the ID thing
     makeMarker(6, pos, name, name);
@@ -244,16 +245,6 @@ void goal_to_robot(const std_msgs::String& robot_name) {
 }
 
 
-// This applies a preview of the transform kyle sends
-void preview_tf(const std_msgs::String::ConstPtr& robot_name){
-    // look for robot with name
-    for(auto robot : robots){
-        if(robot->name == robot_name->data.c_str()){
-            robot->PreviewTF(kylePreviewTF);
-        }
-    }
-}
-
 // This removes all artifact markers from rviz
 void clearMarkers(const std_msgs::String::ConstPtr& msg){
     cout << "clearing markers" << msg->data << endl;
@@ -294,17 +285,8 @@ int main(int argc, char **argv) {
     // Get the submitted text marker offsets from the launch file
     setOffsets(&nh);
 
-    // initialize robots vector for goal to robot functionality
-    // Make a new robot and add it to the robots vector
-    vector<string> robot_names = get_config_robots(&nh);
-    for (auto i = 0; i < robot_names.size(); i++) {
-        Robot *new_robot = new Robot(&nh, robot_names[i], robot_scale, server);
-        robots.push_back(new_robot);
-    }
-
     // Read in the robot names from the config
     vector<string> config_robots = get_config_robots(&nh);
-
     
     ros::Duration(0.1).sleep();
 
@@ -317,9 +299,6 @@ int main(int argc, char **argv) {
 
     // subscribe to the gui for clearing rviz markers
     ros::Subscriber clear_sub = nh.subscribe("/gui/clear_markers", 10, clearMarkers);
-
-    // Use this to activate the transform preview
-    ros::Subscriber transform_preview = nh.subscribe("/gui/transform_preview", 10, preview_tf);
 
     // updates to gui about fused artifacts
     pub = nh.advertise<marble_gui::ArtifactTransport>("mkr_srv_talkback", 1);
@@ -335,30 +314,7 @@ int main(int argc, char **argv) {
 
     cout << "inited goal" << endl;
 
-
-    // The "main" loop
-    ros::Rate loop_rate(10);
-    while(true){
-        if(ros::ok()){
-            ros::spinOnce();
-            cout << "heart beat" << endl;
-            loop_rate.sleep();
-        }else{
-            cout << "server reset" << endl;
-            // server.reset();
-
-            for(int i = 0; i < robots.size(); i++)
-                delete robots[i];
-
-            // delete the server
-            server.reset();
-            
-            return 0;
-            // exit(0);
-            
-        }
-        
-    }
+    ros::spin();
 
     return 0;
     
