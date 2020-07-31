@@ -17,7 +17,6 @@
 #include "std_msgs/String.h"
 #include "marble_artifact_detection_msgs/Artifact.h"
 #include "marble_gui/ArtifactTransport.h"
-#include "marble_gui/TransformPreview.h"
 
 #include "markers.hpp"
 #include "Robot.hpp"

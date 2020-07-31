@@ -185,9 +185,9 @@ function previewTransform(onoff){
         pose : {
             pose : {
                 position : {
-                    x : parseFloat(document.getElementById("x_translation").value),
-                    y : parseFloat(document.getElementById("y_translation").value),
-                    z : parseFloat(document.getElementById("z_translation").value)
+                    x : -parseFloat(document.getElementById("x_translation").value),
+                    y : -parseFloat(document.getElementById("y_translation").value),
+                    z : -parseFloat(document.getElementById("z_translation").value)
                 },
                 orientation : {
                     x : parseFloat(document.getElementById("x_rotation").value),
