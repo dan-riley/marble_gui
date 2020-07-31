@@ -190,9 +190,9 @@ function previewTransform(onoff){
                     z : -parseFloat(document.getElementById("z_translation").value)
                 },
                 orientation : {
-                    x : parseFloat(document.getElementById("x_rotation").value),
-                    y : parseFloat(document.getElementById("y_rotation").value),
-                    z : parseFloat(document.getElementById("z_rotation").value),
+                    x : -parseFloat(document.getElementById("x_rotation").value),
+                    y : -parseFloat(document.getElementById("y_rotation").value),
+                    z : -parseFloat(document.getElementById("z_rotation").value),
                     w : parseFloat(document.getElementById("w_rotation").value)
                 }
             }
