@@ -67,7 +67,9 @@ class Artifact {
         this.updateDisplay();
     }
 
+    // This is a way of getting elements from the page
     set_artifact_tracker(robot_artifacts, id) {
+        console.log(`setting trackers for ${id}`);
         this.artifact_tracker[id] = robot_artifacts.querySelector("[artifact_id = '" + id + "']");
         this.artifact_position[id] = this.artifact_tracker[id].querySelector("[id = 'position']");
         this.artifact_type[id] = this.artifact_tracker[id].querySelector("[id = 'type']");
@@ -186,6 +188,9 @@ class Artifact {
                 let new_row = this.add_artifact(id);
                 robot_artifacts.appendChild(new_row);
                 this.set_artifact_tracker(robot_artifacts, id);
+                if(this.robot_name != "Base"){
+                    this.highlight_line(id);
+                }
             }
 
             // When artifact class value has not been set, allow for code to set the class
@@ -255,6 +260,32 @@ class Artifact {
                 console.log(`saved artifact ${type}`)
             }
         }
+    }
+
+    // This highlights the artifact line when a new one comes in
+    // THIS REQURES THE "set_artifact_tracker" METHOD BE RUN BEFORE CALLING THIS
+    async highlight_line(id){
+        console.log(`${id}`);
+        this.artifact_type[id].style.backgroundColor = "#dca200";
+        if(this.robot_name == "Base"){
+            this.artifact_seen_by[id].style.backgroundColor = "#dca200";
+        }
+        this.artifact_confidence[id].style.backgroundColor = "#dca200";
+        this.artifact_position[id].style.backgroundColor = "#dca200";
+        this.artifact_image[id].style.backgroundColor = "#dca200";
+        this.artifact_image[id].firstChild.style.backgroundColor = "#dca200";
+        this.artifact_tracker[id].querySelector(`[id = '${this.robot_name}_${id}']`).style.backgroundColor = "#dca200";
+    
+        await sleep(5000);
+        this.artifact_type[id].style.backgroundColor = "#6c757d";
+        if(this.robot_name == "Base"){
+            this.artifact_seen_by[id].style.backgroundColor = "#6c757d";
+        }
+        this.artifact_confidence[id].style.backgroundColor = "#6c757d";
+        this.artifact_position[id].style.backgroundColor = "#6c757d";
+        this.artifact_image[id].style.backgroundColor = "#6c757d";
+        this.artifact_image[id].firstChild.style.backgroundColor = "#6c757d";
+        this.artifact_tracker[id].querySelector(`[id = '${this.robot_name}_${id}']`).style.backgroundColor = "#6c757d";
     }
     
     
