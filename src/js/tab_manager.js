@@ -231,7 +231,7 @@ function initialize() {
     populateOpts();
     teleop_route();
     get_darpa_artifacts();
-    what_logs();
+    what_logs("js", "_reported.json");
     listen_to_markers();
     listen_to_pose();
     listen_for_tf();

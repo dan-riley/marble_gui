@@ -20,13 +20,24 @@ function populateOpts() {
 
 
 // For crash recovery this checks for logs of artifacts that have been reported by robots
-function what_logs() {
-    console.log("Checking for logs");
+function what_logs(dir, suffix) {
+    console.log("Checking for logs", dir, suffix);
+
     var existing_logs = []
-    var files = fs.readdirSync('js');
+    var files = fs.readdirSync(dir);
+
+    // Parse through all files found in dir
     for (f = 0; f < files.length; f++) {
-        if (files[f].includes("_reported.json")) {
-            existing_logs.push(files[f].split("_")[0]);
+        let dirPath = dir + files[f];
+        // If its a directory named after a robot drill down further
+        if(fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory() && robots_disp.includes(files[f])) {
+            // concatinate image files to existing logs
+            existing_logs.concat(what_logs(dir + files[f], suffix));
+        }
+        // If the file is not a directoy but has the correct suffix, add it to the list
+        if (files[f].includes(suffix)) {
+            // remove the siffix from the file name
+            existing_logs.push(files[f].replace(suffix,''));
         }
     }
     console.log(existing_logs);
@@ -104,7 +115,7 @@ function get_darpa_artifacts() {
     // open or make DARPA_reported
 
     // Get the list of existing logs
-    let existing_logs = what_logs();
+    let existing_logs = what_logs("js", "_reported.json");
 
     var found = existing_logs.find(function (darpa) {
         return darpa == "DARPA";
@@ -150,7 +161,7 @@ function get_darpa_artifacts() {
 // end mission
 function end_mission() {
     console.log("ending mission")
-    let existing_logs = what_logs();
+    let existing_logs = what_logs("js", "_reported.json");
     // MAKE BETTER DIR NAME
     var currentdate = new Date();
     var folder = currentdate.getFullYear() + "."
@@ -165,6 +176,10 @@ function end_mission() {
         let oldPath = `js/${existing_logs[f]}_reported.json`;
         let newPath = `js/saved_missions/${folder}/${existing_logs[f]}_reported.json`;
         copy(oldPath, newPath);
+    }
+    let images = what_logs("js/mission_imgs", ".jpg")
+    for(i = 0; i < images.length; i++){
+
     }
     $('#EndMissionModal').modal('hide');
 }
@@ -185,7 +200,15 @@ function copy(oldPath, newPath) {
 // for use while at competition and preliminary checks are over
 function clear_mission() {
     console.log("Clearing mission");
-    let existing_logs = what_logs();
+    let existing_logs = what_logs("js", "_reported.json");
+    for (f = 0; f < existing_logs.length; f++) {
+        let file_path = `js/${existing_logs[f]}_reported.json`;
+        fs.writeFile(file_path, '', function (err) {
+            if (err) throw err;
+            console.log(err);
+        });
+    }
+    let existing_imgs = what_logs("js/mission_imgs", "_reported.json");
     for (f = 0; f < existing_logs.length; f++) {
         let file_path = `js/${existing_logs[f]}_reported.json`;
         fs.writeFile(file_path, '', function (err) {

@@ -188,9 +188,7 @@ class Artifact {
                 let new_row = this.add_artifact(id);
                 robot_artifacts.appendChild(new_row);
                 this.set_artifact_tracker(robot_artifacts, id);
-                if(this.robot_name != "Base"){
-                    this.highlight_line(id);
-                }
+                this.highlight_line(id);
             }
 
             // When artifact class value has not been set, allow for code to set the class
