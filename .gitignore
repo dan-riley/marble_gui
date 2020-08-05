@@ -7,3 +7,4 @@ src/js/*.txt
 *_reported.json
 src/js/mission_imgs/*/*.png
 src/js/mission_imgs/*/*.jpg
+src/js/saved_missions/*/*/*.jpg

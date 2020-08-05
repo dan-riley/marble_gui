@@ -19,6 +19,7 @@
 #include <math.h>
 #include <vector>
 #include <algorithm>
+#include <regex>
 
 #include "std_msgs/String.h"
 #include "marble_artifact_detection_msgs/Artifact.h"
@@ -72,12 +73,35 @@ vector<string> get_config_robots(ros::NodeHandle* nh) {
     vector<string> robot_names;
 
     nh->getParam("robots", robots);
-    stringstream s_stream(robots);
-    while (s_stream.good()) {
-        string substr;
-        getline(s_stream, substr, ',');
-        robot_names.push_back(substr);
+    if(robots != ""){
+        stringstream s_stream(robots);
+        while (s_stream.good()) {
+            string substr;
+            getline(s_stream, substr, ',');
+            robot_names.push_back(substr);
+        }
+    }else{
+        // cout << "looking for robot topics" << endl;
+
+        // THIS IS A VECTOR OF ALL THE TOPICS
+        ros::master::V_TopicInfo topics;
+        ros::master::getTopics(topics);
+        for(auto topic : topics){
+            // std::string s ("this subject has a submarine as a subsequence");
+            std::smatch m;
+            std::regex e ("([A-Z]\\d{2})");
+            if(std::regex_search(topic.name, m, e)){
+                // cout << "found a match" << endl;
+                for(string match : m){
+                    if(std::find(robot_names.begin(), robot_names.end(), match) == robot_names.end()){
+                        robot_names.push_back(match);
+                    }
+                } 
+            }
+        }
+
     }
+    
 
     return robot_names;
 }

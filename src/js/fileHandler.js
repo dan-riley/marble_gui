@@ -20,27 +20,54 @@ function populateOpts() {
 
 
 // For crash recovery this checks for logs of artifacts that have been reported by robots
-function what_logs(dir, suffix) {
+function what_logs(dir, suffix, keepPath, keepSuffix) {
+    if(keepPath == undefined) keepPath = false;
+    if(keepSuffix == undefined) keepSuffix = false;
     console.log("Checking for logs", dir, suffix);
 
-    var existing_logs = []
+    var existing_logs = [];
     var files = fs.readdirSync(dir);
+
+    if(files.length == 0){
+        return existing_logs;
+    }
 
     // Parse through all files found in dir
     for (f = 0; f < files.length; f++) {
-        let dirPath = dir + files[f];
+        let dirPath = `${dir}/${files[f]}`;
+        console.log(dirPath);
         // If its a directory named after a robot drill down further
-        if(fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory() && robots_disp.includes(files[f])) {
-            // concatinate image files to existing logs
-            existing_logs.concat(what_logs(dir + files[f], suffix));
+        if(fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
+            var patt = /([A-Z]\d{2})/;
+            // If the dir name fits the robot name format
+            if(patt.test(files[f])){
+                console.log("drilling down");
+                // add image files to existing logs
+                var sub_logs = what_logs(dirPath, suffix, keepPath, keepSuffix);
+                if(sub_logs.length != 0){
+                    // Concat has some weird issues here so use .push.apply instead
+                    existing_logs.push.apply(existing_logs, sub_logs);
+                }
+            }
         }
         // If the file is not a directoy but has the correct suffix, add it to the list
-        if (files[f].includes(suffix)) {
-            // remove the siffix from the file name
-            existing_logs.push(files[f].replace(suffix,''));
+        if(files[f].includes(suffix)){
+            console.log("adding files to existing logs");
+            var file = files[f];
+            // remove the suffix from the file name if requested
+            if(!keepSuffix){
+                console.log("removing file extension");
+                file = files[f].replace(suffix, '');
+            }
+            // add path if requested
+            if(keepPath){
+                existing_logs.push(`${dir}/${file}`);
+            }else{
+                existing_logs.push(file);
+            }
         }
     }
-    console.log(existing_logs);
+    console.log("returning ", existing_logs);
     return existing_logs;
 }
 
@@ -161,7 +188,7 @@ function get_darpa_artifacts() {
 // end mission
 function end_mission() {
     console.log("ending mission")
-    let existing_logs = what_logs("js", "_reported.json");
+    let existing_logs = what_logs("js", "_reported.json", true, true);
     // MAKE BETTER DIR NAME
     var currentdate = new Date();
     var folder = currentdate.getFullYear() + "."
@@ -170,23 +197,33 @@ function end_mission() {
         + currentdate.getHours() + "."
         + currentdate.getMinutes() + "."
         + currentdate.getSeconds();
-    fs.mkdirSync(`js/saved_missions/${folder}`)
-    // console.log(folder);
+    let save_folder = `js/saved_missions/${folder}`;
+    fs.mkdirSync(save_folder);
+    // Move all of the logs of the objects
     for (f = 0; f < existing_logs.length; f++) {
-        let oldPath = `js/${existing_logs[f]}_reported.json`;
-        let newPath = `js/saved_missions/${folder}/${existing_logs[f]}_reported.json`;
+        let oldPath = existing_logs[f];
+        let newPath = `js/saved_missions/${folder}/${existing_logs[f].replace("js/")}`;
         copy(oldPath, newPath);
     }
-    let images = what_logs("js/mission_imgs", ".jpg")
+    // Move all of the images
+    let images = what_logs("js/mission_imgs", ".jpg", true, true);
     for(i = 0; i < images.length; i++){
-
+        let oldPath = images[i];
+        let newPath = `js/saved_missions/${folder}/${images[i].replace("js/mission_imgs/", "")}`;
+        // Make directory for robot if necessary
+        let dirPath = newPath.substr(0, newPath.lastIndexOf("/"));
+        if(!fs.existsSync(dirPath)){
+            fs.mkdirSync(`js/saved_missions/${folder}/${dirPath.replace(save_folder + "/", "")}`)
+        }
+        copy(oldPath, newPath);
     }
     $('#EndMissionModal').modal('hide');
 }
 
 
-// Take  a guess what this does
+// Take a guess what this does
 function copy(oldPath, newPath) {
+    console.log(oldPath, newPath);
     fs.rename(oldPath, newPath, (err) => {
         if (err) throw err;
         console.log('Rename complete!');
@@ -200,24 +237,23 @@ function copy(oldPath, newPath) {
 // for use while at competition and preliminary checks are over
 function clear_mission() {
     console.log("Clearing mission");
-    let existing_logs = what_logs("js", "_reported.json");
+    let existing_logs = what_logs("js", "_reported.json", true, true);
     for (f = 0; f < existing_logs.length; f++) {
-        let file_path = `js/${existing_logs[f]}_reported.json`;
-        fs.writeFile(file_path, '', function (err) {
+        fs.unlink(existing_logs[f], function (err) {
             if (err) throw err;
             console.log(err);
         });
     }
-    let existing_imgs = what_logs("js/mission_imgs", "_reported.json");
-    for (f = 0; f < existing_logs.length; f++) {
-        let file_path = `js/${existing_logs[f]}_reported.json`;
-        fs.writeFile(file_path, '', function (err) {
+    let existing_imgs = what_logs("js/mission_imgs", ".jpg", true, true);
+    for (f = 0; f < existing_imgs.length; f++) {
+        fs.unlink(existing_imgs[f], function (err) {
             if (err) throw err;
             console.log(err);
         });
+        console.log("deleted image");
     }
     $('#EndMissionModal').modal('hide');
-    location.reload();
+    // location.reload();
 }
 
 

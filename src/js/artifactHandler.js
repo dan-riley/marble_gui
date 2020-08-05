@@ -263,6 +263,9 @@ class Artifact {
     // This highlights the artifact line when a new one comes in
     // THIS REQURES THE "set_artifact_tracker" METHOD BE RUN BEFORE CALLING THIS
     async highlight_line(id){
+        // This gsts and saves the original background color of an artifact for use later
+        var previous_color = this.artifact_type[id].style.backgroundColor;
+
         console.log(`${id}`);
         this.artifact_type[id].style.backgroundColor = "#dca200";
         if(this.robot_name == "Base"){
@@ -275,15 +278,15 @@ class Artifact {
         this.artifact_tracker[id].querySelector(`[id = '${this.robot_name}_${id}']`).style.backgroundColor = "#dca200";
     
         await sleep(5000);
-        this.artifact_type[id].style.backgroundColor = "#6c757d";
+        this.artifact_type[id].style.backgroundColor = previous_color;
         if(this.robot_name == "Base"){
-            this.artifact_seen_by[id].style.backgroundColor = "#6c757d";
+            this.artifact_seen_by[id].style.backgroundColor = previous_color;
         }
-        this.artifact_confidence[id].style.backgroundColor = "#6c757d";
-        this.artifact_position[id].style.backgroundColor = "#6c757d";
-        this.artifact_image[id].style.backgroundColor = "#6c757d";
-        this.artifact_image[id].firstChild.style.backgroundColor = "#6c757d";
-        this.artifact_tracker[id].querySelector(`[id = '${this.robot_name}_${id}']`).style.backgroundColor = "#6c757d";
+        this.artifact_confidence[id].style.backgroundColor = previous_color;
+        this.artifact_position[id].style.backgroundColor = previous_color;
+        this.artifact_image[id].style.backgroundColor = previous_color;
+        this.artifact_image[id].firstChild.style.backgroundColor = previous_color;
+        this.artifact_tracker[id].querySelector(`[id = '${this.robot_name}_${id}']`).style.backgroundColor = previous_color;
     }
     
     
