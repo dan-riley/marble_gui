@@ -228,7 +228,6 @@ function listen_for_tf(){
 // Initialize the whole gui
 function initialize() {
     load_params();
-    populateOpts();
     teleop_route();
     get_darpa_artifacts();
     what_logs("js", "_reported.json");

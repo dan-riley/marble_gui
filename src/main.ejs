@@ -117,6 +117,10 @@
                         Transform Transport
                     </button>
 
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#NewArtifactModal"
+                        data-backdrop="static" data-keyboard="false" style="float: center;">
+                        Custom Artifact
+                    </button>
 
                     <!-- Button to end mission -->
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#EndMissionModal"
@@ -136,6 +140,9 @@
 
                 <!-- Image pop up modal -->
                 <%- include ../src/ejs_modules/modals/image_modal.ejs %>
+
+                <!-- Custom Artifact modal -->
+                <%- include ../src/ejs_modules/modals/custom_artifact.ejs %>
             </div>
         </div>
     </div>

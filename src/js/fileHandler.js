@@ -6,16 +6,18 @@ const { join } = require('path')
 var artifact_file = fs.readFileSync("js/artifacts.txt", "utf-8");
 var artifacts = artifact_file.split("\n");
 var ARTIFACT_ARR_LEN = artifacts.length;
-function populateOpts() {
-    var modal_options = document.getElementById("edit_type");
+function populateOpts(id) {
+    var modal_options = document.getElementById(id);
     for (var i = 0; i < artifacts.length; i++) {
         var artifact = artifacts[i];
-        var option = document.createElement("option");
-        option.text = artifact;
-        option.value = artifact;
-        modal_options.add(option);
+        if(artifact != ""){
+            var option = document.createElement("option");
+            option.text = artifact;
+            option.value = artifact;
+            modal_options.add(option);
+        }
     }
-    console.log("made artifacts array");
+    // console.log("made artifacts array");
 }
 
 

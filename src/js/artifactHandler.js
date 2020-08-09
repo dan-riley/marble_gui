@@ -2,6 +2,31 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function createNewArtifact(){
+    let new_artifact_type = document.getElementById("custom_type").value;
+    let x = parseFloat(document.getElementById("x_pos").value);
+    let y = parseFloat(document.getElementById("y_pos").value);
+    let z = parseFloat(document.getElementById("z_pos").value);
+    let note = document.getElementById("notes");
+
+    var d = new Date();
+    var t = d.getTime();
+
+    // Make a new artifact with this info for base
+    // look at how its done in fusion
+    let artifact_msg = {
+        "artifacts": [{
+                "artifact_id": t,
+                "position": {"x": x, "y": y, "z": z},
+                "obj_class": new_artifact_type,
+                "obj_prob": 90
+        }]
+    }
+    global_tabManager.fusedArtifacts.set_artifacts(artifact_msg.artifacts);
+
+    $('#NewArtifactModal').modal('hide');
+}
+
 async function update_fused_artifact(msg){
     let id = msg.id;
     let fusedArtifacts = global_tabManager.fusedArtifacts.artifactsList;
@@ -290,7 +315,6 @@ class Artifact {
     }
     
     
-
     add_array(array) {
         this.artifact_All.push(array);
     }
@@ -455,12 +479,14 @@ class Artifact {
 
     // THIS IS SUPER IMPORTANT AND ACTUALLY WHERE THE ARTIFACTS COME IN
     set_artifacts(msg) {
-        // console.log("begining of setting artifact")
+        console.log("begining of setting artifact")
         let update = false;
+        console.log(msg.length);
         for (let i = 0; i < msg.length; i++) {
             // Remap the artifacts to the DARPA required names
             // SHOULD BE CHANGED BY MIKE ON A ROBOT LEVEL SO TRANSLATION DOESN'T NEED TO HAPPEN
             let obj_class = msg[i].obj_class;
+            console.log(obj_class);
             switch(msg[i].obj_class) {
                 case "person":
                 case "survivor":
@@ -494,6 +520,8 @@ class Artifact {
             var id_y = Math.round((msg[i].position.y + Number.EPSILON) * 100) / 100
             var id_z = Math.round((msg[i].position.z + Number.EPSILON) * 100) / 100
             let id = id_x + '-' + id_y + '-' + id_z;
+            console.log(id);
+            // let id = msg[i].artifact_id;
             // The old way to do IDs
             // let id = msg[i].position.x + '-' + msg[i].position.y + '-' + msg[i].position.z;
 
@@ -513,6 +541,7 @@ class Artifact {
                     this.artifactsList[id].header = msg[i].header;
                     this.artifactsList[id].position = msg[i].position;
                     this.artifactsList[id].image_id = msg[i].image_id;
+                    // this.artifactsList[id].image_id = msg[i].artifact_id;
                     this.artifactsList[id].vehicle_reporter = this.robot_name;
                 }
                 // When there is an artifact class declared, only set certain properties of the artifact
@@ -528,7 +557,7 @@ class Artifact {
                 this.fuse_artifacts(id, false);
             }
         }
-        // console.log("set artifacts")
+        console.log("set artifacts")
         if (update) {
             //this.save_file();
             this.updateDisplay();
