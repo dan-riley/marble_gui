@@ -180,7 +180,6 @@ class Artifact {
             let type = artifact.obj_class;
             let confidence = artifact.obj_prob;
             let position = artifact.position;
-            let image_id = artifact.image_id;
 
             if (this.artifact_tracker[id] == null) {
                 let new_row = this.add_artifact(id);
@@ -234,11 +233,11 @@ class Artifact {
             if (position != undefined) {
                 this.artifact_position[id].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
             }
-            if (this.artifactImages.includes(image_id)){
+            if (this.artifactImages.includes(id)){
                 var img_btn = this.artifact_image[id].firstChild;
                 console.log(this.robot_name + " has an image");
                 let name = this.robot_name;
-                img_btn.onclick = function(){show_image(name, image_id);};
+                img_btn.onclick = function(){show_image(name, id);};
                 img_btn.innerHTML = "View Image";
                 img_btn.setAttribute("data-toggle", "modal");
                 img_btn.setAttribute("data-target", "#artifact_image_modal");
@@ -256,8 +255,6 @@ class Artifact {
             }
         }
     }
-    
-    
 
     add_array(array) {
         this.artifact_All.push(array);
@@ -265,7 +262,7 @@ class Artifact {
 
     // this svaes the image id for display purpouses
     save_image(msg) {
-        this.artifactImages.push(msg.image_id);
+        this.artifactImages.push(this.robot_name + '_' + msg.artifact_id);
         console.log("got an image");
         this.updateDisplay();
     }
@@ -353,12 +350,7 @@ class Artifact {
                     newArtifact.position.y = y / length;
                     newArtifact.position.z = z / length;
                     newArtifact.obj_prob = obj_prob / length;
-                    let new_x = Math.round((newArtifact.position.x + Number.EPSILON) * 100) / 100
-                    let new_y = Math.round((newArtifact.position.y + Number.EPSILON) * 100) / 100
-                    let new_z = Math.round((newArtifact.position.z + Number.EPSILON) * 100) / 100
-                    let newid = new_x + '-' + new_y + '-' + new_z;
-                    // old way
-                    // let newid = newArtifact.position.x + '-' + newArtifact.position.y + '-' + newArtifact.position.z;
+                    let newid = artifact2.id + '_' + id
 
                     fusedArtifacts[newid] = newArtifact;
                     fusedArtifacts[newid].id = newid;
@@ -456,14 +448,9 @@ class Artifact {
 
             // console.log(typeof msg[i])
 
-            // Set a unique id.  Position never changes, but index can
+            // Set a unique id by adding the robot name
             // Only update the list if it's a new artifact
-            var id_x = Math.round((msg[i].position.x + Number.EPSILON) * 100) / 100
-            var id_y = Math.round((msg[i].position.y + Number.EPSILON) * 100) / 100
-            var id_z = Math.round((msg[i].position.z + Number.EPSILON) * 100) / 100
-            let id = id_x + '-' + id_y + '-' + id_z;
-            // The old way to do IDs
-            // let id = msg[i].position.x + '-' + msg[i].position.y + '-' + msg[i].position.z;
+            let id = this.robot_name + '_' + msg[i].artifact_id;
 
             if (this.artifactsList[id] == undefined) {
                 update = true;
@@ -477,17 +464,14 @@ class Artifact {
                 if (this.artifactsList[id].obj_class == undefined || this.artifactsList[i].obj_class == "") {
                     this.artifactsList[id].obj_class = obj_class;
                     this.artifactsList[id].obj_prob = msg[i].obj_prob;
-                    this.artifactsList[id].has_been_reported = msg[i].has_been_reported;
                     this.artifactsList[id].header = msg[i].header;
                     this.artifactsList[id].position = msg[i].position;
-                    this.artifactsList[id].image_id = msg[i].image_id;
                     this.artifactsList[id].vehicle_reporter = this.robot_name;
                 }
                 // When there is an artifact class declared, only set certain properties of the artifact
                 // this logic allows for the user to change the name of artifact class from the gui
                 else {
                     this.artifactsList[id].obj_prob = msg[i].obj_prob;
-                    this.artifactsList[id].has_been_reported = msg[i].has_been_reported;
                     this.artifactsList[id].header = msg[i].header;
                     this.artifactsList[id].position = msg[i].position;
                 }
@@ -580,14 +564,13 @@ class Artifact {
 
 async function submit_artifact(id, _this) {
     var robo_name;
-    
+
     // Catches for custom artifacts
     if(_this != undefined){
         robo_name = _this.get_robot_name();
     }else{
         robo_name = "base";
     }
-    
 
     var data = {
         "x": parseFloat($('#edit_x_pos').val()),

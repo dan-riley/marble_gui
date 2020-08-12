@@ -29,7 +29,7 @@ struct image{
 
 class ImageSaver{
     private:
-        vector<float> images;
+        vector<string> images;
         string prefix_;
         string img_dir_;
         ros::NodeHandle nh_;
@@ -39,7 +39,7 @@ class ImageSaver{
     public:
         ImageSaver(ros::NodeHandle* nh, string robot_name, string comms_prefix);
         ~ImageSaver();
-        bool imageExists(float id);
+        bool imageExists(string id);
         void imageWriter(marble_artifact_detection_msgs::ArtifactImg image);
 };
 
