@@ -34,9 +34,8 @@ bool ImageSaver::imageExists(string id){
 }
 
 void ImageSaver::imageWriter(const marble_artifact_detection_msgs::ArtifactImg image){
-    string artifact_id = name_ + "_" + to_string(image.artifact_id);
-    if(!imageExists(artifact_id)){
-        string img_path = img_dir_ + name_ + "/" + artifact_id + ".jpg";
+    if(!imageExists(image.artifact_id)){
+        string img_path = img_dir_ + name_ + "/" + image.artifact_id + ".jpg";
         try{
             //convert compressed image data to cv::Mat
             cv::Mat conv_img = cv::imdecode(cv::Mat(image.artifact_img.data),1);
@@ -47,6 +46,6 @@ void ImageSaver::imageWriter(const marble_artifact_detection_msgs::ArtifactImg i
             ROS_ERROR("Could not convert to image!");
         }
 
-        images.push_back(artifact_id);
+        images.push_back(image.artifact_id);
     }
 }

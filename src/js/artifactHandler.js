@@ -262,7 +262,7 @@ class Artifact {
 
     // this svaes the image id for display purpouses
     save_image(msg) {
-        this.artifactImages.push(this.robot_name + '_' + msg.artifact_id);
+        this.artifactImages.push(msg.artifact_id);
         console.log("got an image");
         this.updateDisplay();
     }
@@ -450,7 +450,7 @@ class Artifact {
 
             // Set a unique id by adding the robot name
             // Only update the list if it's a new artifact
-            let id = this.robot_name + '_' + msg[i].artifact_id;
+            let id = msg[i].artifact_id;
 
             if (this.artifactsList[id] == undefined) {
                 update = true;
