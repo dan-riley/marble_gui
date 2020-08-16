@@ -31,9 +31,9 @@ function createNewArtifact(){
 // This populates the pose of the custom artifact based on some other pose
 function populate_pos(){
     let robot_name = document.getElementById("existing_location").value;
-    console.log("setting position to ", robot_name);
+    // console.log("setting position to ", robot_name);
     if(robot_name == "goal"){
-        console.log(goal_pose);
+        // console.log(goal_pose);
         // update the modal with message data
         document.getElementById("x_pos").value = goal_pose.position.x;
         document.getElementById("y_pos").value = goal_pose.position.y;
@@ -61,7 +61,7 @@ function populate_pos(){
 function populateBots(id) {
     if(global_tabManager != undefined){
         let robots = global_tabManager.robot_name;
-        console.log("robots exist");
+        // console.log("robots exist");
         var modal_options = document.getElementById(id);
         var robots_in_display = [];
         // check for what robots already exist in the options list
@@ -71,19 +71,19 @@ function populateBots(id) {
                 robots_in_display.push(option_value);
             }
         });
-        console.log("adding robots", robots.length);
+        // console.log("adding robots", robots.length);
         // Add robots to the options list
         for (var i = 0; i < robots.length; i++) {
             var robot = robots[i];
-            console.log(robot);
+            // console.log(robot);
             if(robot != "" && !robots_in_display.includes(robot)){
-                console.log("adding ", robot);
+                // console.log("adding ", robot);
                 var option = document.createElement("option");
                 option.text = robot;
                 option.value = robot;
                 option.onclick = function(){populate_pos()};
                 modal_options.add(option);
-                console.log("added option ", robot);
+                // console.log("added option ", robot);
             }
         }
     }else{

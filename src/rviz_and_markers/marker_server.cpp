@@ -232,10 +232,15 @@ void goal_to_robot(const std_msgs::String& robot_name) {
     // Change the pose marker to be close but not on top of the robot
     near_robot_pose.position.z += 1;
 
-    cout << near_robot_pose << endl;
+    // cout << near_robot_pose << endl;
 
     server->setPose("GOAL", near_robot_pose);
     server->applyChanges();
+    
+    robot_goal.position = near_robot_pose.position;
+    robot_goal.orientation = near_robot_pose.orientation;
+
+    publishGoal();
 
     cout << "Got goal_to_robot" << endl;
 }

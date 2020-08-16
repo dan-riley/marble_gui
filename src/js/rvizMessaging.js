@@ -22,7 +22,7 @@ function publish_goal(robot){
     if(robot != 'base'){
         Topic.publish(goal_pose);
     }
-    console.log()
+    console.log("publishing goal for ", robot);
 }
 
 
