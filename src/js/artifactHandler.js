@@ -27,6 +27,72 @@ function createNewArtifact(){
     $('#NewArtifactModal').modal('hide');
 }
 
+
+// This populates the pose of the custom artifact based on some other pose
+function populate_pos(){
+    let robot_name = document.getElementById("existing_location").value;
+    console.log("setting position to ", robot_name);
+    if(robot_name == "goal"){
+        console.log(goal_pose);
+        // update the modal with message data
+        document.getElementById("x_pos").value = goal_pose.position.x;
+        document.getElementById("y_pos").value = goal_pose.position.y;
+        document.getElementById("z_pos").value = goal_pose.position.z;
+    }else{
+        var Topic = new ROSLIB.Topic({
+            ros: ros,
+            name: `${ma_prefix}${robot_name}/odometry`,
+            messageType: "nav_msgs/Odometry"
+        });
+        // update the tf variable to be sent to a robot
+        // console.log("maybe its subscribed");
+        Topic.subscribe(function (message){
+            // update the modal with message data
+            document.getElementById("x_pos").value = message.pose.pose.position.x;
+            document.getElementById("y_pos").value = message.pose.pose.position.y;
+            document.getElementById("z_pos").value = message.pose.pose.position.z;
+            Topic.unsubscribe();
+        });
+    }   
+}
+
+
+// This populates an options list with active robots names
+function populateBots(id) {
+    if(global_tabManager != undefined){
+        let robots = global_tabManager.robot_name;
+        console.log("robots exist");
+        var modal_options = document.getElementById(id);
+        var robots_in_display = [];
+        // check for what robots already exist in the options list
+        Array.from(modal_options.options).forEach(function(option_element) {
+            let option_value = option_element.value;
+            if(robots.includes(option_value)){
+                robots_in_display.push(option_value);
+            }
+        });
+        console.log("adding robots", robots.length);
+        // Add robots to the options list
+        for (var i = 0; i < robots.length; i++) {
+            var robot = robots[i];
+            console.log(robot);
+            if(robot != "" && !robots_in_display.includes(robot)){
+                console.log("adding ", robot);
+                var option = document.createElement("option");
+                option.text = robot;
+                option.value = robot;
+                option.onclick = function(){populate_pos()};
+                modal_options.add(option);
+                console.log("added option ", robot);
+            }
+        }
+    }else{
+        console.log("no robots to show");
+    }
+    // console.log("made artifacts array");
+}
+
+
 async function update_fused_artifact(msg){
     let id = msg.id;
     let fusedArtifacts = global_tabManager.fusedArtifacts.artifactsList;

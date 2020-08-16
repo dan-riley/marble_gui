@@ -153,6 +153,7 @@ void initGoal(){
     string name = "GOAL";
     // Note: using "name" twice was to get around the ID thing
     makeMarker(6, pos, name, name);
+    robot_goal.position = pos.position;
     server->applyChanges();
     // cout << "applied changes to server" << endl;
     publishGoal();
@@ -325,6 +326,7 @@ int main(int argc, char **argv) {
 
         try{
             mission_robots = get_config_robots(&nh);
+            publishGoal();
         }catch (const std::exception& e) { // reference to the base of a polymorphic object
             std::cout << e.what() << endl; // information from length_error printed
             cout << "error getting robots" << endl;

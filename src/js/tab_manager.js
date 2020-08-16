@@ -225,6 +225,15 @@ function listen_for_tf(){
     });
 }
 
+
+// This updates options lists with new robots
+async function updateRobotOptions(){
+    // This is for the custom artifact modal
+    populateBots("existing_location");
+
+}
+
+
 // Initialize the whole gui
 function initialize() {
     load_params();
@@ -235,6 +244,7 @@ function initialize() {
     listen_to_pose();
     listen_for_tf();
     init_reset();
+
 }
 
 class TabManager {
@@ -594,6 +604,7 @@ class TabManager {
 
         // Sets up all objects for vehicle artifact manager
         this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n], n);
+        updateRobotOptions();
 
         // Subscribes to artifact messages
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
