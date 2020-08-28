@@ -213,7 +213,7 @@ void setOffsets(ros::NodeHandle* nh){
 geometry_msgs::Pose get_robot_pose(const std_msgs::String& robot_name){
     // look for the correct robot
     // this should be changed to a better search algorithm in the future
-    for (int i = 0; i < robots.size(); i++) {
+    for (int i = 0; i < static_cast<int>(robots.size()); i++) {
         cout << robots[i]->name << endl;
         if (robots[i]->name == robot_name.data) {
             cout << "found robot and pose" << endl;
@@ -327,7 +327,7 @@ int main(int argc, char **argv) {
     vector<string> mission_robots;
 
     ros::Rate loop_rate(1);
-    while (ros::ok()){
+    while(ros::ok()){
 
         try{
             mission_robots = get_config_robots(&nh);
