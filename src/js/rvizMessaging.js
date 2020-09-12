@@ -180,14 +180,22 @@ function previewTransform(onoff){
         messageType: "nav_msgs/Odometry"
     });
 
+    // Change the tf based on the robot name
+    // see here for more https://trello.com/c/lPxNw8HD
+    var tf = {x : 0.0, y : 0.0, z : 0.0};
+    if(robot_name.includes("H")){
+        tf = {x : -0.4379, y : 0.0, z : -0.52418};
+    }else if(robot_name.includes("T")){
+        tf = {x : -0.4167, y : 0.0, z : -0.343};
+    }
     
     var msg = new ROSLIB.Message({
         pose : {
             pose : {
                 position : {
-                    x : -parseFloat(document.getElementById("x_translation").value),
-                    y : -parseFloat(document.getElementById("y_translation").value),
-                    z : -parseFloat(document.getElementById("z_translation").value)
+                    x : -parseFloat(document.getElementById("x_translation").value) + tf.x,
+                    y : -parseFloat(document.getElementById("y_translation").value) + tf.y,
+                    z : -parseFloat(document.getElementById("z_translation").value) + tf.z
                 },
                 orientation : {
                     x : -parseFloat(document.getElementById("x_rotation").value),
@@ -199,8 +207,10 @@ function previewTransform(onoff){
             
 
         }
-    });
+    }); 
 
+    console.log(msg);
+    
 
     Topic.publish(msg);
     

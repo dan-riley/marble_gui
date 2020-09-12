@@ -479,13 +479,12 @@ class TabManager {
             <br>
             <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_btn_explore"
                 onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Explore')" title="Explore">
-                <img src="./images/enterprise.png" class="control-icons">
+                <img src="./images/compas.png" class="control-icons">
             </button>
-            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_btn_home"
+            <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_btn_home"
                 onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Home')" title="Go Home">
                 <img src="./images/go_home.png" class="control-icons">
             </button>
-            <br>
             <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_btn_deploy"
                 onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')" title="Deploy Beacon">
                 <img src="./images/deploy_beacon.png" class="control-icons">

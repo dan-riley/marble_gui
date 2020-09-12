@@ -54,12 +54,3 @@ app.on('activate', function () {
     createWindow();
   }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
-
-function DDR(){
-  // not operational yet. based off a joke of "what can't be used as a teleop controller?"
-  document.body.style.backgroundImage = 'url("../images/DDR_STEVE.gif")'
-}

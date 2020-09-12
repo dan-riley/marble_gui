@@ -1,8 +1,5 @@
-<!DOCTYPE html>
-<html>
-
 <head>
-    <%- include ../src/ejs_modules/infastructure/header.ejs %>
+    <%- include ("../src/ejs_modules/infastructure/header.ejs") %>
 </head>
 
 
@@ -11,11 +8,11 @@
 <body onload="initialize();" style="overflow: hidden;">
     <!-- <div class="container"> -->
     <!--! Tab bar at the top of web page that displays all vehicles and default tabs -->
-    <%- include ../src/ejs_modules/nav_bars/connections_bar.ejs %>
+    <%- include ("../src/ejs_modules/nav_bars/connections_bar.ejs") %>
 
 
     <!-- sidebar to control each robot scrolls independently from any of the rest of the page -->
-    <%- include ../src/ejs_modules/nav_bars/controls_bar.ejs %>
+    <%- include ("../src/ejs_modules/nav_bars/controls_bar.ejs") %>
 
     <!--! Top bar on web page that displays all information reported back by DARPA when getting the score -->
     <div id="Universal_Page" class="row">
@@ -33,7 +30,7 @@
         <!--! DIV that contains all details within each tab, vehicle pages are added as subsections through javascript -->
         <div id="Robot_Pages" >
             <div id="DARPA" class="tabcontent">`
-                <%- include ../src/ejs_modules/infastructure/darpa_tab.ejs %>
+                <%- include ("../src/ejs_modules/infastructure/darpa_tab.ejs") %>
             </div>
 
             <!-- This is where the rviz map lives -->
@@ -98,7 +95,7 @@
 
                 <!-- WHERE THE SUBMISSIONS LIVE -->
                 <div id="submissions_table" class="section_div">
-                    <%- include ../src/ejs_modules/infastructure/submission_table.ejs %>
+                    <%- include ("../src/ejs_modules/infastructure/submission_table.ejs") %>
                 </div>
 
                 <div>
@@ -130,21 +127,20 @@
                 </div>
 
                 <!-- New Report Modal -->
-                <%- include ../src/ejs_modules/modals/new_report.ejs %>
+                <%- include ("../src/ejs_modules/modals/new_report.ejs") %>
 
                 <!-- End Mission Modal -->
-                <%- include ../src/ejs_modules/modals/end_mission.ejs %>
+                <%- include ("../src/ejs_modules/modals/end_mission.ejs") %>
 
                 <!-- Transport TF modal -->
-                <%- include ../src/ejs_modules/modals/tf_transport.ejs %>
+                <%- include ("../src/ejs_modules/modals/tf_transport.ejs") %>
 
                 <!-- Image pop up modal -->
-                <%- include ../src/ejs_modules/modals/image_modal.ejs %>
+                <%- include ("../src/ejs_modules/modals/image_modal.ejs") %>
 
                 <!-- Custom Artifact modal -->
-                <%- include ../src/ejs_modules/modals/custom_artifact.ejs %>
+                <%- include ("../src/ejs_modules/modals/custom_artifact.ejs") %>
             </div>
         </div>
     </div>
 </body>
-</html>
