@@ -275,7 +275,7 @@ li {
   overflow-x: hidden;
   overflow-y: auto;
   /* Disable horizontal scroll */
-  padding-top: 0px;
+  padding-top: 8vh;
   padding-left: 0px;
   resize: horizontal;
 
