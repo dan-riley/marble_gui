@@ -310,22 +310,24 @@ class TabManager {
     search_robots() {
         var _this = global_tabManager;
         if (robots_disp[0] == "") {
-            // This is where robots and beacons are filtered
-            var patt = /^((?!B).)\d{2}(?!_)/;
-            for (let i = 0; i < topicsList.length; i++) {
-                let name = topicsList[i].split('/')[3];
+             // This is where robots and beacons are filtered
+             var patt = /^((?!B).)\d{1,2}(?!_)/;
 
-                if (robots_disp.indexOf(name) == -1) {
-                    if (patt.test(name) && (name != 'S01')) {
-                        if (_this.robot_name.indexOf(name) == -1) {
-                            _this.robot_name.push(name);
-                            _this.tabs_robot_name.push(name);
-                            _this.x++;
-                        }
-                    }
-                    robots_disp.push(name);
-                }
-            }
+             for (let i = 0; i < topicsList.length; i++) {
+                 let name = topicsList[i].split('/')[1];
+                 var handled_names = [];
+ 
+                 if (handled_names.indexOf(name) == -1) {
+                     if (patt.test(name) && (name != 'S01')) {
+                         if (_this.robot_name.indexOf(name) == -1) {
+                             _this.robot_name.push(name);
+                             _this.tabs_robot_name.push(name);
+                             _this.x++;
+                         }
+                     }
+                     handled_names.push(name);
+                 }
+             }
         } else {
           for (let i = 0; i < robots_disp.length; i++) {
               name = robots_disp[i];

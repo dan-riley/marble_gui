@@ -152,9 +152,10 @@ button {
 }
 
 #sidebar-container {
-  min-height: 90vh;   
+  height: 92vh; 
   background-color: #333;
   padding: 0;
+  overflow-y: scroll;
 }
 
 .grid-container{

@@ -197,6 +197,7 @@ function end_mission() {
         }
         copy(oldPath, newPath);
     }
+    copy("js/DARPA_reported.txt", save_folder + "DARPA_reported.txt")
     $('#EndMissionModal').modal('hide');
 }
 
@@ -234,6 +235,12 @@ function clear_mission() {
         });
         console.log("deleted image");
     }
+    // Get rid of the submitted data
+    fs.unlink("js/DARPA_reported.txt", function (err) {
+        if (err) throw err;
+        console.log(err);
+    });
+
     $('#EndMissionModal').modal('hide');
     location.reload();
 }
