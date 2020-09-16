@@ -2,6 +2,97 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function createNewArtifact(){
+    let new_artifact_type = document.getElementById("custom_type").value;
+    let x = parseFloat(document.getElementById("x_pos").value);
+    let y = parseFloat(document.getElementById("y_pos").value);
+    let z = parseFloat(document.getElementById("z_pos").value);
+    let note = document.getElementById("notes");
+
+    var d = new Date();
+    var t = d.getTime();
+
+    // Make a new artifact with this info for base
+    // look at how its done in fusion
+    let artifact_msg = {
+        "artifacts": [{
+                "artifact_id": t.toString(10),
+                "position": {"x": x, "y": y, "z": z},
+                "obj_class": new_artifact_type,
+                "obj_prob": 90
+        }]
+    }
+    global_tabManager.fusedArtifacts.set_artifacts(artifact_msg.artifacts);
+
+    $('#NewArtifactModal').modal('hide');
+}
+
+
+// This populates the pose of the custom artifact based on some other pose
+function populate_pos(){
+    let robot_name = document.getElementById("existing_location").value;
+    // console.log("setting position to ", robot_name);
+    if(robot_name == "goal"){
+        // console.log(goal_pose);
+        // update the modal with message data
+        document.getElementById("x_pos").value = goal_pose.position.x;
+        document.getElementById("y_pos").value = goal_pose.position.y;
+        document.getElementById("z_pos").value = goal_pose.position.z;
+    }else{
+        var Topic = new ROSLIB.Topic({
+            ros: ros,
+            name: `${ma_prefix}${robot_name}/odometry`,
+            messageType: "nav_msgs/Odometry"
+        });
+        // update the tf variable to be sent to a robot
+        // console.log("maybe its subscribed");
+        Topic.subscribe(function (message){
+            // update the modal with message data
+            document.getElementById("x_pos").value = message.pose.pose.position.x;
+            document.getElementById("y_pos").value = message.pose.pose.position.y;
+            document.getElementById("z_pos").value = message.pose.pose.position.z;
+            Topic.unsubscribe();
+        });
+    }   
+}
+
+
+// This populates an options list with active robots names
+function populateBots(id) {
+    if(global_tabManager != undefined){
+        let robots = global_tabManager.robot_name;
+        // console.log("robots exist");
+        var modal_options = document.getElementById(id);
+        var robots_in_display = [];
+        // check for what robots already exist in the options list
+        Array.from(modal_options.options).forEach(function(option_element) {
+            let option_value = option_element.value;
+            if(robots.includes(option_value)){
+                robots_in_display.push(option_value);
+            }
+        });
+        // console.log("adding robots", robots.length);
+        // Add robots to the options list
+        for (var i = 0; i < robots.length; i++) {
+            var robot = robots[i];
+            // console.log(robot);
+            if(robot != "" && !robots_in_display.includes(robot)){
+                // console.log("adding ", robot);
+                var option = document.createElement("option");
+                option.text = robot;
+                option.value = robot;
+                option.onclick = function(){populate_pos()};
+                modal_options.add(option);
+                // console.log("added option ", robot);
+            }
+        }
+    }else{
+        console.log("no robots to show");
+    }
+    // console.log("made artifacts array");
+}
+
+
 async function update_fused_artifact(msg){
     let id = msg.id;
     let fusedArtifacts = global_tabManager.fusedArtifacts.artifactsList;
@@ -67,7 +158,9 @@ class Artifact {
         this.updateDisplay();
     }
 
+    // This is a way of getting elements from the page
     set_artifact_tracker(robot_artifacts, id) {
+        // console.log(`setting trackers for ${id}`);
         this.artifact_tracker[id] = robot_artifacts.querySelector("[artifact_id = '" + id + "']");
         this.artifact_position[id] = this.artifact_tracker[id].querySelector("[id = 'position']");
         this.artifact_type[id] = this.artifact_tracker[id].querySelector("[id = 'type']");
@@ -185,6 +278,7 @@ class Artifact {
                 let new_row = this.add_artifact(id);
                 robot_artifacts.appendChild(new_row);
                 this.set_artifact_tracker(robot_artifacts, id);
+                this.highlight_line(id);
             }
 
             // When artifact class value has not been set, allow for code to set the class
@@ -256,6 +350,37 @@ class Artifact {
         }
     }
 
+
+    // This highlights the artifact line when a new one comes in
+    // THIS REQURES THE "set_artifact_tracker" METHOD BE RUN BEFORE CALLING THIS
+    async highlight_line(id){
+        // This gsts and saves the original background color of an artifact for use later
+        var previous_color = this.artifact_type[id].style.backgroundColor;
+
+        // console.log(`${id}`);
+        this.artifact_type[id].style.backgroundColor = "#dca200";
+        if(this.robot_name == "Base"){
+            this.artifact_seen_by[id].style.backgroundColor = "#dca200";
+        }
+        this.artifact_confidence[id].style.backgroundColor = "#dca200";
+        this.artifact_position[id].style.backgroundColor = "#dca200";
+        this.artifact_image[id].style.backgroundColor = "#dca200";
+        this.artifact_image[id].firstChild.style.backgroundColor = "#dca200";
+        this.artifact_tracker[id].querySelector(`[id = '${this.robot_name}_${id}']`).style.backgroundColor = "#dca200";
+    
+        await sleep(5000);
+        this.artifact_type[id].style.backgroundColor = previous_color;
+        if(this.robot_name == "Base"){
+            this.artifact_seen_by[id].style.backgroundColor = previous_color;
+        }
+        this.artifact_confidence[id].style.backgroundColor = previous_color;
+        this.artifact_position[id].style.backgroundColor = previous_color;
+        this.artifact_image[id].style.backgroundColor = previous_color;
+        this.artifact_image[id].firstChild.style.backgroundColor = previous_color;
+        this.artifact_tracker[id].querySelector(`[id = '${this.robot_name}_${id}']`).style.backgroundColor = previous_color;
+    }
+    
+    
     add_array(array) {
         this.artifact_All.push(array);
     }
@@ -304,7 +429,7 @@ class Artifact {
                 let dist = this.getDist(artifact, artifact2);
 
                 if ((dist < 3) && (artifact.obj_class == artifact2.obj_class)) {
-                    console.log("fusing", id, id2);
+                    // console.log("fusing", id, id2);
                     fuse = true;
 
                     if (useFusedArtifact) {
@@ -415,12 +540,14 @@ class Artifact {
 
     // THIS IS SUPER IMPORTANT AND ACTUALLY WHERE THE ARTIFACTS COME IN
     set_artifacts(msg) {
-        // console.log("begining of setting artifact")
+        console.log("begining of setting artifact")
         let update = false;
+        console.log(msg.length);
         for (let i = 0; i < msg.length; i++) {
             // Remap the artifacts to the DARPA required names
             // SHOULD BE CHANGED BY MIKE ON A ROBOT LEVEL SO TRANSLATION DOESN'T NEED TO HAPPEN
             let obj_class = msg[i].obj_class;
+            console.log(obj_class);
             switch(msg[i].obj_class) {
                 case "person":
                 case "survivor":
@@ -450,8 +577,9 @@ class Artifact {
 
             // Set a unique id by adding the robot name
             // Only update the list if it's a new artifact
-            let id = msg[i].artifact_id;
 
+            let id = msg[i].artifact_id;
+          
             if (this.artifactsList[id] == undefined) {
                 update = true;
                 this.artifactsList[id] = {}
@@ -480,7 +608,7 @@ class Artifact {
                 this.fuse_artifacts(id, false);
             }
         }
-        // console.log("set artifacts")
+        console.log("set artifacts")
         if (update) {
             //this.save_file();
             this.updateDisplay();

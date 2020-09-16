@@ -1,38 +1,58 @@
 var fs = require("fs");
-const { join } = require('path')
+const path = require('path')
 
 // you might wnat to change where the artifact file is
 // It works by putting each artifact on a new line
 var artifact_file = fs.readFileSync("js/artifacts.txt", "utf-8");
 var artifacts = artifact_file.split("\n");
 var ARTIFACT_ARR_LEN = artifacts.length;
-function populateOpts() {
-    var modal_options = document.getElementById("edit_type");
+function populateOpts(id) {
+    var modal_options = document.getElementById(id);
     for (var i = 0; i < artifacts.length; i++) {
         var artifact = artifacts[i];
-        var option = document.createElement("option");
-        option.text = artifact;
-        option.value = artifact;
-        modal_options.add(option);
-    }
-    console.log("made artifacts array");
-}
-
-
-// For crash recovery this checks for logs of artifacts that have been reported by robots
-function what_logs() {
-    console.log("Checking for logs");
-    var existing_logs = []
-    var files = fs.readdirSync('js');
-    for (f = 0; f < files.length; f++) {
-        if (files[f].includes("_reported.json")) {
-            existing_logs.push(files[f].split("_")[0]);
+        if(artifact != ""){
+            var option = document.createElement("option");
+            option.text = artifact;
+            option.value = artifact;
+            modal_options.add(option);
         }
     }
-    console.log(existing_logs);
-    return existing_logs;
+    // console.log("made artifacts array");
 }
 
+
+function what_logs(startPath, filter, keepPath, keepSuffix){
+    if(keepPath == undefined) keepPath = false;
+    if(keepSuffix == undefined) keepSuffix = false;
+    // console.log("Checking for logs", startPath, filter);
+
+    var returnable = []
+
+    if(!fs.existsSync(startPath)){
+        console.log("no dir ",startPath);
+        return;
+    }
+
+    var files = fs.readdirSync(startPath);
+    for(var i = 0; i < files.length; i++){
+        var filename = path.join(startPath, files[i]);
+        var stat = fs.lstatSync(filename);
+        if(stat.isDirectory()){
+            // Recurse
+            returnable.concat(what_logs(filename, filter, keepPath, keepSuffix));
+        }else if(filename.indexOf(filter) >= 0) {
+            if(keepPath == false){
+                filename.replace(startPath, '');
+            }
+            if(keepSuffix == false){
+                filename.replace(filter, '');
+            }
+            returnable.push(filename)
+        };
+    };
+    // console.log(returnable);
+    return returnable
+}
 
 // This logs artifacts that have been submitted to darpa
 function log_submitted_artifacts(artifact, position, notes, score) {
@@ -64,7 +84,7 @@ function log_robot_artifacts(robot_name, artifacts) {
     var artifact_data = `{"data": [${artifact_list}]}`;
 
     // write all of the data to the file
-    fs.writeFile(`js/${robot_name}_reported.json`, artifact_data, function (err) {
+    fs.writeFile(`js/mission_logs/${robot_name}_reported.json`, artifact_data, function (err) {
         if (err) {
             console.log(err);
         }
@@ -104,11 +124,9 @@ function get_darpa_artifacts() {
     // open or make DARPA_reported
 
     // Get the list of existing logs
-    let existing_logs = what_logs();
+    let existing_logs = what_logs("js/mission_logs", "_reported.json");
 
-    var found = existing_logs.find(function (darpa) {
-        return darpa == "DARPA";
-    });
+    var found = existing_logs.find(item => item =="DARPA");
     if (found) {
         fs.open(darpa_file_name, 'r+', function (err, file) {
             if (err) throw err;
@@ -150,7 +168,7 @@ function get_darpa_artifacts() {
 // end mission
 function end_mission() {
     console.log("ending mission")
-    let existing_logs = what_logs();
+    let existing_logs = what_logs("js/mission_logs", "_reported.json", true, true);
     // MAKE BETTER DIR NAME
     var currentdate = new Date();
     var folder = currentdate.getFullYear() + "."
@@ -159,19 +177,34 @@ function end_mission() {
         + currentdate.getHours() + "."
         + currentdate.getMinutes() + "."
         + currentdate.getSeconds();
-    fs.mkdirSync(`js/saved_missions/${folder}`)
-    // console.log(folder);
+    let save_folder = `js/saved_missions/${folder}`;
+    fs.mkdirSync(save_folder);
+    // Move all of the logs of the objects
     for (f = 0; f < existing_logs.length; f++) {
-        let oldPath = `js/${existing_logs[f]}_reported.json`;
-        let newPath = `js/saved_missions/${folder}/${existing_logs[f]}_reported.json`;
+        let oldPath = existing_logs[f];
+        let newPath = `js/saved_missions/${folder}/${existing_logs[f].replace("js/")}`;
         copy(oldPath, newPath);
     }
+    // Move all of the images
+    let images = what_logs("js/mission_imgs", ".jpg", true, true);
+    for(i = 0; i < images.length; i++){
+        let oldPath = images[i];
+        let newPath = `js/saved_missions/${folder}/${images[i].replace("js/mission_imgs/", "")}`;
+        // Make directory for robot if necessary
+        let dirPath = newPath.substr(0, newPath.lastIndexOf("/"));
+        if(!fs.existsSync(dirPath)){
+            fs.mkdirSync(`js/saved_missions/${folder}/${dirPath.replace(save_folder + "/", "")}`)
+        }
+        copy(oldPath, newPath);
+    }
+    copy("js/DARPA_reported.txt", save_folder + "DARPA_reported.txt")
     $('#EndMissionModal').modal('hide');
 }
 
 
-// Take  a guess what this does
+// Take a guess what this does
 function copy(oldPath, newPath) {
+    console.log(oldPath, newPath);
     fs.rename(oldPath, newPath, (err) => {
         if (err) throw err;
         console.log('Rename complete!');
@@ -185,14 +218,29 @@ function copy(oldPath, newPath) {
 // for use while at competition and preliminary checks are over
 function clear_mission() {
     console.log("Clearing mission");
-    let existing_logs = what_logs();
+    let existing_logs = what_logs("js/mission_logs", "_reported.json", true, true);
+    console.log(existing_logs)
     for (f = 0; f < existing_logs.length; f++) {
-        let file_path = `js/${existing_logs[f]}_reported.json`;
-        fs.writeFile(file_path, '', function (err) {
+        fs.unlink(existing_logs[f], function (err) {
             if (err) throw err;
             console.log(err);
         });
     }
+    let existing_imgs = what_logs("js/mission_imgs", ".jpg", true, true);
+    console.log(existing_imgs)
+    for (f = 0; f < existing_imgs.length; f++) {
+        fs.unlink(existing_imgs[f], function (err) {
+            if (err) throw err;
+            console.log(err);
+        });
+        console.log("deleted image");
+    }
+    // Get rid of the submitted data
+    fs.unlink("js/DARPA_reported.txt", function (err) {
+        if (err) throw err;
+        console.log(err);
+    });
+
     $('#EndMissionModal').modal('hide');
     location.reload();
 }

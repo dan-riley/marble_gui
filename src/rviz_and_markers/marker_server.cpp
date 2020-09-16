@@ -147,12 +147,13 @@ void makeMarker(int dof, geometry_msgs::Pose &pos, const string &artifact_name, 
 void initGoal(){
     geometry_msgs::Pose pos;
     // CHECK TO MAKE SURE THESE ARE IN THE RIGHT PLACES
-    pos.position.x = 0;
+    pos.position.x = -5;
     pos.position.y = 0;
-    pos.position.z = 2;
+    pos.position.z = 3;
     string name = "GOAL";
     // Note: using "name" twice was to get around the ID thing
     makeMarker(6, pos, name, name);
+    robot_goal.position = pos.position;
     server->applyChanges();
     // cout << "applied changes to server" << endl;
     publishGoal();
@@ -160,12 +161,8 @@ void initGoal(){
 
 // This continuiousely publishes the goal marker position
 void publishGoal(){
-    ros::Rate r(1); // 1 hz
-    while (ros::ok) {
-        goal_pub.publish(robot_goal);
-        ros::spinOnce();
-        r.sleep();
-    }
+    goal_pub.publish(robot_goal);
+    return;
 }
 
 // This deletes a marker from the server and from the logged artifacts vector
@@ -216,7 +213,7 @@ void setOffsets(ros::NodeHandle* nh){
 geometry_msgs::Pose get_robot_pose(const std_msgs::String& robot_name){
     // look for the correct robot
     // this should be changed to a better search algorithm in the future
-    for (int i = 0; i < robots.size(); i++) {
+    for (int i = 0; i < static_cast<int>(robots.size()); i++) {
         cout << robots[i]->name << endl;
         if (robots[i]->name == robot_name.data) {
             cout << "found robot and pose" << endl;
@@ -235,10 +232,15 @@ void goal_to_robot(const std_msgs::String& robot_name) {
     // Change the pose marker to be close but not on top of the robot
     near_robot_pose.position.z += 1;
 
-    cout << near_robot_pose << endl;
+    // cout << near_robot_pose << endl;
 
     server->setPose("GOAL", near_robot_pose);
     server->applyChanges();
+    
+    robot_goal.position = near_robot_pose.position;
+    robot_goal.orientation = near_robot_pose.orientation;
+
+    publishGoal();
 
     cout << "Got goal_to_robot" << endl;
 }
@@ -258,6 +260,15 @@ void clearMarkers(const std_msgs::String::ConstPtr& msg){
         submitted_markers.markers[i].action = visualization_msgs::Marker::DELETE;
     }
     sub_mkr_pub.publish(submitted_markers);
+}
+
+bool exists(vector<Robot*>& robot_objects, string robot_name){
+    for(auto i : robot_objects){
+        if(i->name == robot_name){
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -313,7 +324,39 @@ int main(int argc, char **argv) {
 
     cout << "inited goal" << endl;
 
-    ros::spin();
+    vector<string> mission_robots;
+
+    ros::Rate loop_rate(1);
+    while(ros::ok()){
+
+        try{
+            mission_robots = get_config_robots(&nh);
+            publishGoal();
+        }catch (const std::exception& e) { // reference to the base of a polymorphic object
+            std::cout << e.what() << endl; // information from length_error printed
+            cout << "error getting robots" << endl;
+        }
+
+        try{
+            // subscribe to images artifacts
+            for(string robot : mission_robots){
+                if(!exists(robots, robot)){
+                    cout << "adding " << robot << " image listener" << endl;
+                    Robot *new_robot = new Robot(&nh, robot);
+                    robots.push_back(new_robot);
+                }
+                
+            }
+        }catch (const std::exception& e) { // reference to the base of a polymorphic object
+            std::cout << e.what() << endl; // information from length_error printed
+            cout << "error adding robot" << endl;
+        }
+        
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+
+    cout << "exiting image marker server node" << endl;
 
     return 0;
     

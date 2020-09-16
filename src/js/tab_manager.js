@@ -90,6 +90,7 @@ function send_string_to(robot_name, signal, text) {
 }
 
 
+
 // This changes what robot we want to teleop to
 // This is legacy code kept around in case I broke something and we need to stitch back
 function teleop_to(robot_name){
@@ -225,17 +226,26 @@ function listen_for_tf(){
     });
 }
 
+
+// This updates options lists with new robots
+async function updateRobotOptions(){
+    // This is for the custom artifact modal
+    populateBots("existing_location");
+
+}
+
+
 // Initialize the whole gui
 function initialize() {
     load_params();
-    populateOpts();
     teleop_route();
     get_darpa_artifacts();
-    what_logs();
+    what_logs("js", "_reported.json");
     listen_to_markers();
     listen_to_pose();
     listen_for_tf();
     init_reset();
+
 }
 
 class TabManager {
@@ -294,13 +304,13 @@ class TabManager {
     // list if they are not there already
     search_robots() {
         var _this = global_tabManager;
-        if (robots_disp.length == 1) {
+        if (robots_disp[0] == "") {
             // This is where robots and beacons are filtered
             var patt = /^((?!B).)\d{1,2}(?!_)/;
+            var handled_names = [];
 
             for (let i = 0; i < topicsList.length; i++) {
                 let name = topicsList[i].split('/')[1];
-                var handled_names = [];
 
                 if (handled_names.indexOf(name) == -1) {
                     if (patt.test(name) && (name != 'S01')) {
@@ -470,13 +480,12 @@ class TabManager {
             <br>
             <button type='button' class="btn btn-success btn-sm" id="${this.robot_name[n]}_btn_explore"
                 onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Explore')" title="Explore">
-                <img src="./images/enterprise.png" class="control-icons">
+                <img src="./images/compas.png" class="control-icons">
             </button>
-            <button type='button' class="btn btn-danger btn-sm" id="${this.robot_name[n]}_btn_home"
+            <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_btn_home"
                 onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Home')" title="Go Home">
                 <img src="./images/go_home.png" class="control-icons">
             </button>
-            <br>
             <button type='button' class="btn btn-primary btn-sm" id="${this.robot_name[n]}_btn_deploy"
                 onclick="send_ma_task('${this.robot_name[n]}', 'task', 'Deploy')" title="Deploy Beacon">
                 <img src="./images/deploy_beacon.png" class="control-icons">
@@ -595,6 +604,7 @@ class TabManager {
 
         // Sets up all objects for vehicle artifact manager
         this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n], n);
+        updateRobotOptions();
 
         // Subscribes to artifact messages
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
