@@ -1,5 +1,5 @@
 var fs = require("fs");
-const { join } = require('path')
+const path = require('path')
 
 // you might wnat to change where the artifact file is
 // It works by putting each artifact on a new line
@@ -21,58 +21,38 @@ function populateOpts(id) {
 }
 
 
-// For crash recovery this checks for logs of artifacts that have been reported by robots
-function what_logs(dir, suffix, keepPath, keepSuffix) {
+function what_logs(startPath, filter, keepPath, keepSuffix){
     if(keepPath == undefined) keepPath = false;
     if(keepSuffix == undefined) keepSuffix = false;
-    console.log("Checking for logs", dir, suffix);
+    // console.log("Checking for logs", startPath, filter);
 
-    var existing_logs = [];
-    var files = fs.readdirSync(dir);
+    var returnable = []
 
-    if(files.length == 0){
-        return existing_logs;
+    if(!fs.existsSync(startPath)){
+        console.log("no dir ",startPath);
+        return;
     }
 
-    // Parse through all files found in dir
-    for (f = 0; f < files.length; f++) {
-        let dirPath = `${dir}/${files[f]}`;
-        console.log(dirPath);
-        // If its a directory named after a robot drill down further
-        if(fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
-            var patt = /([A-Z]\d{2})/;
-            // If the dir name fits the robot name format
-            if(patt.test(files[f])){
-                console.log("drilling down");
-                // add image files to existing logs
-                var sub_logs = what_logs(dirPath, suffix, keepPath, keepSuffix);
-                if(sub_logs.length != 0){
-                    // Concat has some weird issues here so use .push.apply instead
-                    existing_logs.push.apply(existing_logs, sub_logs);
-                }
+    var files = fs.readdirSync(startPath);
+    for(var i = 0; i < files.length; i++){
+        var filename = path.join(startPath, files[i]);
+        var stat = fs.lstatSync(filename);
+        if(stat.isDirectory()){
+            // Recurse
+            returnable.concat(what_logs(filename, filter, keepPath, keepSuffix));
+        }else if(filename.indexOf(filter) >= 0) {
+            if(keepPath == false){
+                filename.replace(startPath, '');
             }
-        }
-        // If the file is not a directoy but has the correct suffix, add it to the list
-        if(files[f].includes(suffix)){
-            console.log("adding files to existing logs");
-            var file = files[f];
-            // remove the suffix from the file name if requested
-            if(!keepSuffix){
-                console.log("removing file extension");
-                file = files[f].replace(suffix, '');
+            if(keepSuffix == false){
+                filename.replace(filter, '');
             }
-            // add path if requested
-            if(keepPath){
-                existing_logs.push(`${dir}/${file}`);
-            }else{
-                existing_logs.push(file);
-            }
-        }
-    }
-    console.log("returning ", existing_logs);
-    return existing_logs;
+            returnable.push(filename)
+        };
+    };
+    // console.log(returnable);
+    return returnable
 }
-
 
 // This logs artifacts that have been submitted to darpa
 function log_submitted_artifacts(artifact, position, notes, score) {
@@ -104,7 +84,7 @@ function log_robot_artifacts(robot_name, artifacts) {
     var artifact_data = `{"data": [${artifact_list}]}`;
 
     // write all of the data to the file
-    fs.writeFile(`js/${robot_name}_reported.json`, artifact_data, function (err) {
+    fs.writeFile(`js/mission_logs/${robot_name}_reported.json`, artifact_data, function (err) {
         if (err) {
             console.log(err);
         }
@@ -144,11 +124,9 @@ function get_darpa_artifacts() {
     // open or make DARPA_reported
 
     // Get the list of existing logs
-    let existing_logs = what_logs("js", "_reported.json");
+    let existing_logs = what_logs("js/mission_logs", "_reported.json");
 
-    var found = existing_logs.find(function (darpa) {
-        return darpa == "DARPA";
-    });
+    var found = existing_logs.find(item => item =="DARPA");
     if (found) {
         fs.open(darpa_file_name, 'r+', function (err, file) {
             if (err) throw err;
@@ -190,7 +168,7 @@ function get_darpa_artifacts() {
 // end mission
 function end_mission() {
     console.log("ending mission")
-    let existing_logs = what_logs("js", "_reported.json", true, true);
+    let existing_logs = what_logs("js/mission_logs", "_reported.json", true, true);
     // MAKE BETTER DIR NAME
     var currentdate = new Date();
     var folder = currentdate.getFullYear() + "."
@@ -239,7 +217,8 @@ function copy(oldPath, newPath) {
 // for use while at competition and preliminary checks are over
 function clear_mission() {
     console.log("Clearing mission");
-    let existing_logs = what_logs("js", "_reported.json", true, true);
+    let existing_logs = what_logs("js/mission_logs", "_reported.json", true, true);
+    console.log(existing_logs)
     for (f = 0; f < existing_logs.length; f++) {
         fs.unlink(existing_logs[f], function (err) {
             if (err) throw err;
@@ -247,6 +226,7 @@ function clear_mission() {
         });
     }
     let existing_imgs = what_logs("js/mission_imgs", ".jpg", true, true);
+    console.log(existing_imgs)
     for (f = 0; f < existing_imgs.length; f++) {
         fs.unlink(existing_imgs[f], function (err) {
             if (err) throw err;
@@ -255,7 +235,7 @@ function clear_mission() {
         console.log("deleted image");
     }
     $('#EndMissionModal').modal('hide');
-    // location.reload();
+    location.reload();
 }
 
 

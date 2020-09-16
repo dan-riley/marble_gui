@@ -89,7 +89,7 @@ vector<string> get_config_robots(ros::NodeHandle* nh) {
         for(auto topic : topics){
             // std::string s ("this subject has a submarine as a subsequence");
             std::smatch m;
-            std::regex e ("([A-Z]\\d{2})");
+            std::regex e ("([A-Z]{1}\\d{2})");
             if(std::regex_search(topic.name, m, e)){
                 // cout << "found a match" << endl;
                 for(string match : m){

@@ -16,7 +16,7 @@ function createNewArtifact(){
     // look at how its done in fusion
     let artifact_msg = {
         "artifacts": [{
-                "artifact_id": t,
+                "artifact_id": t.toString(10),
                 "position": {"x": x, "y": y, "z": z},
                 "obj_class": new_artifact_type,
                 "obj_prob": 90
@@ -160,7 +160,7 @@ class Artifact {
 
     // This is a way of getting elements from the page
     set_artifact_tracker(robot_artifacts, id) {
-        console.log(`setting trackers for ${id}`);
+        // console.log(`setting trackers for ${id}`);
         this.artifact_tracker[id] = robot_artifacts.querySelector("[artifact_id = '" + id + "']");
         this.artifact_position[id] = this.artifact_tracker[id].querySelector("[id = 'position']");
         this.artifact_type[id] = this.artifact_tracker[id].querySelector("[id = 'type']");
@@ -357,7 +357,7 @@ class Artifact {
         // This gsts and saves the original background color of an artifact for use later
         var previous_color = this.artifact_type[id].style.backgroundColor;
 
-        console.log(`${id}`);
+        // console.log(`${id}`);
         this.artifact_type[id].style.backgroundColor = "#dca200";
         if(this.robot_name == "Base"){
             this.artifact_seen_by[id].style.backgroundColor = "#dca200";
@@ -429,7 +429,7 @@ class Artifact {
                 let dist = this.getDist(artifact, artifact2);
 
                 if ((dist < 3) && (artifact.obj_class == artifact2.obj_class)) {
-                    console.log("fusing", id, id2);
+                    // console.log("fusing", id, id2);
                     fuse = true;
 
                     if (useFusedArtifact) {

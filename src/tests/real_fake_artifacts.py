@@ -31,6 +31,21 @@ import numpy as np
 ROBOT_NAMES = ['H01', 'T02']
 ARTIFACT_IMG_ID = 0
 ARTIFACT_IMG_PATH = 'test_img.jpg'
+ARTIFACTS = ['survivor', 'drill', 'dan', 'backpack']
+
+def make_message(id, i):
+    msg = Artifact()
+    msg.header.seq = i
+    msg.header.stamp = rospy.Time.now()
+    msg.header.frame_id = ''
+    msg.position.x = np.random.uniform(-20, 20.1, 1)[0]
+    msg.position.y = np.random.uniform(-20, 20.1, 1)[0]
+    msg.position.z = np.random.uniform(-20, 20.1, 1)[0]
+    msg.obj_class = np.random.choice(ARTIFACTS, 1)[0]
+    msg.obj_prob = 0.99
+    msg.artifact_id = str(id)
+    
+    return msg
 
 
 def get_messages_filled_with_data(robot_name):
@@ -43,64 +58,18 @@ def get_messages_filled_with_data(robot_name):
     array_msg.header.frame_id = ''
     array_msg.owner = robot_name
 
-    for i in range(1, 20):
-        msg = Artifact()
-        msg.header.seq = i
-        msg.header.stamp = rospy.Time.now()
-        msg.header.frame_id = ''
-        msg.position.x = 0
-        msg.position.y = 0
-        msg.position.z = 0
-        msg.obj_class = ''
-        msg.obj_prob = 0
-        msg.has_been_reported = True
-        array_msg.artifacts.append(msg)
+    id = 0
 
-    array_msg.artifacts[0].position.x = 70 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[0].position.y = -60 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[0].position.z = 0.2 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[0].obj_class = 'backpack'
-    array_msg.artifacts[0].obj_prob = 0.785
-    array_msg.artifacts[0].has_been_reported = False
+    for i in range(1, 20):
+      id +=1
+      array_msg.artifacts.append(make_message(id, i))
 
     cv_img = cv2.imread(ARTIFACT_IMG_PATH, cv2.IMREAD_COLOR)
     compressed_img_msg = CvBridge().cv2_to_compressed_imgmsg(cv_img)
 
     artifact_img_msg.header.stamp = rospy.Time.now()
     artifact_img_msg.artifact_img = compressed_img_msg
-    artifact_img_msg.image_id = ARTIFACT_IMG_ID
-    artifact_img_msg.vehicle_reporter = robot_name
-
-    array_msg.artifacts[1].position.x = 25 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[1].position.y = 2.0 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[1].position.z = 0.2 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[1].obj_class = 'drill'
-    array_msg.artifacts[1].obj_prob = 0.454
-
-    array_msg.artifacts[2].position.x = 60.0 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[2].position.y = -2 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[2].position.z = 0.2 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[2].obj_class = 'survivor'
-    array_msg.artifacts[2].obj_prob = 0.154
-    # array_msg.artifacts[2].has_been_reported = False
-    #
-    array_msg.artifacts[3].position.x = 40 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[3].position.y = 20 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[3].position.z = 0.2 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[3].obj_class = 'extinguisher'
-    array_msg.artifacts[3].obj_prob = 0.972
-
-    array_msg.artifacts[4].position.x = 65 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[4].position.y = -40 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[4].position.z = 0.2 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[4].obj_class = 'extinguisher'
-    array_msg.artifacts[4].obj_prob = 0.972
-
-    array_msg.artifacts[5].position.x = 15 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[5].position.y = -60 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[5].position.z = 0.2 + np.random.uniform(-3, 3.1, 1)[0]
-    array_msg.artifacts[5].obj_class = 'extinguisher'
-    array_msg.artifacts[5].obj_prob = 0.972
+    artifact_img_msg.artifact_id = str(id)
 
     return array_msg, compressed_img_msg, artifact_img_msg
 
@@ -110,7 +79,7 @@ def main(robot_name):
 	array_pub = rospy.Publisher(
 	    '/Base/neighbors/' + robot_name + '/artifacts', ArtifactArray, queue_size=10)
 	img_pub = rospy.Publisher(
-	    '/Base/neighbors/' + robot_name + '/artifact_image_to_base', ArtifactImg, queue_size=10)
+	    '/Base/neighbors/' + robot_name + '/image', ArtifactImg, queue_size=10)
 	rqt_img_pub = rospy.Publisher('/Base/neighbors/' + robot_name + '/' + str(
 	    ARTIFACT_IMG_ID) + '/artifact_img/compressed', CompressedImage, queue_size=10)
 
