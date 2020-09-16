@@ -147,9 +147,9 @@ void makeMarker(int dof, geometry_msgs::Pose &pos, const string &artifact_name, 
 void initGoal(){
     geometry_msgs::Pose pos;
     // CHECK TO MAKE SURE THESE ARE IN THE RIGHT PLACES
-    pos.position.x = 0;
+    pos.position.x = -5;
     pos.position.y = 0;
-    pos.position.z = 5;
+    pos.position.z = 3;
     string name = "GOAL";
     // Note: using "name" twice was to get around the ID thing
     makeMarker(6, pos, name, name);

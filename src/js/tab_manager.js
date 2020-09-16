@@ -14,14 +14,9 @@ function load_params() {
     console.log('calling robots');
     robots_param.get(function(param){
         console.log('got robots');
-        if(param == ""){
-            // You did this to make sure the system will look on the network for robots if none are in the launch param
-            robots_disp = [''];
-        }else{
-            robots_disp = param.split(',');
-            console.log(param);
-        }
-        
+        robots_disp = param.split(',');
+        console.log(param);
+        robots_init = true;
     });
     var ma_param = new ROSLIB.Param({
         ros: ros,
@@ -312,11 +307,11 @@ class TabManager {
         if (robots_disp[0] == "") {
              // This is where robots and beacons are filtered
              var patt = /^((?!B).)\d{1,2}(?!_)/;
+             var handled_names = [];
 
              for (let i = 0; i < topicsList.length; i++) {
                  let name = topicsList[i].split('/')[1];
-                 var handled_names = [];
- 
+
                  if (handled_names.indexOf(name) == -1) {
                      if (patt.test(name) && (name != 'S01')) {
                          if (_this.robot_name.indexOf(name) == -1) {

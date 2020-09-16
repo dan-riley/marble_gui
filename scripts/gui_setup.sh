@@ -20,7 +20,7 @@ sudo apt-get -y install libboost-all-dev
 
 # Catkin Build
 printf "++++++++++++++++++++++++++++ \n INSTALLING CATKIN TOOLS, NODEjs, AND JOYSTICK THINGS \n++++++++++++++++++++++++++++\n"
-sudo apt -y install python3-catkin-tools ros-noetic-joy nodejs npm
+sudo apt -y install python3-catkin-tools ros-melodic-teleop-twist-joy ros-melodic-joy nodejs npm
 
 printf "++++++++++++++++++++++++++++ \n DOWNLOADING ROSBRIDGE_SUITE \n++++++++++++++++++++++++++++\n"
 git clone https://github.com/RobotWebTools/rosbridge_suite.git
