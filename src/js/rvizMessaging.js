@@ -193,14 +193,14 @@ function previewTransform(onoff){
         pose : {
             pose : {
                 position : {
-                    x : -parseFloat(document.getElementById("x_translation").value) + tf.x,
-                    y : -parseFloat(document.getElementById("y_translation").value) + tf.y,
-                    z : -parseFloat(document.getElementById("z_translation").value) + tf.z
+                    x : parseFloat(document.getElementById("x_translation").value) + tf.x,
+                    y : parseFloat(document.getElementById("y_translation").value) + tf.y,
+                    z : parseFloat(document.getElementById("z_translation").value) + tf.z
                 },
                 orientation : {
-                    x : -parseFloat(document.getElementById("x_rotation").value),
-                    y : -parseFloat(document.getElementById("y_rotation").value),
-                    z : -parseFloat(document.getElementById("z_rotation").value),
+                    x : parseFloat(document.getElementById("x_rotation").value),
+                    y : parseFloat(document.getElementById("y_rotation").value),
+                    z : parseFloat(document.getElementById("z_rotation").value),
                     w : parseFloat(document.getElementById("w_rotation").value)
                 }
             }

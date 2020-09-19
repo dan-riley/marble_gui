@@ -215,6 +215,7 @@ function listen_for_tf(){
         robot_transform = message;
 
         // update the modal with message data
+        $('#select_robot_transform').val(robot_transform.child_frame_id);
         $('#x_translation').val(robot_transform.transform.translation.x);
         $('#y_translation').val(robot_transform.transform.translation.y);
         $('#z_translation').val(robot_transform.transform.translation.z);
