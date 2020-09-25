@@ -18,9 +18,13 @@ cd ~/$1/src/
 printf "++++++++++++++++++++++++++++ \n INSTALLING BOOST LIBRARIES \n++++++++++++++++++++++++++++\n"
 sudo apt-get -y install libboost-all-dev
 
+# Get node
+printf "++++++++++++++++++++++++++++ \n GETTING NIDE FOR apt INSTALL \n++++++++++++++++++++++++++++\n"
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+
 # Catkin Build
 printf "++++++++++++++++++++++++++++ \n INSTALLING CATKIN TOOLS, NODEjs, AND JOYSTICK THINGS \n++++++++++++++++++++++++++++\n"
-sudo apt -y install python3-catkin-tools ros-melodic-teleop-twist-joy ros-melodic-joy nodejs npm
+sudo apt -y install python3-catkin-tools ros-melodic-teleop-twist-joy ros-melodic-joy nodejs
 
 printf "++++++++++++++++++++++++++++ \n DOWNLOADING ROSBRIDGE_SUITE \n++++++++++++++++++++++++++++\n"
 git clone https://github.com/RobotWebTools/rosbridge_suite.git
@@ -33,18 +37,8 @@ git clone https://github.com/RobotWebTools/tf2_web_republisher.git -b master
 
 cd ~/catkin_ws
 
-# echo "++++++++++++++++++++++++++++ \n BUILDING GUI \n++++++++++++++++++++++++++++"
-# catkin build marble_gui
-
-# catkin build tf2_web_republisher
-
-# INSTALL ELECTRON AND nodejs IN GENERAL
-# curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-
-# sudo apt -y install nodejs
-
 printf "++++++++++++++++++++++++++++ \n INSTALLING ELECTRON \n++++++++++++++++++++++++++++\n"
-sudo npm install electron -g
+sudo npm install electron
 
 printf "++++++++++++++++++++++++++++ \n NPM INSTALL THE GUI \n++++++++++++++++++++++++++++\n"
 cd ~/$1/src/marble_base_station/marble_gui/src
