@@ -1,5 +1,5 @@
 <launch>
-    <arg name="robots" default="" />
+    <arg name="robots" default="H01,T02" />
     <node name="rosbridge" pkg="rosbridge_server" type="rosbridge_websocket" output="screen">
     </node>
     <node name="rosapi" pkg="rosapi" type="rosapi_node" output="screen">

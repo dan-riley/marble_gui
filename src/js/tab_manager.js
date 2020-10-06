@@ -243,7 +243,7 @@ function initialize() {
     get_darpa_artifacts();
     what_logs("js", "_reported.json");
     listen_to_markers();
-    listen_to_pose();
+    listen_goal_pose();
     listen_for_tf();
     init_reset();
 

@@ -1,13 +1,14 @@
-// This sends the goal pose from RVIZ to the correct robot
-function listen_to_pose(){
+// This listens to the goal pose
+function listen_goal_pose(){
     var pose_listener = new ROSLIB.Topic({
         ros: ros,
-        name: '/robot_to_goal',
+        name: '/goal_pose',
         messageType: 'geometry_msgs/Pose'
     });
    
     pose_listener.subscribe(function (message){
-        goal_pose = message
+        console.log('updating goal pose');
+        goal_pose = message;
     });
 }
 
@@ -95,7 +96,7 @@ function clear_rviz(){
 function send_fused_update(artifact, id, old_id) {
     // Important to catch these null artifacts
     if (artifact != undefined) {
-        if (old_id)
+        if (old_id != '')
             console.log("Updating fused artifact " + old_id + " with " + id)
         else
             console.log("Sending new fused artifact to server: " + id)
@@ -116,8 +117,9 @@ function send_fused_update(artifact, id, old_id) {
             position: artifact.position,
             origin: "gui"
         });
-        //   console.log(pose)
+        console.log("publishing fused update", pose)
         fused_pub.publish(pose)
+
     }
 }
 
