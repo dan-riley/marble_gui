@@ -6,6 +6,7 @@ ros = new ROSLIB.Ros({
 });
 
 var robots_disp, ma_prefix, comms_prefix;
+var handled_topics = [];
 function load_params() {
     var robots_param = new ROSLIB.Param({
         ros: ros,
@@ -305,25 +306,55 @@ class TabManager {
     // list if they are not there already
     search_robots() {
         var _this = global_tabManager;
+        // if we need to search the network for robots
         if (robots_disp[0] == "") {
             // This is where robots and beacons are filtered
-            var patt = /^((?!B).)\d{1,2}(?!_)/;
-            var handled_names = [];
+            // var patt = /^((?!B).)\d{1,2}(?!_)/;
+            // var handled_names = [];
 
-            for (let i = 0; i < topicsList.length; i++) {
-                let name = topicsList[i].split('/')[1];
+            // for (let i = 0; i < topicsList.length; i++) {
+            //     console.log("Looking for robots on the network");
+            //     let name = topicsList[i].split('/')[1];
 
-                if (handled_names.indexOf(name) == -1) {
-                    if (patt.test(name) && (name != 'S01')) {
+            //     if (handled_names.indexOf(name) == -1) {
+            //         if (patt.test(name) && (name != 'S01')) {
+            //             console.log('adding ', name, ' from the network');
+            //             if (_this.robot_name.indexOf(name) == -1) {
+            //                 _this.robot_name.push(name);
+            //                 _this.tabs_robot_name.push(name);
+            //                 _this.x++;
+                            
+            //             }
+            //         }
+            //         handled_names.push(name);
+            //     }
+            // }
+
+            // Make decision of what to do with this improved system
+            let topics = topicsList.filter(x => !handled_topics.includes(x));
+
+            for (let i = 0; i < topics.length; i++) {
+                // console.log("Looking for robots on the network");
+                if(topics[i].includes(ma_prefix) && topics[i].includes('odometry')){
+                    
+                    // reg ex patern for good robot names
+                    var patt = /\b[A, C-R, T-Z]\d{1,2}(?!_)\b/i;
+                    let results = topics[i].match(patt);
+                    if(results){
+                        name = results[0];
+                        console.log('adding ', name, ' from the network');
                         if (_this.robot_name.indexOf(name) == -1) {
                             _this.robot_name.push(name);
                             _this.tabs_robot_name.push(name);
                             _this.x++;
+                            
                         }
                     }
-                    handled_names.push(name);
                 }
+                handled_topics.push(topics[i]);
             }
+
+        // If we can get robots from launch file
         } else {
           for (let i = 0; i < robots_disp.length; i++) {
               name = robots_disp[i];

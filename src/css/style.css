@@ -37,7 +37,7 @@ body {
 .topnav {
   background-color: #333;
   overflow-y: hidden;
-  overflow-x: auto;
+  overflow-x: scroll;
   font-size: medium;
   height: 8vh;
   /* resize: vertical; */
@@ -166,3 +166,19 @@ button {
 .modal{
   margin-top: 8vh;
 }
+
+ /* width */
+ ::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* THIS SECTION IS SOME STYLING FOR THE SCROLL BARS */
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(231, 231, 231);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(105, 198, 252);
+} 
