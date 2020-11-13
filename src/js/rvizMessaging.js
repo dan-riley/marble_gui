@@ -26,43 +26,6 @@ function publish_goal(robot){
     console.log("publishing goal for ", robot);
 }
 
-
-// This sends the goal location to  the specified robot
-// function publish_goalII(){
-//     var opt = document.getElementById("teleop_robot_select");
-//     var robot = opt.options[opt.selectedIndex].value;
-
-//     var Topic = new ROSLIB.Topic({
-//         ros: ros,
-//         name: `Base/neighbors/${robot}/guiGoalPoint`,
-//         messageType: "geometry_msgs/Pose"
-//     });
-    
-//     Topic.name = `Base/neighbors/${robot}/guiGoalPoint`;
-//     if(robot != 'Base'){
-//         Topic.publish(goal_pose);
-//     }
-// }
-
-
-// This send the goal near the pose of the specified robot
-// function goal_to_robot(){
-//     var opt = document.getElementById("teleop_robot_select");
-//     var robot = opt.options[opt.selectedIndex].value;
-
-//     console.log("goal to robot: " + robot);
-
-//     var Topic = new ROSLIB.Topic({
-//         ros: ros,
-//         name: `/gui/goal_to_robot`,
-//         messageType: "std_msgs/String"
-//     });
-//     var msg = new ROSLIB.Message({
-//         data: robot
-//     });
-//     Topic.publish(msg);
-// }
-
 // This send the goal near the pose of the specified robot
 function goal_to_robotII(robot){
     console.log("goal to robot: " + robot);
