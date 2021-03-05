@@ -187,8 +187,10 @@ function previewTransform(onoff){
         tf = {x : -0.4379, y : 0.0, z : -0.52418};
     }else if(robot_name.includes("T")){
         tf = {x : -0.4167, y : 0.0, z : -0.343};
+    }else if(robot_name.includes("D")){
+        tf = {x : -0.34803, y : 0.00333, z : -0.30025};
     }
-    
+
     var msg = new ROSLIB.Message({
         pose : {
             pose : {
