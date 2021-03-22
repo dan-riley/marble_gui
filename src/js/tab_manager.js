@@ -39,6 +39,7 @@ class TabManager {
         this.Tab_CommSub = [];
         this.Tab_ArtifactSub = [];
         this.Tab_ArtifactImgSub = [];
+        this.Tab_RobotLocation = [];
 
         this.global_vehicleType = [];
         this.tasks = [];
@@ -238,7 +239,7 @@ class TabManager {
         });
 
         // Creating tab at top of screen for selecting robot view
-        $('#Robot_Tabs').append(robotTab(robot));
+        $('#Robot_Tabs').append(robotTab(robot, n));
 
 
         $('#controls_bar_inner').append(controlCard(robot))
@@ -247,22 +248,7 @@ class TabManager {
         tabContent(robot);
 
         // Build the artifacts section for this robot
-        robotArtifactSection(robot);
-
-        // Artifact rows get created by the artifact handler now
-        let artifact_tracker = document.getElementById("robot_artifact_tables");
-        // Creates a DIV element that is placed either on the left or right side of the screen depending on how many robots there currently are
-        if (n % 2 == 0) {
-            this.rows++;
-            let row_artifact_containers = document.createElement("DIV");
-            row_artifact_containers.setAttribute("class", "row");
-            row_artifact_containers.setAttribute("row_id", this.rows);
-            row_artifact_containers.appendChild(robot_artifact_container);
-            artifact_tracker.appendChild(row_artifact_containers);
-        } else {
-            let row_artifact_containers = artifact_tracker.querySelector("[row_id = '" + this.rows + "']");
-            row_artifact_containers.appendChild(robot_artifact_container);
-        }
+        robotArtifactSection(robot, n);
 
         // Buttons have to be added here or jquery doesn't see it in the DOM
         // $('#' + this.robot_name[n] + '_buttons').clone(true, true).appendTo('#' + this.robot_name[n] + '_buttons_container');
@@ -285,6 +271,12 @@ class TabManager {
             // }
 
         });
+        this.Tab_RobotLocation[n].subscribe(function (msg) {
+            // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
+            global_tabManager.global_vehicleArtifactsList[n].update_location(msg);
+            // }
+
+        });
 
         // Add to the Transform Transport dropdown
         var modal_options = document.getElementById("select_robot_transform");
@@ -295,6 +287,19 @@ class TabManager {
 
         // Build the reset section for this robot
         robotReset(robot);
+    }
+
+    update_location(msg){
+        console.log('location updated')
+        var to_update = document.getElementById( "distance_to_" + this.robot_name).innerHTML;
+        let x = msg.pose.pose.position.x;
+        let y = msg.pose.pose.position.y;
+        let z = msg.pose.pose.position.z;
+        
+        let d1 = Math.sqrt((x * x) + (y * y));
+        let d2 = Math.sqrt((d1 * d1) + (z * z));
+
+        to_update = str(d2) + 'm';
     }
 
     // This is used by "add_tab" above
@@ -328,6 +333,11 @@ class TabManager {
             ros: ros,
             name: ma_prefix + robot + "/image",
             messageType: "marble_artifact_detection_msgs/ArtifactImg"
+        });
+        this.Tab_RobotLocation[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: ma_prefix + robot + "/odometry",
+            messageType: "nav_msgs/Odometry"
         });
     }
 

@@ -13,6 +13,7 @@ function controlCard(robot){
 
     let card = `<li id="${robot}_control_card" class="quick_control">
             <h4>${robot}</h4>
+            <p id="distance_to_${robot}">0m</p>
             ${disarmBtn}
             <button type='button' class="btn btn-success btn-sm" id="${robot}_btn_start"
                 onclick="send_ma_task('${robot}', 'task', 'Start')" title="Start">
@@ -56,13 +57,14 @@ function controlCard(robot){
                 onclick="goal_to_robotII('${robot}')" value="Goal to Robot" title="Goal To Robot">
                 <img src="./images/goal_to_robot.png" class="control-icons">
             </button></br>
+
         </li>`;
 
         return card;
 }
 
 
-function robotTab(robot){
+function robotTab(robot, n){
     let tab = `
     <li class="nav-item" id="${robot}_nav_link" robot_name="${robot}">
         <a  class="nav-link" onclick="window.openPage('${robot}', ${n})" >
@@ -128,7 +130,7 @@ function tabContent(robot){
 
         var top_card_header = document.createElement("DIV");
         top_card_header.setAttribute("class", "card-header");
-        top_card_header.innerText = global_tabManager.robot_name[n];
+        top_card_header.innerText = robot;
 
         top_card.appendChild(top_card_header);
         tab_content.appendChild(top_card);
@@ -137,7 +139,7 @@ function tabContent(robot){
 }
 
 
-function robotArtifactSection(robot){
+function robotArtifactSection(robot, n){
     var robot_artifact_container = document.createElement("DIV");
         robot_artifact_container.setAttribute("class", "col-sm-12 artifact_table");
         robot_artifact_container.setAttribute("robot_name", robot);
@@ -186,4 +188,20 @@ function robotArtifactSection(robot){
 
         robot_artifact_container.appendChild(robot_artifact_header);
         robot_artifact_container.appendChild(robot_artifact_titles);
+
+        // Artifact rows get created by the artifact handler now
+        let artifact_tracker = document.getElementById("robot_artifact_tables");
+        // Creates a DIV element that is placed either on the left or right side of the screen depending on how many robots there currently are
+        if (n % 2 == 0) {
+            this.rows++;
+            let row_artifact_containers = document.createElement("DIV");
+            row_artifact_containers.setAttribute("class", "row");
+            row_artifact_containers.setAttribute("row_id", this.rows);
+            row_artifact_containers.appendChild(robot_artifact_container);
+            artifact_tracker.appendChild(row_artifact_containers);
+        } else {
+            let row_artifact_containers = artifact_tracker.querySelector("[row_id = '" + this.rows + "']");
+            row_artifact_containers.appendChild(robot_artifact_container);
+        }
+
 }

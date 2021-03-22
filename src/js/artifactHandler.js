@@ -263,6 +263,20 @@ class Artifact {
         return robot_artifact_tracker;
     }
 
+    update_location(msg){
+        console.log('location updated');
+        const to_update = document.getElementById(`distance_to_${this.robot_name}`);
+        let x = msg.pose.pose.position.x;
+        let y = msg.pose.pose.position.y;
+        let z = msg.pose.pose.position.z;
+        
+        let d1 = Math.sqrt((x * x) + (y * y));
+        var d2 = Math.sqrt((d1 * d1) + (z * z));
+        d2 = Number((d2).toFixed(2))
+
+        to_update.innerText = `${d2} m`;
+    }
+
     updateDisplay() {
         console.log("updating the display")
         var artifact_page = document.getElementById("Artifact_Page");
@@ -349,6 +363,8 @@ class Artifact {
             }
         }
     }
+
+
 
 
     // This highlights the artifact line when a new one comes in
@@ -614,6 +630,7 @@ class Artifact {
             this.updateDisplay();
         }
     }
+
 
     deleteArtifact(id) {
         this.artifact_tracker[id].remove();

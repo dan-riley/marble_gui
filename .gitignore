@@ -1,6 +1,7 @@
 *.vscode
 *node_modules*
 *.pyc
+*build
 *bower_components*
 tags
 src/js/*.txt
