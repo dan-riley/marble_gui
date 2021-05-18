@@ -35,13 +35,12 @@ git clone https://github.com/GT-RAIL/rosauth.git -b master
 printf "++++++++++++++++++++++++++++ \n DOWNLOADING ROSAUTH \n++++++++++++++++++++++++++++\n"
 git clone https://github.com/RobotWebTools/tf2_web_republisher.git -b master
 
-cd ~/catkin_ws
+cd ~/$1/src/marble_base_station/marble_gui/src
 
 printf "++++++++++++++++++++++++++++ \n INSTALLING ELECTRON \n++++++++++++++++++++++++++++\n"
 sudo npm install electron
 
 printf "++++++++++++++++++++++++++++ \n NPM INSTALL THE GUI \n++++++++++++++++++++++++++++\n"
-cd ~/$1/src/marble_base_station/marble_gui/src
 npm install
 
 printf "++++++++++++++++++++++++++++ \n NPM INSTALL EJS, JQUERY, FS, PATH, AND ROS-WEBSOCKET  \n++++++++++++++++++++++++++++\n"
