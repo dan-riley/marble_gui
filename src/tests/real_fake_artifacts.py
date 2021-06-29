@@ -28,7 +28,7 @@ import cv2
 from cv_bridge import CvBridge
 import numpy as np
 
-ROBOT_NAMES = ['H01', 'T02']
+ROBOT_NAMES = ['H01', 'H02', 'H03', 'T01', 'T02', 'T03', 'A01', 'A02', 'A03']
 ARTIFACT_IMG_ID = 0
 ARTIFACT_IMG_PATH = 'test_img.jpg'
 ARTIFACTS = ['survivor', 'drill', 'dan', 'backpack']

@@ -68,6 +68,7 @@ void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr
             if (feedback->marker_name == "GOAL") {
                 robot_goal.position = feedback->pose.position;
                 robot_goal.orientation = feedback->pose.orientation;
+                publishGoal();
             } else {
                 string* identifiers = getIdFromName(feedback->marker_name);
                 // cout << identifiers << endl;
@@ -95,6 +96,7 @@ void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr
 // This deals with marker messages
 // It creates new markers and updates existing ones when necessary
 void markerCallback(const marble_gui::ArtifactTransport &art){
+    cout << art << endl;
     if (art.origin ==  "gui") {
         geometry_msgs::Pose pos;
         // CHECK TO MAKE SURE TEHESE ARE IN THE RIGHT PLACES
@@ -300,8 +302,8 @@ int main(int argc, char **argv) {
     
     ros::Duration(0.1).sleep();
 
-    // subscribe to fused artifacts
-    ros::Subscriber sub = nh.subscribe("/gui/fused_artifact", 10, markerCallback);
+    // subscribe to fused artifacts !!!!!! YOU WANT A REASONABLY HIGH QUEUE SIZE !!!!!!!
+    ros::Subscriber sub = nh.subscribe("/gui/fused_artifact", 1000, markerCallback);
     // scribe to the the gui setting the goal to be closer to a robot
     ros::Subscriber goal_sub = nh.subscribe("/gui/goal_to_robot", 10, goal_to_robot);
     // subscribe to the submitted artifact topic from the gui
@@ -313,7 +315,7 @@ int main(int argc, char **argv) {
     // updates to gui about fused artifacts
     pub = nh.advertise<marble_gui::ArtifactTransport>("mkr_srv_talkback", 1);
     // sends the goal for the robot to the gui
-    goal_pub = nh.advertise<geometry_msgs::Pose>("robot_to_goal", 10);
+    goal_pub = nh.advertise<geometry_msgs::Pose>("goal_pose", 10);
     // send non interactive markers to rviz
     sub_mkr_pub = nh.advertise<visualization_msgs::MarkerArray>("submitted_markers", 1);
 
@@ -331,7 +333,6 @@ int main(int argc, char **argv) {
 
         try{
             mission_robots = get_config_robots(&nh);
-            publishGoal();
         }catch (const std::exception& e) { // reference to the base of a polymorphic object
             std::cout << e.what() << endl; // information from length_error printed
             cout << "error getting robots" << endl;
@@ -341,7 +342,6 @@ int main(int argc, char **argv) {
             // subscribe to images artifacts
             for(string robot : mission_robots){
                 if(!exists(robots, robot)){
-                    cout << "adding " << robot << " image listener" << endl;
                     Robot *new_robot = new Robot(&nh, robot);
                     robots.push_back(new_robot);
                 }

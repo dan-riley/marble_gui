@@ -31,9 +31,9 @@ function createNewArtifact(){
 // This populates the pose of the custom artifact based on some other pose
 function populate_pos(){
     let robot_name = document.getElementById("existing_location").value;
-    // console.log("setting position to ", robot_name);
+    console.log("setting position to ", robot_name);
     if(robot_name == "goal"){
-        // console.log(goal_pose);
+        console.log(goal_pose);
         // update the modal with message data
         document.getElementById("x_pos").value = goal_pose.position.x;
         document.getElementById("y_pos").value = goal_pose.position.y;
@@ -263,6 +263,20 @@ class Artifact {
         return robot_artifact_tracker;
     }
 
+    update_location(msg){
+        console.log('location updated');
+        const to_update = document.getElementById(`distance_to_${this.robot_name}`);
+        let x = msg.pose.pose.position.x;
+        let y = msg.pose.pose.position.y;
+        let z = msg.pose.pose.position.z;
+        
+        let d1 = Math.sqrt((x * x) + (y * y));
+        var d2 = Math.sqrt((d1 * d1) + (z * z));
+        d2 = Number((d2).toFixed(2))
+
+        to_update.innerText = `${d2} m`;
+    }
+
     updateDisplay() {
         console.log("updating the display")
         var artifact_page = document.getElementById("Artifact_Page");
@@ -349,6 +363,8 @@ class Artifact {
             }
         }
     }
+
+
 
 
     // This highlights the artifact line when a new one comes in
@@ -540,14 +556,14 @@ class Artifact {
 
     // THIS IS SUPER IMPORTANT AND ACTUALLY WHERE THE ARTIFACTS COME IN
     set_artifacts(msg) {
-        console.log("begining of setting artifact")
+        // console.log("begining of setting artifact")
         let update = false;
-        console.log(msg.length);
+        // console.log(msg.length);
         for (let i = 0; i < msg.length; i++) {
             // Remap the artifacts to the DARPA required names
             // SHOULD BE CHANGED BY MIKE ON A ROBOT LEVEL SO TRANSLATION DOESN'T NEED TO HAPPEN
             let obj_class = msg[i].obj_class;
-            console.log(obj_class);
+            // console.log(obj_class);
             switch(msg[i].obj_class) {
                 case "person":
                 case "survivor":
@@ -608,12 +624,13 @@ class Artifact {
                 this.fuse_artifacts(id, false);
             }
         }
-        console.log("set artifacts")
+        // console.log("set artifacts")
         if (update) {
             //this.save_file();
             this.updateDisplay();
         }
     }
+
 
     deleteArtifact(id) {
         this.artifact_tracker[id].remove();

@@ -21,8 +21,6 @@ Robot::Robot(ros::NodeHandle* nh, std::string robot_name){
         string prefix;
         nh_.getParam("ma_prefix", prefix);
 
-        // this spoofs a robot's odometry so the urdf will preview the transform from kyle
-        // tf_pub_ = nh_.advertise<odometry_msgs::Pose>(prefix + robot_name + "_base/base_link", 1);
         odom_sub = nh_.subscribe(prefix + robot_name + "/odometry", 10, &Robot::update_robot_callback, this);
 
         
