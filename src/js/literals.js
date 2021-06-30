@@ -13,7 +13,7 @@ function controlCard(robot){
 
     let card = `<li id="${robot}_control_card" class="quick_control">
             <h4>${robot}</h4>
-            <p id="distance_to_${robot}">0m</p>
+            <div class="distance_to" id="distance_to_${robot}">0m</div>
             ${disarmBtn}
             <button type='button' class="btn btn-success btn-sm" id="${robot}_btn_start"
                 onclick="send_ma_task('${robot}', 'task', 'Start')" title="Start">
@@ -22,6 +22,10 @@ function controlCard(robot){
             <button type='button' class="btn btn-danger btn-sm" id="${robot}_btn_stop"
                 onclick="send_ma_task('${robot}', 'task', 'Stop')" title="Stop">
                 <img src="./images/Stop_sign.png" class="control-icons">
+            </button>
+            <button type='button' class="btn btn-success btn-sm" id="${robot}_btn_estop_toggle"
+                onclick="estop_toggle('${robot}')" title="Estop">
+                E-Stop
             </button>
             <br>
             <button type='button' class="btn btn-success btn-sm" id="${robot}_btn_explore"
@@ -37,10 +41,6 @@ function controlCard(robot){
                 <img src="./images/deploy_beacon.png" class="control-icons">
             </button>
             <br>
-            <button type='button' class="btn btn-success btn-sm" id="${robot}_btn_estop_toggle"
-                onclick="estop_toggle('${robot}')" title="Estop">
-                E-Stop
-            </button>
             <button type='button' class="btn btn-warning btn-sm" id="${robot}_btn_radio"
                 onclick="send_signal_to('${robot}', 'radio_reset_cmd', true)" title="Radio Reset">
                 <img src="./images/radio_reset.png" class="control-icons">

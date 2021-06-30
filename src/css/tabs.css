@@ -11,12 +11,12 @@ body{
     height: 100%;
     background-image: url("../images/lines.png");
   }
-  
+
   /* Style the tab content (and add height:100% for full page content) */
   .tabcontent {
     display: none;
     padding: 20px 20px;
-    max-width: 95%;
+    /* max-width: 95%; */
     height: 100%;
     margin: auto;
   }

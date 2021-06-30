@@ -37,9 +37,9 @@ body {
 .topnav {
   background-color: #333;
   overflow-y: hidden;
-  overflow-x: scroll;
+  overflow-x: auto;
   font-size: medium;
-  height: 8vh;
+  height: 5em;
   /* resize: vertical; */
 }
 
@@ -70,7 +70,6 @@ li {
   padding-left: 0px;
   resize: horizontal;
   /* margin-top: 8vh; */
-
 }
 
 
@@ -82,7 +81,7 @@ li {
   /* padding-bottom: 10px; */
   /* padding-top: 200px; */
   overflow-y: auto;
-  overflow-x: hidden; 
+  overflow-x: hidden;
   height: auto;
   /* background-color: #000000; */
 }
@@ -138,7 +137,7 @@ button {
   resize: vertical;
 
 }
-/* 
+/*
 .custom-select{
 } */
 
@@ -152,10 +151,11 @@ button {
 }
 
 #sidebar-container {
-  height: 92vh; 
+  height: 92vh;
   background-color: #333;
   padding: 0;
   overflow-y: scroll;
+  max-width: 14em;
 }
 
 .grid-container{
@@ -167,9 +167,15 @@ button {
   margin-top: 8vh;
 }
 
+.distance_to {
+  margin-top: -10px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
  /* width */
  ::-webkit-scrollbar {
-  width: 10px;
+  width: 0px;
 }
 
 /* THIS SECTION IS SOME STYLING FOR THE SCROLL BARS */
@@ -181,4 +187,4 @@ button {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(105, 198, 252);
-} 
+}
