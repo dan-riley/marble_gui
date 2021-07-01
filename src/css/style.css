@@ -173,6 +173,20 @@ button {
   font-weight: bold;
 }
 
+#previousImage {
+  display: none;
+  float: left;
+  font-weight: bold;
+  font-size: 1.4em;
+}
+
+#nextImage {
+  display: none;
+  float: right;
+  font-weight: bold;
+  font-size: 1.4em;
+}
+
  /* width */
  ::-webkit-scrollbar {
   width: 0px;

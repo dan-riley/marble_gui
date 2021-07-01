@@ -32,20 +32,51 @@ function teleop_toII(){
     }
 }
 
-// This shows an artifact image
-function show_image(robot_name, id){
-    // console.log(`uhh showing ${robot_name}`);
-    // $(this.children[0]).toggleClass("show");
-    let img_modal = document.getElementById("artifact_image_modal");
+var prevListener = false;
+var nextListener = false;
+// This shows an artifact image(s)
+function show_images(robots, ids){
     let modalImg = document.getElementById("artifact_image");
-    // console.log(id);
+    let prevBtn = document.getElementById("previousImage");
+    let nextBtn = document.getElementById("nextImage");
+    iidx = 0;
+
+    // Hide buttons by default
+    prevBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
+
+    if (robots.length > 1) {
+        nextBtn.style.display = 'block';
+
+        if (!prevListener) {
+            prevListener = true;
+            prevBtn.addEventListener('click', function() {
+                iidx--;
+                modalImg.src = `js/mission_imgs/${robots[iidx]}/${ids[iidx]}.jpg`;
+                nextBtn.style.display = 'block';
+                if (iidx == 0)
+                    prevBtn.style.display = 'none';
+            });
+        }
+
+        if (!nextListener) {
+            nextListener = true;
+            nextBtn.addEventListener('click', function() {
+                iidx++;
+                modalImg.src = `js/mission_imgs/${robots[iidx]}/${ids[iidx]}.jpg`;
+                prevBtn.style.display = 'block';
+                if (iidx > robots.length - 2)
+                    nextBtn.style.display = 'none';
+            });
+        }
+    }
+
+    // Display default image
     try{
-        modalImg.src = `js/mission_imgs/${robot_name}/${id}.jpg`;
-        // img_modal.modal('show');
-        // console.log("image show not working now");
+        modalImg.src = `js/mission_imgs/${robots[0]}/${ids[0]}.jpg`;
     }catch{
         console.log("error with image");
-    } 
+    }
 }
 
 // This is used for determining if we need to publish the odom a few times

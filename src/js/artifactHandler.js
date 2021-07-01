@@ -302,6 +302,10 @@ class Artifact {
             }
             this.artifact_type[id].setAttribute("value", type);
 
+            let fusedImages = false;
+            let fusedImagesRobot = [];
+            let fusedImagesID = [];
+
             if (this.robot_name == 'Base') {
                 // let num_seen = seen_by.split(',').length;
                 // this.artifact_num_seen[id].innerText = num_seen;
@@ -312,6 +316,15 @@ class Artifact {
                 }
                 if(seen_by != ""){
                     this.artifact_seen_by[id].innerText = seen_by.slice(0, -1);
+                }
+
+                for (let oid in artifact.originals) {
+                  let n = artifact.originals[oid].n
+                  if (global_tabManager.global_vehicleArtifactsList[n].artifactImages.includes(oid)) {
+                      fusedImages = true;
+                      fusedImagesRobot.push(artifact.originals[oid].vehicle_reporter);
+                      fusedImagesID.push(oid);
+                    }
                 }
             } else if (artifact.fused) {
                 this.artifact_type[id].style.backgroundColor = "#aaaaaa";
@@ -341,11 +354,14 @@ class Artifact {
             if (position != undefined) {
                 this.artifact_position[id].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
             }
-            if (this.artifactImages.includes(id)){
+            if (this.artifactImages.includes(id) || fusedImages){
                 var img_btn = this.artifact_image[id].firstChild;
                 console.log(this.robot_name + " has an image");
                 let name = this.robot_name;
-                img_btn.onclick = function(){show_image(name, id);};
+                if (fusedImages)
+                  img_btn.onclick = function(){show_images(fusedImagesRobot, fusedImagesID);};
+                else
+                  img_btn.onclick = function(){show_images([name], [id]);};
                 img_btn.innerHTML = "View Image";
                 img_btn.setAttribute("data-toggle", "modal");
                 img_btn.setAttribute("data-target", "#artifact_image_modal");
@@ -406,6 +422,7 @@ class Artifact {
         this.artifactImages.push(msg.artifact_id);
         console.log("got an image");
         this.updateDisplay();
+        global_tabManager.fusedArtifacts.updateDisplay();
     }
 
     getDist(artifact, artifact2) {
