@@ -264,12 +264,11 @@ class Artifact {
     }
 
     update_location(msg){
-        console.log('location updated');
         const to_update = document.getElementById(`distance_to_${this.robot_name}`);
         let x = msg.pose.pose.position.x;
         let y = msg.pose.pose.position.y;
         let z = msg.pose.pose.position.z;
-        
+
         let d1 = Math.sqrt((x * x) + (y * y));
         var d2 = Math.sqrt((d1 * d1) + (z * z));
         d2 = Number((d2).toFixed(2))
@@ -411,18 +410,20 @@ class Artifact {
         this.artifact_image[id].firstChild.style.backgroundColor = previous_color;
         this.artifact_tracker[id].querySelector(`[id = '${this.robot_name}_${id}']`).style.backgroundColor = previous_color;
     }
-    
-    
+
+
     add_array(array) {
         this.artifact_All.push(array);
     }
 
     // this svaes the image id for display purpouses
     save_image(msg) {
-        this.artifactImages.push(msg.artifact_id);
-        console.log("got an image");
-        this.updateDisplay();
-        global_tabManager.fusedArtifacts.updateDisplay();
+        if (msg.artifact_id in this.artifactsList) {
+            this.artifactImages.push(msg.artifact_id);
+            console.log("got an image");
+            this.updateDisplay();
+            global_tabManager.fusedArtifacts.updateDisplay();
+        }
     }
 
     getDist(artifact, artifact2) {
@@ -604,6 +605,15 @@ class Artifact {
                 case "vent":
                     obj_class = "Vent";
                     break;
+                case "helmet":
+                    obj_class = "Helmet";
+                    break;
+                case "rope":
+                    obj_class = "Rope";
+                    break;
+                case "cube":
+                    obj_class = "Cube";
+                    break;
             }
 
             // console.log(typeof msg[i])
@@ -711,11 +721,22 @@ class Artifact {
                 return "red";
             case "Backpack":
                 return "black";
-                break;
             case "Survivor":
                 return "blue";
             case "Drill":
                 return "orange";
+            case "Cell Phone":
+                return "green";
+            case "Cube":
+                return "purple";
+            case "Gas":
+                return "yellow";
+            case "Vent":
+                return "pink";
+            case "Helmet":
+                return "white";
+            case "Rope":
+                return "brown";
             default:
                 break;
 

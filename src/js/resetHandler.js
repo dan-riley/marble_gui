@@ -3,7 +3,7 @@ function init_reset_msg(robot_name) {
     robot['Topic'] = new ROSLIB.Topic({
         ros: ros,
         name: `${ma_prefix}${robot_name}/guiReset`,
-        messageType: "marble_multi_agent/AgentReset"
+        messageType: "bobcat/AgentReset"
     });
 
     var now = new Date().getTime() / 1000;

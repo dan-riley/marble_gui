@@ -251,7 +251,6 @@ class TabManager {
         robotArtifactSection(robot, n);
 
         // Buttons have to be added here or jquery doesn't see it in the DOM
-        // $('#' + this.robot_name[n] + '_buttons').clone(true, true).appendTo('#' + this.robot_name[n] + '_buttons_container');
 
         // Sets up all objects for vehicle artifact manager
         this.global_vehicleArtifactsList[n] = new Artifact(this.robot_name[n], n);
@@ -259,23 +258,13 @@ class TabManager {
 
         // Subscribes to artifact messages
         this.Tab_ArtifactSub[n].subscribe(function (msg) {
-            // console.log("get some artifacts");
-            // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
             global_tabManager.global_vehicleArtifactsList[n].set_artifacts(msg.artifacts);
-            // }
-
         });
         this.Tab_ArtifactImgSub[n].subscribe(function (msg) {
-            // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
             global_tabManager.global_vehicleArtifactsList[n].save_image(msg);
-            // }
-
         });
         this.Tab_RobotLocation[n].subscribe(function (msg) {
-            // if (JSON.stringify(msg.artifacts) != JSON.stringify(global_tabManager.global_vehicleArtifactsList[n].get_artifactsList())) {
             global_tabManager.global_vehicleArtifactsList[n].update_location(msg);
-            // }
-
         });
 
         // Add to the Transform Transport dropdown
@@ -287,19 +276,6 @@ class TabManager {
 
         // Build the reset section for this robot
         robotReset(robot);
-    }
-
-    update_location(msg){
-        console.log('location updated')
-        var to_update = document.getElementById( "distance_to_" + this.robot_name).innerHTML;
-        let x = msg.pose.pose.position.x;
-        let y = msg.pose.pose.position.y;
-        let z = msg.pose.pose.position.z;
-        
-        let d1 = Math.sqrt((x * x) + (y * y));
-        let d2 = Math.sqrt((d1 * d1) + (z * z));
-
-        to_update = str(d2) + 'm';
     }
 
     // This is used by "add_tab" above

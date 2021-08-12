@@ -39,7 +39,7 @@ function what_logs(startPath, filter, keepPath, keepSuffix){
         var stat = fs.lstatSync(filename);
         if(stat.isDirectory()){
             // Recurse
-            returnable.concat(what_logs(filename, filter, keepPath, keepSuffix));
+          returnable = returnable.concat(what_logs(filename, filter, keepPath, keepSuffix));
         }else if(filename.indexOf(filter) >= 0) {
             if(keepPath == false){
                 filename.replace(startPath, '');
@@ -179,17 +179,21 @@ function end_mission() {
         + currentdate.getSeconds();
     let save_folder = `js/saved_missions/${folder}`;
     fs.mkdirSync(save_folder);
+    fs.mkdirSync(`${save_folder}/mission_logs`);
+    fs.mkdirSync(`${save_folder}/mission_imgs`);
     // Move all of the logs of the objects
     for (f = 0; f < existing_logs.length; f++) {
         let oldPath = existing_logs[f];
-        let newPath = `js/saved_missions/${folder}/${existing_logs[f].replace("js/")}`;
+        let newPath = `js/saved_missions/${folder}/${existing_logs[f].replace("js/", "")}`;
         copy(oldPath, newPath);
     }
     // Move all of the images
     let images = what_logs("js/mission_imgs", ".jpg", true, true);
+    console.log('moving images');
+    console.log(images);
     for(i = 0; i < images.length; i++){
         let oldPath = images[i];
-        let newPath = `js/saved_missions/${folder}/${images[i].replace("js/mission_imgs/", "")}`;
+        let newPath = `js/saved_missions/${folder}/${images[i].replace("js/", "")}`;
         // Make directory for robot if necessary
         let dirPath = newPath.substr(0, newPath.lastIndexOf("/"));
         if(!fs.existsSync(dirPath)){
@@ -197,7 +201,7 @@ function end_mission() {
         }
         copy(oldPath, newPath);
     }
-    copy("js/DARPA_reported.txt", save_folder + "DARPA_reported.txt")
+    copy("js/DARPA_reported.txt", save_folder + "/DARPA_reported.txt")
     $('#EndMissionModal').modal('hide');
 }
 
