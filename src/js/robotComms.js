@@ -182,7 +182,7 @@ function send_tf_to(){
 
     $('#TFModal').modal('hide');
 
-    for(let i = 0; i < 3; i++){
+    for(let i = 0; i < 10; i++){
         tf_publisher.publish(robot_transform);
         sleep(50);
     }
@@ -205,6 +205,7 @@ function listen_for_tf(){
     tf_listener.subscribe(function (message){
         console.log("got transform");
         robot_transform = message;
+        global_tabManager.transforms[robot_transform.child_frame_id] = robot_transform;
 
         // update the modal with message data
         $('#select_robot_transform').val(robot_transform.child_frame_id);

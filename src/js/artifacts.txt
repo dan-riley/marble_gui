@@ -7,3 +7,4 @@ Drill
 Fire Extinguisher
 Rope
 Helmet
+Cube

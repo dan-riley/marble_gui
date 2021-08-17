@@ -68,7 +68,7 @@ function robotTab(robot, n){
     let tab = `
     <li class="nav-item" id="${robot}_nav_link" robot_name="${robot}">
         <a  class="nav-link" onclick="window.openPage('${robot}', ${n})" >
-            ${robot}
+            <span id="battery_status_${robot}">${robot}</span>
             <br><span id="connection_status_${robot}"></span>
             <br><span id="task_status_${robot}"></span>
         </a>
@@ -125,6 +125,13 @@ function tabContent(robot){
         var sub = document.createElement("DIV");
         sub.setAttribute("class", "info");
 
+        var card_content = document.createElement("DIV");
+        card_content.innerText = 'Battery:  ';
+
+        var battery = document.createElement("SPAN");
+        battery.setAttribute("id", 'battery_' + robot);
+        card_content.appendChild(battery);
+
         var top_card = document.createElement("DIV");
         top_card.setAttribute("class", "card");
 
@@ -133,6 +140,7 @@ function tabContent(robot){
         top_card_header.innerText = robot;
 
         top_card.appendChild(top_card_header);
+        top_card.appendChild(card_content);
         tab_content.appendChild(top_card);
 
         $('#Robot_Pages').prepend(tab_content);

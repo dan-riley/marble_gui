@@ -33,6 +33,7 @@ function initialize() {
 class TabManager {
     constructor() {
         // Permanent subscribers for all vehicle tabs
+        this.Tab_BatterySub = [];
         this.Tab_TaskSub = [];
         this.Tab_TaskNameSub = [];
         this.Tab_TaskValueSub = [];
@@ -42,6 +43,7 @@ class TabManager {
         this.Tab_RobotLocation = [];
 
         this.global_vehicleType = [];
+        this.battery = [];
         this.tasks = [];
         this.task_names = [];
         this.task_values = [];
@@ -53,6 +55,7 @@ class TabManager {
         this.robot_name = [];
         this.incomm = [];
         this.tabs_robot_name = [];
+        this.transforms = [];
         this.x = 0;
         this.tabs = document.getElementById("Robot_Tabs");
         this.pages = document.getElementById("Robot_Pages");
@@ -145,6 +148,17 @@ class TabManager {
         // receiving messages from it.
         let now = new Date();
         for (let i = 0; i < curr_robot_length; i++) {
+            var battery_disp = $('#battery_' + global_tabManager.robot_name[i]);
+            var battery_dom = $('#battery_status_' + global_tabManager.robot_name[i]);
+            var color = 'grey';
+            if (global_tabManager.battery[i] < 23.1) {
+                color = 'red';
+            } else if (global_tabManager.battery[i] < 24.5) {
+                color = 'orange';
+            }
+            battery_disp.html('<font color="' + color + '">' + global_tabManager.battery[i] + '</font>');
+            battery_dom.html('<font color="' + color + '">' + global_tabManager.robot_name[i] + '</font>');
+
             var status_dom = $('#connection_status_' + global_tabManager.robot_name[i]);
             if (global_tabManager.incomm[i]) {
                 status_dom.html('<font color="green">Connected</font>');
@@ -193,6 +207,10 @@ class TabManager {
 
         // This function (found below) gets up all the listeners for this robot
         this.listen_to_robot_topics(n, robot)
+
+        global_tabManager.Tab_BatterySub[n].subscribe(function (msg) {
+            global_tabManager.battery[n] = msg.data;
+        });
 
         global_tabManager.Tab_TaskSub[n].subscribe(function (msg) {
             global_tabManager.tasks[n] = msg.data;
@@ -274,12 +292,32 @@ class TabManager {
         option.value = robot;
         modal_options.add(option);
 
+        modal_options.addEventListener("change", function() {
+          robot_transform = global_tabManager.transforms[$(this).val()]
+          if (robot_transform) {
+            $('#select_robot_transform').val(robot_transform.child_frame_id);
+            $('#x_translation').val(robot_transform.transform.translation.x);
+            $('#y_translation').val(robot_transform.transform.translation.y);
+            $('#z_translation').val(robot_transform.transform.translation.z);
+
+            $('#x_rotation').val(robot_transform.transform.rotation.x);
+            $('#y_rotation').val(robot_transform.transform.rotation.y);
+            $('#z_rotation').val(robot_transform.transform.rotation.z);
+            $('#w_rotation').val(robot_transform.transform.rotation.w);
+          }
+        });
+
         // Build the reset section for this robot
         robotReset(robot);
     }
 
     // This is used by "add_tab" above
     listen_to_robot_topics(n, robot){
+        this.Tab_BatterySub[n] = new ROSLIB.Topic({
+            ros: ros,
+            name: ma_prefix + robot + "/battery",
+            messageType: "std_msgs/Float32"
+        });
         this.Tab_TaskSub[n] = new ROSLIB.Topic({
             ros: ros,
             name: ma_prefix + robot + "/status",
