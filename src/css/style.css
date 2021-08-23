@@ -173,6 +173,14 @@ button {
   font-weight: bold;
 }
 
+.robot-text {
+  margin-top: 10px;
+}
+
+.robot-submit {
+  margin-top: 5px;
+}
+
 #previousImage {
   display: none;
   float: left;

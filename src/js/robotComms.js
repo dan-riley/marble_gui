@@ -137,26 +137,27 @@ function pubTask(task_dom, tasks, i) {
     }
 }
 
-// This stores the transform to get it from the subscriber to the publisher to the correct robot
-var robot_transform = new ROSLIB.Message({
-    transform : {
-        translation : {
-            x : 0,
-            y : 0,
-            z : 0
-        },
-        rotation : {
-            x : 0,
-            y : 0,
-            z : 0,
-            w : 0
-        }
-    }
-});
-
 // This sends kyle's transform to the correct robot
 function send_tf_to(){
     var robot = document.getElementById("select_robot_transform").value;
+
+    // Transform Message essentials.  Would be better to just grab a template.
+    var robot_transform = new ROSLIB.Message({
+        transform : {
+            translation : {
+                x : 0,
+                y : 0,
+                z : 0
+            },
+            rotation : {
+                x : 0,
+                y : 0,
+                z : 0,
+                w : 0
+            }
+        }
+    });
+
     // get data from the modal
     robot_transform.transform.translation.x = parseFloat(document.getElementById("x_translation").value);
     robot_transform.transform.translation.y = parseFloat(document.getElementById("y_translation").value);

@@ -132,10 +132,28 @@ function tabContent(robot){
         battery.setAttribute("id", 'battery_' + robot);
         card_content.appendChild(battery);
 
+        var card_content = document.createElement("DIV");
+            card_content.setAttribute("id", "robot_status_" + robot);
+            card_content.innerHTML = `
+                <div class="row">
+                  <H3>Battery: <span id="battery_${robot}"></span></H3>
+                </div>
+                <div class="row">
+                  <H3>Beacons: </H3>
+                  <div class="col-auto"><input type="text" class="form-control" name="beacons_${robot}" title="Set the beacons for this robot"></div>
+                  <div class="col-auto robot-submit"><button type='button' class="btn btn-primary" id="${robot}_btn_beacons" onclick="send_beacons('${robot}')" title="Send Beacons">Send to robot</button></div>
+                </div>
+                <div class="row">
+                  <H3>End time: </H3>
+                  <div class="col-auto"><input type="number" class="form-control" min="0" max="999" name="end_minutes_${robot}" title="Set the mission end time (minutes from now) for this robot, ie when it should immediately report artifacts."></div>
+                  <div class="col-auto robot-text" id="end_time_${robot}" data-time=""></div>
+                  <div class="col-auto robot-submit"><button type='button' class="btn btn-primary" id="${robot}_btn_end_time" onclick="send_end_time('${robot}')" title="Send End Time">Send to robot</button></div>
+                </div>`;
+
         var top_card = document.createElement("DIV");
         top_card.setAttribute("class", "card");
 
-        var top_card_header = document.createElement("DIV");
+        var top_card_header = document.createElement("H1");
         top_card_header.setAttribute("class", "card-header");
         top_card_header.innerText = robot;
 

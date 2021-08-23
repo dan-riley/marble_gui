@@ -94,3 +94,13 @@ function transform_preview(){
     }
 
 }
+
+function send_beacons(robot) {
+    var beacons = document.getElementsByName("beacons_" + robot)[0].value;
+    send_ma_task(robot, 'setBeacons', beacons);
+}
+
+function send_end_time(robot) {
+    var end_time = document.getElementById("end_time_" + robot).dataset.time;
+    send_ma_task(robot, 'setGUITime', end_time);
+}

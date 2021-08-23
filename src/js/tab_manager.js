@@ -69,6 +69,22 @@ class TabManager {
         this.i = 0;
 
         window.setInterval(this.get_TopicsFromROS, ANALYZE_TOPICS_LIST_INTERVAL);
+
+        document.getElementById("select_robot_transform").addEventListener("change", function() {
+          robot_transform = global_tabManager.transforms[$(this).val()]
+          if (robot_transform) {
+            $('#select_robot_transform').val(robot_transform.child_frame_id);
+            $('#x_translation').val(robot_transform.transform.translation.x);
+            $('#y_translation').val(robot_transform.transform.translation.y);
+            $('#z_translation').val(robot_transform.transform.translation.z);
+
+            $('#x_rotation').val(robot_transform.transform.rotation.x);
+            $('#y_rotation').val(robot_transform.transform.rotation.y);
+            $('#z_rotation').val(robot_transform.transform.rotation.z);
+            $('#w_rotation').val(robot_transform.transform.rotation.w);
+          }
+        });
+
     }
     remove_tab(name) {
         var content = document.getElementById("Robot_Pages").querySelector("[id='" + name + "']");
@@ -205,6 +221,24 @@ class TabManager {
 
         console.log("Tab: " + robot);
 
+        // Create an empty transform for the robot
+        global_tabManager.transforms[robot] = new ROSLIB.Message({
+            child_frame_id : robot,
+            transform : {
+                translation : {
+                    x : 0,
+                    y : 0,
+                    z : 0
+                },
+                rotation : {
+                    x : 0,
+                    y : 0,
+                    z : 0,
+                    w : 0
+                }
+            }
+        });
+
         // This function (found below) gets up all the listeners for this robot
         this.listen_to_robot_topics(n, robot)
 
@@ -292,23 +326,25 @@ class TabManager {
         option.value = robot;
         modal_options.add(option);
 
-        modal_options.addEventListener("change", function() {
-          robot_transform = global_tabManager.transforms[$(this).val()]
-          if (robot_transform) {
-            $('#select_robot_transform').val(robot_transform.child_frame_id);
-            $('#x_translation').val(robot_transform.transform.translation.x);
-            $('#y_translation').val(robot_transform.transform.translation.y);
-            $('#z_translation').val(robot_transform.transform.translation.z);
-
-            $('#x_rotation').val(robot_transform.transform.rotation.x);
-            $('#y_rotation').val(robot_transform.transform.rotation.y);
-            $('#z_rotation').val(robot_transform.transform.rotation.z);
-            $('#w_rotation').val(robot_transform.transform.rotation.w);
-          }
-        });
-
         // Build the reset section for this robot
         robotReset(robot);
+
+        document.getElementsByName("end_minutes_" + robot)[0].addEventListener("change", function() {
+          var end_seconds = $(this).val() * 60;
+          // Current time in seconds -- Note that when using sim time the times won't work!
+          var now = new Date();
+          var now_time = Math.floor(now.getTime() / 1000);
+          // New time in seconds
+          var new_time = now_time + end_seconds;
+          // Get a readable time
+          var date = new Date(new_time * 1000);
+          var hours = date.getHours();
+          var minutes = "0" + date.getMinutes();
+
+          var end_time = document.getElementById("end_time_" + robot);
+          end_time.dataset.time = new_time.toString();
+          end_time.innerHTML = hours + ":" + minutes.substr(-2);
+        });
     }
 
     // This is used by "add_tab" above
