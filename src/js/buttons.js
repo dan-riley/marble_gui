@@ -101,6 +101,7 @@ function send_beacons(robot) {
 }
 
 function send_end_time(robot) {
-    var end_time = document.getElementById("end_time_" + robot).dataset.time;
-    send_ma_task(robot, 'setGUITime', end_time);
+    // Let BOBCAT actually calculate the time since Javascript stamp may not match
+    var end_minutes = document.getElementsByName("end_minutes_" + robot)[0].value;
+    send_ma_task(robot, 'setGUITime', 'setTime_' + end_minutes.toString());
 }
