@@ -108,22 +108,16 @@ function teleop_route(){
         name: '/joy',
         messageType: 'sensor_msgs/Joy'
     });
-    var Topic = new ROSLIB.Topic({
-        ros: ros,
-        name: `${comms_prefix}${teleop_robot}/joy_base`,
-        messageType: "sensor_msgs/Joy"
-    })
     // create a publisher
     var last_robot = "Base"
     teleop_listener.subscribe(function (message){
-        if(teleop_robot != last_robot){
-            Topic.name = `${comms_prefix}/${teleop_robot}/joy_base`;
-            last_robot = teleop_robot;
-            console.log("changed target robot")
-        }
-        var msg = new ROSLIB.Message(message);
         if(teleop_robot != 'Base'){
-            Topic.publish(msg);
+            if(teleop_robot != last_robot){
+                last_robot = teleop_robot;
+                console.log("changed target robot")
+            }
+            var msg = new ROSLIB.Message(message);
+            global_tabManager.joy[teleop_robot].publish(msg);
         }
     });
 }
@@ -169,12 +163,6 @@ function send_tf_to(){
     robot_transform.transform.rotation.w = parseFloat(document.getElementById("w_rotation").value);
 
     console.log("sending tf");
-    var tf_publisher = new ROSLIB.Topic({
-        ros: ros,
-        name: `${comms_prefix}${robot}/origin_from_base`,
-        messageType: "geometry_msgs/TransformStamped"
-    });
-
     // This is to deactivate the transform preview in rviz when sending the transform to the robot
     // var preview_button = document.getElementById("transform_preview_button");
     // if(preview_button.innerText != "Preview TF"){
@@ -184,7 +172,7 @@ function send_tf_to(){
     $('#TFModal').modal('hide');
 
     for(let i = 0; i < 10; i++){
-        tf_publisher.publish(robot_transform);
+        global_tabManager.tf_publisher[robot].publish(robot_transform);
         sleep(50);
     }
 

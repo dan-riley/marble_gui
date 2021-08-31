@@ -41,6 +41,8 @@ class TabManager {
         this.Tab_ArtifactSub = [];
         this.Tab_ArtifactImgSub = [];
         this.Tab_RobotLocation = [];
+        this.joy = [];
+        this.tf_publisher = [];
 
         this.global_vehicleType = [];
         this.battery = [];
@@ -288,6 +290,18 @@ class TabManager {
             // Save our current time to update connection status
             // The service call isn't reliable!
             global_tabManager.incomm[n] = msg.data;
+        });
+
+        global_tabManager.joy[robot] = new ROSLIB.Topic({
+            ros: ros,
+            name: `${comms_prefix}${robot}/joy_base`,
+            messageType: "sensor_msgs/Joy"
+        })
+
+        global_tabManager.tf_publisher[robot] = new ROSLIB.Topic({
+            ros: ros,
+            name: `${comms_prefix}${robot}/origin_from_base`,
+            messageType: "geometry_msgs/TransformStamped"
         });
 
         // Creating tab at top of screen for selecting robot view

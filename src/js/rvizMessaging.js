@@ -153,7 +153,7 @@ function previewTransform(onoff){
     }else if(robot_name.includes("T")){
         tf = {x : -0.4167, y : 0.0, z : -0.343};
     }else if(robot_name.includes("D")){
-        tf = {x : -0.34803, y : 0.00333, z : -0.30025};
+        tf = {x : -0.34842, y : 0.0, z : -0.29575};
     }
 
     var msg = new ROSLIB.Message({
@@ -171,15 +171,11 @@ function previewTransform(onoff){
                     w : parseFloat(document.getElementById("w_rotation").value)
                 }
             }
-            
+
 
         }
-    }); 
+    });
 
     console.log(msg);
-    
-
     Topic.publish(msg);
-    
-    
 }
