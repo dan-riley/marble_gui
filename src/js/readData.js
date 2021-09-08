@@ -76,7 +76,7 @@ $(document).ready(function () {
 				let t = new Date();
 				t.setSeconds(t.getSeconds() - 2);
 				if (t > scoringTimer) {
-					// startGET_Status();
+					startGET_Status();
 					scoringTimer = new Date();
 				}
 			}, 5000);
