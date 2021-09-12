@@ -1,5 +1,7 @@
 <launch>
     <arg name="robots" default="" />
+    <arg name="ipaddress" default="10.100.1.200" />
+    <arg name="token" default="tokentokentoken1" />
     <node name="rosbridge" pkg="rosbridge_server" type="rosbridge_websocket" output="screen">
     </node>
     <node name="rosapi" pkg="rosapi" type="rosapi_node" output="screen">
@@ -30,7 +32,9 @@
     <param name="robot_names_config" type="string" value="$(find marble_gui)/src/js/robots.txt"/>
     <!-- Robots to create listeners for -->
     <param name="robots" value="$(arg robots)" />
-    
+    <param name="ipaddress" value="$(arg ipaddress)" />
+    <param name="token" value="$(arg token)" />
+
     <node name="gui" pkg="marble_gui" type="gui_launch.sh" output="screen" args="$(find marble_gui)/src">
     </node>
     <include file="$(find marble_gui)/launch/teleop.launch" />
