@@ -67,7 +67,7 @@ InteractiveMarker make6dofMarker(const string &artifact_name, string world_frame
 // This makes the markers for the artifacts submitted to DARPA
 Marker makeSubmittedMarker(const marble_gui::ArtifactTransport &art, string world_frame) {
     // get this from a param in the launch file in the future
-    float scale = 2.0;
+    float scale = 5.2;
     Marker sub_marker_viz = submittedMarker(scale, world_frame, art.success);
     sub_marker_viz.pose.position.x = art.position.x;
     sub_marker_viz.pose.position.y = art.position.y;
