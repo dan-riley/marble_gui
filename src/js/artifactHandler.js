@@ -17,6 +17,7 @@ function createNewArtifact(){
     let artifact_msg = {
         "artifacts": [{
                 "artifact_id": t.toString(10),
+                "header": {"frame_id": "cam_front_link"},
                 "position": {"x": x, "y": y, "z": z},
                 "obj_class": new_artifact_type,
                 "obj_prob": 90
@@ -177,6 +178,7 @@ class Artifact {
         let robot_artifact_tracker = document.createElement("DIV");
         robot_artifact_tracker.setAttribute("class", "row");
         robot_artifact_tracker.setAttribute("artifact_id", id);
+        robot_artifact_tracker.setAttribute("title", id);
         let align = '';
         // This is used in place of actual alignment to center the robot artifacts
         if (this.robot_name != 'Base') {
@@ -232,11 +234,13 @@ class Artifact {
                 let artifacts = global_tabManager.fusedArtifacts.artifactsList;
                 artifacts['dupe_' + id] = Object.assign({}, artifacts[id]);
                 artifacts['dupe_' + id].position = Object.assign({}, artifacts[id].position);
+                artifacts['dupe_' + id].camera = Object.assign({}, artifacts[id].camera);
                 global_tabManager.fusedArtifacts.updateDisplay();
             } else {
                 let artifacts = global_tabManager.global_vehicleArtifactsList[n].artifactsList;
                 artifacts['dupe_' + id] = Object.assign({}, artifacts[id]);
                 artifacts['dupe_' + id].position = Object.assign({}, artifacts[id].position);
+                artifacts['dupe_' + id].camera = Object.assign({}, artifacts[id].camera);
                 global_tabManager.global_vehicleArtifactsList[n].updateDisplay();
             }
         }
@@ -286,6 +290,7 @@ class Artifact {
             let type = artifact.obj_class;
             let confidence = artifact.obj_prob;
             let position = artifact.position;
+            let camera = artifact.camera;
 
             if (this.artifact_tracker[id] == null) {
                 let new_row = this.add_artifact(id);
@@ -351,7 +356,7 @@ class Artifact {
                 this.artifact_confidence[id].innerText = confidence.toFixed(2);
             }
             if (position != undefined) {
-                this.artifact_position[id].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + "}";
+                this.artifact_position[id].innerText = "{x: " + position.x.toFixed(2) + " y: " + position.y.toFixed(2) + " z: " + position.z.toFixed(2) + " c: " + camera + "}";
             }
             if (this.artifactImages.includes(id) || fusedImages){
                 var img_btn = this.artifact_image[id].firstChild;
@@ -370,7 +375,7 @@ class Artifact {
             this.artifact_type[id].style.color = color;
 
             if(this.savedArtifacts.includes(type) == false){
-                var position_string = `${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}`;
+                var position_string = `${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}, ${camera}`;
 
                 log_robot_artifacts(this.robot_name, this.artifactsList);
                 this.savedArtifacts.push(type)
@@ -630,6 +635,21 @@ class Artifact {
                 this.artifactsList[id].n = this.n;
                 this.artifactsList[id].fused = false;
                 this.artifactsList[id].submitted = false;
+                let camera = 'U'
+                switch(msg[i].header.frame_id) {
+                    case "cam_front_link":
+                        camera = 'F';
+                        break;
+                    case "cam_left_link":
+                        camera = 'L';
+                        break;
+                    case "cam_right_link":
+                        camera = 'R';
+                        break;
+                    case "cam_back_link":
+                        camera = 'B';
+                        break;
+                }
 
                 // When there is not an artifact class declared, set all properties of the artifact
                 if (this.artifactsList[id].obj_class == undefined || this.artifactsList[i].obj_class == "") {
@@ -637,6 +657,7 @@ class Artifact {
                     this.artifactsList[id].obj_prob = msg[i].obj_prob;
                     this.artifactsList[id].header = msg[i].header;
                     this.artifactsList[id].position = msg[i].position;
+                    this.artifactsList[id].camera = camera;
                     this.artifactsList[id].vehicle_reporter = this.robot_name;
                 }
                 // When there is an artifact class declared, only set certain properties of the artifact
@@ -645,6 +666,7 @@ class Artifact {
                     this.artifactsList[id].obj_prob = msg[i].obj_prob;
                     this.artifactsList[id].header = msg[i].header;
                     this.artifactsList[id].position = msg[i].position;
+                    this.artifactsList[id].camera = camera;
                 }
 
                 // Check if we need to fuse this with another artifact
