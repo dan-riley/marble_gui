@@ -593,6 +593,7 @@ class Artifact {
                     obj_class = "Survivor";
                     break;
                 case "cellphone":
+                case "phone":
                     obj_class = "Cell Phone";
                     break;
                 case "backpack":
